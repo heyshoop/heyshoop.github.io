@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://genji.wiki/"/>
-  <updated>2019-11-28T10:00:54.352Z</updated>
+  <updated>2019-11-28T11:43:58.961Z</updated>
   <id>http://genji.wiki/</id>
   
   <author>
@@ -15,6 +15,35 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>VMware Fusion虚拟机避开虚拟机检测</title>
+    <link href="http://genji.wiki/2019/11/28/VMware-Fusion%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%81%BF%E5%BC%80%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%A3%80%E6%B5%8B/"/>
+    <id>http://genji.wiki/2019/11/28/VMware-Fusion%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%81%BF%E5%BC%80%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%A3%80%E6%B5%8B/</id>
+    <published>2019-11-28T11:33:06.000Z</published>
+    <updated>2019-11-28T11:43:58.961Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><p>部分软件启动后会检测其是否运行在虚拟机中,如果是则退出，下面给出方案避开虚拟机检测。</p></blockquote><p>在虚拟机未启动的情况下（如果虚拟机开着不能保存配置）打开Finder在上边的搜索框里输入VMX就会搜索到一个以.vmx结尾的文件</p><p>这个文件就是虚拟机的配置文件，如果有多个虚拟机请根据你想配置的虚拟机名字来配置。</p><p>目录因人而异，注意将<code>anchor</code>替换为自己的用户名，我的目录是：</p><a id="more"></a><pre><code>/Users/anchor/Documents/VirtualMachines.localized/Windows7x64.vmwarevm/Windows7x64.vmx</code></pre><p>之后用文本编辑器打开这个配置文件，在末尾加上：</p><pre><code>monitor_control.restrict_backdoor = &quot;TRUE&quot;isolation.tools.setVersion.disable = &quot;TRUE&quot;isolation.tools.getVersion.disable = &quot;TRUE&quot;</code></pre><p>保存文件，启动虚拟机。搞定。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;部分软件启动后会检测其是否运行在虚拟机中,如果是则退出，下面给出方案避开虚拟机检测。&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;在虚拟机未启动的情况下（如果虚拟机开着不能保存配置）打开Finder在上边的搜索框里输入VMX就会搜索到一个以.vmx结尾的文件&lt;/p&gt;&lt;p&gt;这个文件就是虚拟机的配置文件，如果有多个虚拟机请根据你想配置的虚拟机名字来配置。&lt;/p&gt;&lt;p&gt;目录因人而异，注意将&lt;code&gt;anchor&lt;/code&gt;替换为自己的用户名，我的目录是：&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="MacBook" scheme="http://genji.wiki/categories/MacBook/"/>
+    
+    
+      <category term="VMware" scheme="http://genji.wiki/tags/VMware/"/>
+    
+      <category term="虚拟机" scheme="http://genji.wiki/tags/%E8%99%9A%E6%8B%9F%E6%9C%BA/"/>
+    
+      <category term="虚拟检测" scheme="http://genji.wiki/tags/%E8%99%9A%E6%8B%9F%E6%A3%80%E6%B5%8B/"/>
+    
+  </entry>
   
   <entry>
     <title>安装HomeBrew</title>
