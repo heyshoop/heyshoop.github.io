@@ -111,38 +111,36 @@ brew cleanup mysql</code></pre>]]></content>
 
 <ul>
 <li><p>内存溢出原因分析</p>
-<blockquote>
-<p> java.lang.OutOfMemoryError: PermGen space</p>
-</blockquote>
+<p>  1、<strong>java.lang.OutOfMemoryError: PermGen space</strong></p>
+<p>  <code>PermGen space</code>的全称是<code>Permanent Generation space</code>,是指内存的永久保存区域, 这块内存主要是被JVM存放Class和Meta信息的,Class在被Load时就会被放到<code>PermGen space</code>中, 同时GC(Garbage Collection)不会在主程序运行期对 <code>PermGen space</code>进行清理。</p>
+<p>  所以如果你的应用中有很多CLASS的话,就很可能出现<code>PermGen space</code>错误。    </p>
+<p>  通过上面的描述就可以得出：如果要加载的class与jar文件大小超过<code>-XX:MaxPermSize</code>就有可能会产生<code>java.lang.OutOfMemoryError: PermGen space</code> 。    </p>
+<p>  换句话说<code>-XX:MaxPermSize</code>的大小要超过class与jar的大小。</p>
 </li>
 </ul>
-<pre><code>`PermGen space`的全称是`Permanent Generation space`,是指内存的永久保存区域, 这块内存主要是被JVM存放Class和Meta信息的,Class在被Load时就会被放到`PermGen space`中, 同时GC(Garbage Collection)不会在主程序运行期对 `PermGen space`进行清理。
+<pre><code>2、**java.lang.OutOfMemoryError: Java heap space**
 
-所以如果你的应用中有很多CLASS的话,就很可能出现`PermGen space`错误。    
 
-通过上面的描述就可以得出：如果要加载的class与jar文件大小超过`-XX:MaxPermSize`就有可能会产生`java.lang.OutOfMemoryError: PermGen space` 。    
-
-换句话说`-XX:MaxPermSize`的大小要超过class与jar的大小。</code></pre><blockquote>
-<p> java.lang.OutOfMemoryError: Java heap space</p>
-</blockquote>
-<pre><code>虽然各种java虚拟机的实现机制不一,但是`heap space`内存溢出产生的原因相同：那就是堆内存不够虚拟机分配了。
+虽然各种java虚拟机的实现机制不一,但是`heap space`内存溢出产生的原因相同：那就是堆内存不够虚拟机分配了。
 
 由于内存的分配机制与GC是有联系的，也就是说内存不够用时有部分内存GC肯定无法释放，而我们要找的就是为什么GC释放不了堆内存。
 
 所以当产生`heap space`内存溢出时，堆内存中对象数量过多的就可能是问题的根源了。例外的情况是，程序确实需要那么多内存，这时就要考虑增大堆内存。</code></pre><h1 id="2、内存溢出时应该做什么"><a href="#2、内存溢出时应该做什么" class="headerlink" title="2、内存溢出时应该做什么"></a>2、内存溢出时应该做什么</h1><ul>
 <li><p>收集案发现场数据，尽快恢复系统</p>
 <p>  获取内存快照，根据适用场景有以下三种方式：</p>
-<p>  1、使用<code>jmap</code>命令在案发现场手动生成<code>dump</code>文件</p>
-  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">jmap -dump:format=b,file=heap.dump `pid of java`</span><br></pre></td></tr></table></figure>
-
-
+<p>  1、使用jmap命令在案发现场手动生成dump文件</p>
 </li>
 </ul>
-<pre><code>2、使用`JVM`参数自动在案发当场获取`dump`文件
+<pre><code><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">jmap -dump:format=b,file=heap.dump `pid of java`</span><br></pre></td></tr></table></figure>
+
+
+2、使用JVM参数自动在案发当场获取dump文件
+
+
 
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-XX:+HeapDumpOnOutOfMemoryError</span><br></pre></td></tr></table></figure>
 
-3、使用其它工具获取`dump`文件，主要针对本地开发环境：
+3、使用其它工具获取dump文件，主要针对本地开发环境：
 
 分析 `Heap Dump` 的工具都可以获取 `Heap Dump` 文件。
 比如：`jdk` 自带的工具 `jvisualvm`。
@@ -161,7 +159,10 @@ brew cleanup mysql</code></pre>]]></content>
 
 </li>
 </ul>
-<h1 id="3、自造案发现场"><a href="#3、自造案发现场" class="headerlink" title="3、自造案发现场"></a>3、自造<code>案发现场</code></h1><pre><code>&gt;为了快速验证我们的工具以及加深对OOM的理解，我们自造几种内存溢出场景，代码我已准备妥当，可以直接复制运行验证，开始前记得根据示例调整JVM参数~</code></pre><ul>
+<h1 id="3、自造案发现场"><a href="#3、自造案发现场" class="headerlink" title="3、自造案发现场"></a>3、自造案发现场</h1><blockquote>
+<p>为了快速验证我们的工具以及加深对OOM的理解，我们自造几种内存溢出场景，代码我已准备妥当，可以直接复制运行验证，开始前记得根据示例调整JVM参数~</p>
+</blockquote>
+<ul>
 <li><p>PermGen OOM</p>
   <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @program: jvisualvmDemo</span><br><span class="line"> * @description: jdk1.7永久区内存溢出</span><br><span class="line"> * -XX:MaxPermSize=5m</span><br><span class="line"> * -XX:+HeapDumpOnOutOfMemoryError</span><br><span class="line"> * -XX:HeapDumpPath=/Users/anchor/Downloads/dump/</span><br><span class="line"> * @author: Anchor</span><br><span class="line"> * @create: 2018-07-31</span><br><span class="line"> **/</span><br><span class="line">public class PermGenOOM &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        while (true) &#123;</span><br><span class="line">            Enhancer enhancer = new Enhancer();</span><br><span class="line">            enhancer.setSuperclass(MetaOOM.OOMObject.class);</span><br><span class="line">            enhancer.setUseCache(false);</span><br><span class="line">            enhancer.setCallback(new MethodInterceptor() &#123;</span><br><span class="line">                public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable &#123;</span><br><span class="line">                    return proxy.invokeSuper(obj, args);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">            //无限创建动态代理，生成Class对象</span><br><span class="line">            enhancer.create();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    static class OOMObject &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
 <li><p>MetaOOM</p>
@@ -173,7 +174,10 @@ brew cleanup mysql</code></pre>]]></content>
 
 </li>
 </ul>
-<h1 id="4、案例分析"><a href="#4、案例分析" class="headerlink" title="4、案例分析"></a>4、案例分析</h1><pre><code>&gt;啰里啰嗦这么终于要进入正题了😹</code></pre><ul>
+<h1 id="4、案例分析"><a href="#4、案例分析" class="headerlink" title="4、案例分析"></a>4、案例分析</h1><blockquote>
+<p>啰里啰嗦这么终于要进入正题了😹</p>
+</blockquote>
+<ul>
 <li><p>准备环境，测试脚本</p>
 <p>  根据本地机器性能配置JVM参数：</p>
   <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-server -XX:PermSize=256M -XX:MaxPermSize=256m -Xms300M -Xmx300M </span><br><span class="line">-Dcom.sun.management.jmxremote.port=8999 </span><br><span class="line">-Dcom.sun.management.jmxremote.ssl=false  </span><br><span class="line">-Dcom.sun.management.jmxremote.authenticate=false</span><br></pre></td></tr></table></figure>
@@ -186,11 +190,10 @@ brew cleanup mysql</code></pre>]]></content>
 <p>  <img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129163115.png" alt></p>
 </li>
 </ul>
-<pre><code>(ｷ｀ﾟДﾟ´)!!
-为何内存会被大量SQL片段占领，莫非？？？果断开启断言（瞎猜）模式，我们要复现问题！</code></pre><blockquote>
+<pre><code>(ｷ｀ﾟДﾟ´)!!为何内存会被大量SQL片段占领，莫非？？？果断开启断言（瞎猜）模式，我们要复现问题！</code></pre><blockquote>
 <p> 假设A：使用了静态变量定义SQL片段，导致资源未回收</p>
 </blockquote>
-<pre><code>翻代码确认，发现SQL使用String对象拼接，非静态变量，但是该SQL进行了上百次的拼接必然造成资源浪费加重GC负担，有优化空间改StringBuild，测试之。
+<pre><code> 翻代码确认，发现SQL使用String对象拼接，非静态变量，但是该SQL进行了上百次的拼接必然造成资源浪费加重GC负担，有优化空间改StringBuild，测试之。
 
 ![](https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129163425.png)
 
