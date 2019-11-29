@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Hey Shoop" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-pace-theme-flash.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://genji.wiki').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="0、起因一台部署于商户私有云中的应用频繁宕机，经查为OOM，周期大约一周一次，较规律，所谓千里之堤毁于蚁穴，初步怀疑是轻微的内存泄漏不断积累导致的内存溢出，所以再次宕机出现时果断dump内存镜像开始分析1、内存溢出原理 常见内存溢出：   相信通过写java程序讨生活的人对内存溢出并不陌生，先看三张图：      Heap space（堆空间）      Permgen（永久代）      元空间">
+<meta name="keywords" content="JVM,OOM,Druid">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Druid监控导致的内存溢出问题定位处理（一）">
+<meta property="og:url" content="http:&#x2F;&#x2F;genji.wiki&#x2F;2018&#x2F;08&#x2F;06&#x2F;Druid%E7%9B%91%E6%8E%A7%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E5%A4%84%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89&#x2F;index.html">
+<meta property="og:site_name" content="Hey Shoop">
+<meta property="og:description" content="0、起因一台部署于商户私有云中的应用频繁宕机，经查为OOM，周期大约一周一次，较规律，所谓千里之堤毁于蚁穴，初步怀疑是轻微的内存泄漏不断积累导致的内存溢出，所以再次宕机出现时果断dump内存镜像开始分析1、内存溢出原理 常见内存溢出：   相信通过写java程序讨生活的人对内存溢出并不陌生，先看三张图：      Heap space（堆空间）      Permgen（永久代）      元空间">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129154638.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129155003.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129155026.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129155306.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129161407.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129163115.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129165827.png">
+<meta property="og:updated_time" content="2019-11-29T09:02:18.289Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129154638.png">
+
+<link rel="canonical" href="http://genji.wiki/2018/08/06/Druid%E7%9B%91%E6%8E%A7%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E5%A4%84%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Druid监控导致的内存溢出问题定位处理（一） | Hey Shoop</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+   <a href="https://github.com/heyshoop" target="_blank" rel="noopener" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hey Shoop</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">一杯茶一包烟，一个参数传一天</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/me.html" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://genji.wiki/2018/08/06/Druid%E7%9B%91%E6%8E%A7%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E5%A4%84%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpeg">
+      <meta itemprop="name" content="Anchor">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hey Shoop">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Druid监控导致的内存溢出问题定位处理（一）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-08-06 14:03:15" itemprop="dateCreated datePublished" datetime="2018-08-06T14:03:15+08:00">2018-08-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-11-29 17:02:18" itemprop="dateModified" datetime="2019-11-29T17:02:18+08:00">2019-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JAVA/" itemprop="url" rel="index">
+                    <span itemprop="name">JAVA</span>
+                  </a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>7.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="0、起因"><a href="#0、起因" class="headerlink" title="0、起因"></a>0、起因</h1><p>一台部署于商户私有云中的应用频繁宕机，经查为OOM，周期大约一周一次，较规律，所谓千里之堤毁于蚁穴，初步怀疑是轻微的内存泄漏不断积累导致的内存溢出，所以再次宕机出现时果断dump内存镜像开始分析</p><h1 id="1、内存溢出原理"><a href="#1、内存溢出原理" class="headerlink" title="1、内存溢出原理"></a>1、内存溢出原理</h1><ul>
+<li><p>常见内存溢出：</p>
+<p>  相信通过写java程序讨生活的人对内存溢出并不陌生，先看三张图：</p>
+<p>  <img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129154638.png" alt></p>
+<p>  Heap space（堆空间）</p>
+<p>  <img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129155003.png" alt></p>
+<p>  Permgen（永久代）</p>
+<p>  <img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129155026.png" alt></p>
+<p>  元空间（Metaspace）</p>
+</li>
+<li><p>JVM内存模型</p>
+<p>  <img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129155306.png" alt></p>
+<p>  Java应用程序在启动时会指定所需要的内存大小，它被分割成两个不同的区域：<code>Heap space</code>（堆空间）和<code>Permgen</code>（永久代）。</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java.lang.OutOfMemoryError</span><br></pre></td></tr></table></figure>
+<p>  正如字面意思，当应用程序试图向这两个空间添加更多的数据，但却没有足够的空间来容纳这些数据时，将会触发<code>java.lang.OutOfMemoryError</code>。</p>
+</li>
+</ul><a id="more"></a>
+
+<ul>
+<li><p>内存溢出原因分析</p>
+<blockquote>
+<p> java.lang.OutOfMemoryError: PermGen space</p>
+</blockquote>
+</li>
+</ul>
+<pre><code>`PermGen space`的全称是`Permanent Generation space`,是指内存的永久保存区域, 这块内存主要是被JVM存放Class和Meta信息的,Class在被Load时就会被放到`PermGen space`中, 同时GC(Garbage Collection)不会在主程序运行期对 `PermGen space`进行清理。
+
+所以如果你的应用中有很多CLASS的话,就很可能出现`PermGen space`错误。    
+
+通过上面的描述就可以得出：如果要加载的class与jar文件大小超过`-XX:MaxPermSize`就有可能会产生`java.lang.OutOfMemoryError: PermGen space` 。    
+
+换句话说`-XX:MaxPermSize`的大小要超过class与jar的大小。</code></pre><blockquote>
+<p> java.lang.OutOfMemoryError: Java heap space</p>
+</blockquote>
+<pre><code>虽然各种java虚拟机的实现机制不一,但是`heap space`内存溢出产生的原因相同：那就是堆内存不够虚拟机分配了。
+
+由于内存的分配机制与GC是有联系的，也就是说内存不够用时有部分内存GC肯定无法释放，而我们要找的就是为什么GC释放不了堆内存。
+
+所以当产生`heap space`内存溢出时，堆内存中对象数量过多的就可能是问题的根源了。例外的情况是，程序确实需要那么多内存，这时就要考虑增大堆内存。</code></pre><h1 id="2、内存溢出时应该做什么"><a href="#2、内存溢出时应该做什么" class="headerlink" title="2、内存溢出时应该做什么"></a>2、内存溢出时应该做什么</h1><ul>
+<li><p>收集案发现场数据，尽快恢复系统</p>
+<p>  获取内存快照，根据适用场景有以下三种方式：</p>
+<p>  1、使用<code>jmap</code>命令在案发现场手动生成<code>dump</code>文件</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jmap -dump:format=b,file=heap.dump `pid of java`</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<pre><code>2、使用`JVM`参数自动在案发当场获取`dump`文件
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-XX:+HeapDumpOnOutOfMemoryError</span><br></pre></td></tr></table></figure>
+
+3、使用其它工具获取`dump`文件，主要针对本地开发环境：
+
+分析 `Heap Dump` 的工具都可以获取 `Heap Dump` 文件。
+比如：`jdk` 自带的工具 `jvisualvm`。
+其它工具：`Eclipse memory analyzer（jmat）`、`JProfiler` 等。</code></pre><ul>
+<li><p>本地复现之jvisualvm的使用</p>
+<p>  无论是为了再现案发场景还是验证修复效果，都需要我们在本地环境中监控JVM的运行情况，SO以我熟悉的<code>jvisualvm</code>为例，简单说下使用方法</p>
+<blockquote>
+<p> VisualVM 提供在 Java 虚拟机 (Java Virutal Machine, JVM) 上运行的 Java 应用程序的详细信息。在 VisualVM 的图形用户界面中，您可以方便、快捷地查看多个 Java 应用程序的相关信息。（摘自官方）<br> 简单说来，VisualVM是一种集成了多个JDK命令行工具的可视化工具，它能为您提供强大的分析能力。所有这些都是免费的！它囊括的命令行工具包括jstat, JConsole, jstack, jmap 和 jinfo，这些工具与JDK的标准版本是一致的。 可以使用VisualVM生成和分析海量数据、跟踪内存泄漏、监控垃圾回收器、执行内存和CPU分析。尽管VisualVM自身要在JDK6这个版本上运行，但是JDK1.4以上版本的程序它都能监控。<br> VisualVM的一个最大好处就是，它已经在你的JDK bin目录里了，只要你使用的是JDK1.6 Update7之后的版本。点击一下jvisualvm.exe图标它就可以运行了，也可以终端或者CMD中使用jvisualvm命令启动。</p>
+</blockquote>
+<p>  Jvisualvm本地联调的两种常用方法：</p>
+<p>  1、<code>Jvisualvm</code>与<code>IDEA</code>集成，<code>Intelij Idea</code> -&gt; <code>Preferences</code> -&gt; <code>Plugins</code> -&gt;<br>  <code>Browers 
+  Repositrories</code>，搜索<code>visualvm</code>，选择<code>install</code>：安装成功后会添加<code>visualvm</code>的启动选项，启动Tomcat的同时会打开一个<code>VisualVM</code>的窗口。</p>
+<p>  <img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129161407.png" alt></p>
+<p>  2、不通过插件直接启动，与本地Tomcat联调，需要配置一下Tomcat，添加参数：</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-Dcom.sun.management.jmxremote.port=8999</span><br><span class="line">-Dcom.sun.management.jmxremote.ssl=false</span><br><span class="line">-Dcom.sun.management.jmxremote.authenticate=false</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h1 id="3、自造案发现场"><a href="#3、自造案发现场" class="headerlink" title="3、自造案发现场"></a>3、自造<code>案发现场</code></h1><pre><code>&gt;为了快速验证我们的工具以及加深对OOM的理解，我们自造几种内存溢出场景，代码我已准备妥当，可以直接复制运行验证，开始前记得根据示例调整JVM参数~</code></pre><ul>
+<li><p>PermGen OOM</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @program: jvisualvmDemo</span><br><span class="line"> * @description: jdk1.7永久区内存溢出</span><br><span class="line"> * -XX:MaxPermSize=5m</span><br><span class="line"> * -XX:+HeapDumpOnOutOfMemoryError</span><br><span class="line"> * -XX:HeapDumpPath=/Users/anchor/Downloads/dump/</span><br><span class="line"> * @author: Anchor</span><br><span class="line"> * @create: 2018-07-31</span><br><span class="line"> **/</span><br><span class="line">public class PermGenOOM &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        while (true) &#123;</span><br><span class="line">            Enhancer enhancer = new Enhancer();</span><br><span class="line">            enhancer.setSuperclass(MetaOOM.OOMObject.class);</span><br><span class="line">            enhancer.setUseCache(false);</span><br><span class="line">            enhancer.setCallback(new MethodInterceptor() &#123;</span><br><span class="line">                public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable &#123;</span><br><span class="line">                    return proxy.invokeSuper(obj, args);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">            //无限创建动态代理，生成Class对象</span><br><span class="line">            enhancer.create();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    static class OOMObject &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>MetaOOM</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @program: jvisualvmDemo</span><br><span class="line"> * @description: 方法区内存异常</span><br><span class="line"> * -XX:MetaspaceSize=8m</span><br><span class="line"> * -XX:MaxMetaspaceSize=8m</span><br><span class="line"> * -XX:+HeapDumpOnOutOfMemoryError</span><br><span class="line"> * -XX:HeapDumpPath=/Users/anchor/Downloads/dump/</span><br><span class="line"> * @author: Anchor</span><br><span class="line"> * @create: 2018-07-27</span><br><span class="line"> **/</span><br><span class="line">public class MetaOOM &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        while (true) &#123;</span><br><span class="line">            Enhancer enhancer = new Enhancer();</span><br><span class="line">            enhancer.setSuperclass(OOMObject.class);</span><br><span class="line">            enhancer.setUseCache(false);</span><br><span class="line">            enhancer.setCallback(new MethodInterceptor() &#123;</span><br><span class="line">                public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable &#123;</span><br><span class="line">                    return proxy.invokeSuper(obj, args);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">            //无限创建动态代理，生成Class对象</span><br><span class="line">            enhancer.create();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static class OOMObject &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>HeapOOM</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @program: jvisualvmDemo</span><br><span class="line"> * @description: 堆内存异常</span><br><span class="line"> * VM Args:</span><br><span class="line"> *     //这两个参数保证了堆中的可分配内存固定为20M</span><br><span class="line"> *     -Xms20m</span><br><span class="line"> *     -Xmx20m</span><br><span class="line"> *     -XX:+HeapDumpOnOutOfMemoryError</span><br><span class="line"> *     -XX:HeapDumpPath=/Users/anchor/Downloads/dump/</span><br><span class="line"> * @author: Anchor</span><br><span class="line"> * @create: 2018-07-27</span><br><span class="line"> **/</span><br><span class="line">public class HeapOOM &#123;</span><br><span class="line">    //创建一个内部类用于创建对象使用</span><br><span class="line">    static class OOMObject &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        List&lt;OOMObject&gt; list = new ArrayList&lt;OOMObject&gt;();</span><br><span class="line">        //无限创建对象，在堆中</span><br><span class="line">        while (true) &#123;</span><br><span class="line">            list.add(new OOMObject());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>JavaVMStackSOF</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @program: jvisualvmDemo</span><br><span class="line"> * @description: 栈内存异常</span><br><span class="line"> * VM Args：</span><br><span class="line"> *     //设置栈容量为160K，默认1M</span><br><span class="line"> *    -Xss160k</span><br><span class="line"> * @author: Anchor</span><br><span class="line"> * @create: 2018-07-27</span><br><span class="line"> **/</span><br><span class="line">public class JavaVMStackSOF &#123;</span><br><span class="line">    private int stackLength = 1;</span><br><span class="line">    public void stackLeak() &#123;</span><br><span class="line">        stackLength++;</span><br><span class="line">        //递归调用，触发异常</span><br><span class="line">        stackLeak();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws Throwable &#123;</span><br><span class="line">        JavaVMStackSOF oom = new JavaVMStackSOF();</span><br><span class="line">        try &#123;</span><br><span class="line">            oom.stackLeak();</span><br><span class="line">        &#125; catch (Throwable e) &#123;</span><br><span class="line">            System.out.println(&quot;stack length:&quot; + oom.stackLength);</span><br><span class="line">            throw e;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h1 id="4、案例分析"><a href="#4、案例分析" class="headerlink" title="4、案例分析"></a>4、案例分析</h1><pre><code>&gt;啰里啰嗦这么终于要进入正题了😹</code></pre><ul>
+<li><p>准备环境，测试脚本</p>
+<p>  根据本地机器性能配置JVM参数：</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-server -XX:PermSize=256M -XX:MaxPermSize=256m -Xms300M -Xmx300M </span><br><span class="line">-Dcom.sun.management.jmxremote.port=8999 </span><br><span class="line">-Dcom.sun.management.jmxremote.ssl=false  </span><br><span class="line">-Dcom.sun.management.jmxremote.authenticate=false</span><br></pre></td></tr></table></figure>
+
+<p>  准备测试脚本：</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python3</span><br><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line"></span><br><span class="line">from multiprocessing import Process,Pool</span><br><span class="line">import os,time</span><br><span class="line">import requests</span><br><span class="line"></span><br><span class="line">def run_proc(name):</span><br><span class="line">    for i in range(30000):</span><br><span class="line">        postdata = &#123;&apos;code&apos;: i&#125;</span><br><span class="line">        r = requests.post(&quot;http://localhost:8080/OOM.do&quot;, data=postdata)</span><br><span class="line"></span><br><span class="line">if __name__ ==&apos;__main__&apos;:</span><br><span class="line">    print(&apos;Run the main process (%s).&apos; % (os.getpid()))</span><br><span class="line">    mainStart = time.time()</span><br><span class="line">    p = Pool(8)</span><br><span class="line">    for i in range(16):</span><br><span class="line">        p.apply_async(run_proc,args=(&apos;Process&apos;+str(i),))</span><br><span class="line"></span><br><span class="line">    print(&apos;Waiting for all subprocesses done ...&apos;)</span><br><span class="line">    p.close()</span><br><span class="line">    p.join()</span><br><span class="line">    print(&apos;All subprocesses done&apos;)</span><br><span class="line">    mainEnd = time.time()</span><br><span class="line">    print (&apos;All process ran %0.2f seconds.&apos; % (mainEnd-mainStart))</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>内存快照分析</p>
+<p>  快照导入visualvm，简单翻了一下很快发现问题，内存中存在大量SQL片段未回收，如图：</p>
+<p>  <img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129163115.png" alt></p>
+</li>
+</ul>
+<pre><code>(ｷ｀ﾟДﾟ´)!!
+为何内存会被大量SQL片段占领，莫非？？？果断开启断言（瞎猜）模式，我们要复现问题！</code></pre><blockquote>
+<p> 假设A：使用了静态变量定义SQL片段，导致资源未回收</p>
+</blockquote>
+<pre><code>翻代码确认，发现SQL使用String对象拼接，非静态变量，但是该SQL进行了上百次的拼接必然造成资源浪费加重GC负担，有优化空间改StringBuild，测试之。
+
+![](https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129163425.png)
+
+脚本跑起来~ Emm~~ 貌似没啥效果
+
+假设B：连接池不够用？
+
+
+翻代码确认，发现配置正常，改小连接池大小，测试之，无效。
+
+
+假设C：数据库有死锁？
+
+但是与运维确认每次内存溢出只需重启应用即可恢复，数据库无需操作，PASS
+
+
+假设D：。。。。。
+
+。。。。。
+
+
+假设X：难道Druid连接池会导致内存溢出？
+
+检查Druid配置，发现代码中除了使用了连接池还配置了SQL监控，URL监控，那么监控数据存储在哪里了？难道默认是内存中？百度Google无果，直接动手压测，模拟50W请求，得到如下数据：成功的看到了内存溢出。
+
+
+![](https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129164503.png)
+
+对比生产机内存快照，发现有戏！组成结果基本一致，可是没道理啊，难度Druid还有这种大坑？不行不敢确定，那么我们反向验证下，如果我关掉Druid的监控呢？说干就干，再跑50W请求：
+
+![](https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129164702.png)
+
+
+欧克，果然有点意思，OOM消失了(๑•̀ㅂ•́)و✧
+
+既然问题找到了，那么就要分析为啥会出现这种大坑，先从官网入手，翻下Druid的lssues发现竟然有前辈已经问过该类问题
+
+![](https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129165007.png)
+
+but，官方并未回复，那么看起来这个问题太low？
+
+Emm.... 那自己研究下好了</code></pre><ul>
+<li><p>进一步扩展</p>
+<p>  翻阅官方文档， <a href="https://github.com/alibaba/druid/wiki/%E9%85%8D%E7%BD%AE_StatFilter" target="_blank" rel="noopener">在SQL合并配置</a> ，发现如下内容：</p>
+<blockquote>
+<p> 当你程序中存在没有参数化的sql执行时，sql统计的效果会不好。比如：<br> select * from t where id = 1<br> select * from t where id = 2<br> select * from t where id = 3<br> 在统计中，显示为3条sql，这不是我们希望要的效果。StatFilter提供合并的功能，能够将这3个SQL合并为如下的SQL<br> select * from t where id = ?</p>
+</blockquote>
+<p>  问题到此已经基本明了，不规范的入参导致<code>StatFilter</code>未能成功合并SQL，Druid成功记录了所有的执行语句。。。。。。。</p>
+<p>  大家可以自行体会下这两种写法的区别：</p>
+<p>  <img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129165827.png" alt></p>
+</li>
+</ul>
+<h1 id="5、内存溢出排查总结"><a href="#5、内存溢出排查总结" class="headerlink" title="5、内存溢出排查总结"></a>5、内存溢出排查总结</h1><blockquote>
+<p>导致OutOfMemoryError异常的常见原因有以下几种：</p>
+<pre><code>- 内存中加载的数据量过于庞大，如一次从数据库取出过多数据；
+- 集合类中有对对象的引用，使用完后未清空，使得JVM不能回收；
+- 代码中存在死循环或循环产生过多重复的对象实体；
+- 使用的第三方软件中的BUG；
+- 启动参数内存值设定的过小；
+- 编码不规范的隐患；</code></pre></blockquote>
+
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Anchor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://genji.wiki/2018/08/06/Druid%E7%9B%91%E6%8E%A7%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E5%A4%84%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89/" title="Druid监控导致的内存溢出问题定位处理（一）">http://genji.wiki/2018/08/06/Druid%E7%9B%91%E6%8E%A7%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E5%A4%84%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/JVM/" rel="tag"><i class="fa fa-tag"></i> JVM</a>
+              <a href="/tags/OOM/" rel="tag"><i class="fa fa-tag"></i> OOM</a>
+              <a href="/tags/Druid/" rel="tag"><i class="fa fa-tag"></i> Druid</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/10/24/hello-world/" rel="prev" title="Hello World">
+      <i class="fa fa-chevron-left"></i> Hello World
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/28/%E5%AE%89%E8%A3%85HomeBrew/" rel="next" title="安装HomeBrew">
+      安装HomeBrew <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0、起因"><span class="nav-number">1.</span> <span class="nav-text">0、起因</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1、内存溢出原理"><span class="nav-number">2.</span> <span class="nav-text">1、内存溢出原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2、内存溢出时应该做什么"><span class="nav-number">3.</span> <span class="nav-text">2、内存溢出时应该做什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3、自造案发现场"><span class="nav-number">4.</span> <span class="nav-text">3、自造案发现场</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4、案例分析"><span class="nav-number">5.</span> <span class="nav-text">4、案例分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5、内存溢出排查总结"><span class="nav-number">6.</span> <span class="nav-text">5、内存溢出排查总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Anchor"
+      src="/images/header.jpeg">
+  <p class="site-author-name" itemprop="name">Anchor</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+      
+      <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+      <div class="widget-wrap">
+          <div id="myCanvasContainer" class="widget tagcloud">
+              <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Druid/" rel="tag">Druid</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HomeBrew/" rel="tag">HomeBrew</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/" rel="tag">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MacBook/" rel="tag">MacBook</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OOM/" rel="tag">OOM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VMware/" rel="tag">VMware</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%99%9A%E6%8B%9F%E6%9C%BA/" rel="tag">虚拟机</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%99%9A%E6%8B%9F%E6%A3%80%E6%B5%8B/" rel="tag">虚拟检测</a><span class="tag-list-count">1</span></li></ul>
+              </canvas>
+          </div>
+      </div>
+      
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Anchor</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">9k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">8 分钟</span>
+</div>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.5.0
+  </div>
+-->
+<div id="days">
+<script>
+function show_date_time(){
+    window.setTimeout("show_date_time()", 1000);
+    BirthDay=new Date("10/24/2016 00:00:00");//修改为自己的blog建站时间
+    today=new Date();
+    timeold=(today.getTime()-BirthDay.getTime());
+    sectimeold=timeold/1000
+    secondsold=Math.floor(sectimeold);
+    msPerDay=24*60*60*1000
+    e_daysold=timeold/msPerDay
+    daysold=Math.floor(e_daysold);
+    e_hrsold=(e_daysold-daysold)*24;
+    hrsold=setzero(Math.floor(e_hrsold));
+    e_minsold=(e_hrsold-hrsold)*60;
+    minsold=setzero(Math.floor((e_hrsold-hrsold)*60));
+    seconds=setzero(Math.floor((e_minsold-minsold)*60));
+    document.getElementById('days').innerHTML="本站已安全运行"+daysold+"天"+hrsold+"小时"+minsold+"分"+seconds+"秒";
+}
+function setzero(i){
+    if (i<10)
+    {i="0" + i};
+    return i;
+}
+show_date_time();
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '827618e1a36e70d56d2a',
+      clientSecret: '4ac7950b490210be8e97394ee724d953d007cddc',
+      repo: 'heyshoop.github.io',
+      owner: 'heyshoop',
+      admin: ['heyshoop'],
+      id: '4367fc3c74a6a1b30ed3e9ad71f563a0',
+        language: 'zh-CN',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+  
+    <script type="text/javascript" color="0,0,0" opacity='0.5' zIndex="-1" count="150" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/z16.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"react":{"opacity":0.7}});</script></body>
+</html>
