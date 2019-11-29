@@ -49,18 +49,26 @@
   };
 </script>
 
-  <meta name="description" content="1、简介HomeBrew 官网 Homebrew是一个包管理器，用于安装 Apple 没有预装但你需要的 UNIX 工具。（比如著名的wget）。 Homebrew会将软件包安装到独立目录(&#x2F;usr&#x2F;local&#x2F;Cellar)，并将其文件软链接至&#x2F;usr&#x2F;local。 Homebrew不会将文件安装到它本身目录之外，所以可将Homebrew安装到任意位置。">
-<meta name="keywords" content="MacBook,HomeBrew">
+  <meta name="description" content="接上篇 Druid 监控导致的内存溢出问题定位处理（一） JVM 内存溢出相关，废话不多说直接上分析过程。 1、服务器内存快照分析首先通过快照查看最大的二十个对象如下图：根据反馈数据可以发现前十个对象大小基本差不多，猜测应该由一个问题导致，点击去进一步定位问题。2、定位引起内存溢出的关键对象发现引起内存溢出的对象很明确为 mybatis 的 PerpetualCache 对象：">
+<meta name="keywords" content="JVM,OOM,Mybatis">
 <meta property="og:type" content="article">
-<meta property="og:title" content="安装HomeBrew">
-<meta property="og:url" content="http:&#x2F;&#x2F;genji.wiki&#x2F;2019&#x2F;11&#x2F;28&#x2F;%E5%AE%89%E8%A3%85HomeBrew&#x2F;index.html">
+<meta property="og:title" content="Mybatis一级缓存导致的内存溢出（二）">
+<meta property="og:url" content="http:&#x2F;&#x2F;genji.wiki&#x2F;2018&#x2F;09&#x2F;29&#x2F;Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89&#x2F;index.html">
 <meta property="og:site_name" content="Hey Shoop">
-<meta property="og:description" content="1、简介HomeBrew 官网 Homebrew是一个包管理器，用于安装 Apple 没有预装但你需要的 UNIX 工具。（比如著名的wget）。 Homebrew会将软件包安装到独立目录(&#x2F;usr&#x2F;local&#x2F;Cellar)，并将其文件软链接至&#x2F;usr&#x2F;local。 Homebrew不会将文件安装到它本身目录之外，所以可将Homebrew安装到任意位置。">
+<meta property="og:description" content="接上篇 Druid 监控导致的内存溢出问题定位处理（一） JVM 内存溢出相关，废话不多说直接上分析过程。 1、服务器内存快照分析首先通过快照查看最大的二十个对象如下图：根据反馈数据可以发现前十个对象大小基本差不多，猜测应该由一个问题导致，点击去进一步定位问题。2、定位引起内存溢出的关键对象发现引起内存溢出的对象很明确为 mybatis 的 PerpetualCache 对象：">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-11-29T09:40:41.077Z">
+<meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129201040.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129201323.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129201335.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129201838.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129201855.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129202001.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129202204.png">
+<meta property="og:updated_time" content="2019-11-29T12:26:50.225Z">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129201040.png">
 
-<link rel="canonical" href="http://genji.wiki/2019/11/28/%E5%AE%89%E8%A3%85HomeBrew/">
+<link rel="canonical" href="http://genji.wiki/2018/09/29/Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89/">
 
 
 <script id="page-configurations">
@@ -74,7 +82,7 @@
   };
 </script>
 
-  <title>安装HomeBrew | Hey Shoop</title>
+  <title>Mybatis一级缓存导致的内存溢出（二） | Hey Shoop</title>
   
 
 
@@ -214,7 +222,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://genji.wiki/2019/11/28/%E5%AE%89%E8%A3%85HomeBrew/">
+    <link itemprop="mainEntityOfPage" href="http://genji.wiki/2018/09/29/Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/header.jpeg">
@@ -227,7 +235,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          安装HomeBrew
+          Mybatis一级缓存导致的内存溢出（二）
         </h1>
 
         <div class="post-meta">
@@ -237,14 +245,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2019-11-28 15:32:47" itemprop="dateCreated datePublished" datetime="2019-11-28T15:32:47+08:00">2019-11-28</time>
+              <time title="创建时间：2018-09-29 20:06:29" itemprop="dateCreated datePublished" datetime="2018-09-29T20:06:29+08:00">2018-09-29</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-11-29 17:40:41" itemprop="dateModified" datetime="2019-11-29T17:40:41+08:00">2019-11-29</time>
+                <time title="修改时间：2019-11-29 20:26:50" itemprop="dateModified" datetime="2019-11-29T20:26:50+08:00">2019-11-29</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -252,8 +260,8 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/MacBook/" itemprop="url" rel="index">
-                    <span itemprop="name">MacBook</span>
+                  <a href="/categories/JAVA/" itemprop="url" rel="index">
+                    <span itemprop="name">JAVA</span>
                   </a>
                 </span>
             </span>
@@ -264,14 +272,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>967</span>
+              <span>2.6k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -283,61 +291,70 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="1、简介"><a href="#1、简介" class="headerlink" title="1、简介"></a>1、简介</h1><p><a href="https://brew.sh/index_zh-cn.html" target="_blank" rel="noopener">HomeBrew 官网</a></p>
-<p><code>Homebrew</code>是一个包管理器，用于安装 Apple 没有预装但你需要的 UNIX 工具。（比如著名的<code>wget</code>）。</p>
-<p><code>Homebrew</code>会将软件包安装到独立目录(<code>/usr/local/Cellar</code>)，并将其文件软链接至<code>/usr/local</code>。</p>
-<p><code>Homebrew</code>不会将文件安装到它本身目录之外，所以可将<code>Homebrew</code>安装到任意位置。</p>
-<a id="more"></a>
+        <blockquote>
+<p>接上篇 <a href="http://genji.wiki/2018/08/06/Druid%E7%9B%91%E6%8E%A7%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E5%A4%84%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89/">Druid 监控导致的内存溢出问题定位处理（一）</a> JVM 内存溢出相关，废话不多说直接上分析过程。</p>
+</blockquote><h1 id="1、服务器内存快照分析"><a href="#1、服务器内存快照分析" class="headerlink" title="1、服务器内存快照分析"></a>1、服务器内存快照分析</h1><p>首先通过快照查看最大的二十个对象如下图：<br><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129201040.png" alt></p><p>根据反馈数据可以发现前十个对象大小基本差不多，猜测应该由一个问题导致，点击去进一步定位问题。</p><h1 id="2、定位引起内存溢出的关键对象"><a href="#2、定位引起内存溢出的关键对象" class="headerlink" title="2、定位引起内存溢出的关键对象"></a>2、定位引起内存溢出的关键对象</h1><p>发现引起内存溢出的对象很明确为 mybatis 的 PerpetualCache 对象：<br><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129201323.png" alt><br><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129201335.png" alt></p><a id="more"></a>
 
-<h1 id="2、安装"><a href="#2、安装" class="headerlink" title="2、安装"></a>2、安装</h1><ul>
-<li><p>安装<code>XCode</code>或者<code>Command Line Tools for Xcode</code>。<code>Xcode</code>可以从<code>AppStore</code>里下载安装，<code>Command Line Tools for Xcode</code>可以终端命令安装</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xcode-select --install</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>安装 Homebrew</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/bin/ruby -e &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)&quot;</span><br></pre></td></tr></table></figure>
 
-<p>脚本会在执行前暂停，并说明将它将做什么。</p>
-<blockquote>
-<p>安装完成以后，需要运行 brew<br>doctor 命令检测下是否有什么冲突的地方（如没有卸载 MacPorts 等等）<br>Homebrew 安装成功后，会自动创建目录/usr/local/Cellar 来存放 Homebrew 安装的程序。</p>
-</blockquote>
-</li>
-<li><p>移除 Homebrew</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/bin/ruby -e &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)&quot;</span><br></pre></td></tr></table></figure>
 
+<h1 id="3、分析引起内存溢出的原因"><a href="#3、分析引起内存溢出的原因" class="headerlink" title="3、分析引起内存溢出的原因"></a>3、分析引起内存溢出的原因</h1><ul>
+<li><p>猜测溢出</p>
+<p><code>PerpetualCache</code> 其实是 Mybatis 的一级缓存对象，且全部为 <code>HashMap</code> 类型对象，所以可以大胆猜测是由于 Mybatis 一级缓存不正确使用造成的，敢于如此猜测是因为：</p>
+<p>MyBatis 对会话（Session）级别的一级缓存设计的比较简单，就简单地使用了 HashMap 来维护，并没有对 HashMap 的容量和大小进行限制。</p>
+<p>所以如果我们一直使用某一个 SqlSession 对象查询数据，这样会不会导致 HashMap 太大，而导致 java.lang.OutOfMemoryError 错误？</p>
 </li>
 </ul>
-<h1 id="3、常用命令"><a href="#3、常用命令" class="headerlink" title="3、常用命令"></a>3、常用命令</h1><pre><code>// 搜索包
-brew search mysql
+<ul>
+<li><p>验证溢出</p>
+<p>Mybatis 的一级缓存是事务级别的，一旦事务提交就会清空。因此可能该线程的事务一直未结束和提交。那就从一个拥有大量查询业务繁杂的功能入手验证，结合二阶段定位到的零星线索，发现服务器内存溢出时正在处理的业务是数据下发，那我们就以次为入手点验证：</p>
+<p>A.首先设置 JVM 参数，为了尽快实现内存溢出效果，设定一个合适的参数，可根据本地环境调整：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-server -XX:PermSize=256M -XX:MaxPermSize=256m</span><br><span class="line">-Xms300M -Xmx300M</span><br><span class="line">-Dcom.sun.management.jmxremote.port=8999</span><br><span class="line">-Dcom.sun.management.jmxremote.ssl=false</span><br><span class="line">-Dcom.sun.management.jmxremote.authenticate=false</span><br><span class="line">-XX:+HeapDumpOnOutOfMemoryError</span><br><span class="line">-XX:HeapDumpPath=/Users/anchor/Downloads/dump/</span><br></pre></td></tr></table></figure>
 
-// 安装包
-brew install mysql
+<p>B.开启 Jvisualvm 监控，应用中开启下发业务，获取监控数据：</p>
+<p>如下图所示可以看到，本地程序在运行一段时间后已经处于假死状态，GC 回收活动频繁，可堆内存基本未见有效回收，CPU 过山车式的起伏，很快内存溢出了，至此可以得出结论我们找对了入手点：</p>
+<p><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129201838.png" alt></p>
+<p><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129201855.png" alt></p>
+</li>
+</ul>
+<ul>
+<li><p>修改溢出</p>
+<p>加断点分析下发业务发现，下发业务存在大量 for 循环引发大量数据库查询操作，且该操作参数不重复，也就导致了 Mybatis 的一级缓存一直无法命中，所以正好验证我们的猜测，在一次下发请求中 Mybatis 创建了海量的缓存数据，改部分数据在下发业务完成之前是无法释放的，占用了大量的内存资源，如果此时刚好服务器内存有限很容易引发 GC overhead limit exceded 错误，进而造成服务假死内存溢出：</p>
+<p><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129202001.png" alt></p>
+<p>结合项目实际情况针对一级缓存的可利用率实在过低，由于参数一直变动，缓存命中几率极低，从 MyBatis 一级缓存来看，它以单纯的 HashMap 做缓存，没有容量控制，而一次 SqlSession 中通常来说并不会有大量的查询操作，因此只适用于一次 SqlSession，且项目中已开启二级缓存，所以我们考虑修改一级缓存规则：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-设置一级缓存模式为STATEMENT，默认为SESSION，SESSION为会话级别，STATEMENT为SQL级别-&gt;</span><br><span class="line">&lt;setting name=&quot;localCacheScope&quot; value=&quot;STATEMENT&quot;/&gt;</span><br><span class="line">&lt;!-PS：一级缓存的范围有SESSION和STATEMENT两种，默认是SESSION，如果我们不需要使用一级缓存，那么我们可以把一级缓存的范围指定为STATEMENT，这样每次执行完一个Mapper语句后都会将一级缓存清除。如果需要更改一级缓存的范围，请在Mybatis的配置文件中，在&lt;settings&gt;下通过localCacheScope指定。-&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>再次验证</p>
+<p>启动项目，开启下发业务，打开监控，效果如下：</p>
+<p><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129202204.png" alt></p>
+<p>818 家门店下发业务正常完成，期间堆内存回收稳定，无溢出情况出现（坡度较陡是因为本地 JVM 内存设置较低，为提高内存利用率，GC 回收频繁）。</p>
+</li>
+</ul>
+<h1 id="4、总结"><a href="#4、总结" class="headerlink" title="4、总结"></a>4、总结</h1><ul>
+<li><p>疑问：既然一级缓存会导致内存溢出，为什么 Mybatis 还如此设计？</p>
+<p>MyBatis 这样设计也有它自己的理由：</p>
+<blockquote>
+<p>a.一般而言 <code>SqlSession</code> 的生存时间很短。一般情况下使用一个 <code>SqlSession</code> 对象执行的操作不会太多，执行完就会消亡；</p>
+</blockquote>
+<blockquote>
+<p>b.对于某一个 <code>SqlSession</code> 对象而言，只要执行 <code>update</code> 操作（<code>update</code>、<code>insert</code>、<code>delete</code>），都会将这个 <code>SqlSession</code> 对象中对应的一级缓存清空掉，所以一般情况下不会出现缓存过大，影响 JVM 内存空间的问题；</p>
+</blockquote>
+<blockquote>
+<p>c.可以手动地释放掉 <code>SqlSession</code> 对象中的缓存。</p>
+</blockquote>
+</li>
+<li><p>收获：Mybatis 一级缓存的存储流程</p>
+<blockquote>
+<p>a.<code>MyBatis</code> 的一级缓存是 <code>SqlSession</code> 级别的，但是它并不定义在 <code>SqlSessio</code> 接口的实现类 <code>DefaultSqlSession</code> 中，而是定义在 <code>DefaultSqlSession</code> 的成员变量 <code>Executor</code> <code>中，Executor</code> 是在 <code>openSession</code> 的时候被实例化出来的，它的默认实现为 <code>SimpleExecutor。</code></p>
+</blockquote>
+<blockquote>
+<p>b.<code>MyBatis</code> 中的一级缓存，与有没有配置无关，只要 <code>SqlSession</code> <code>存在，MyBastis</code> <code>一级缓存就存在，localCache</code> 的类型是 <code>PerpetualCache，它其实很简单，一个</code> id 属性+一个 <code>HashMap</code> 属性而已，id 是一个名为”localCache”的字符串，HashMap 用于存储数据，Key 为 <code>CacheKey</code>，<code>Value</code> 为查询结果。</p>
+</blockquote>
+<blockquote>
+<p>c.<code>MyBatis</code> 的一级缓存查询的时候默认都是会先尝试从一级缓存中获取数据的，即想每次查询都走 DB 也行，将<code>&lt;select&gt;</code>标签中的 <code>flushCache</code> 属性设置为 <code>true</code> 即可，这意味着每次查询的时候都会清理一遍 <code>PerpetualCache</code>，<code>PerpetualCache</code> 中没数据，自然只能走 DB。</p>
+</blockquote>
+</li>
+</ul>
 
-// 查看包信息，比如目前的版本，依赖，安装后注意事项等
-brew info mysql
-
-// 卸载包
-brew uninstall wget
-
-// 显示已安装的包
-brew list
-
-// 查看brew的帮助
-brew –help
-
-// 更新， 这会更新 Homebrew 自己
-brew update
-
-// 检查过时（是否有新版本），这会列出所有安装的包里，哪些可以升级
-brew outdated
-brew outdated mysql
-
-// 升级所有可以升级的软件们
-brew upgrade
-brew upgrade mysql
-
-// 清理不需要的版本极其安装包缓存
-brew cleanup
-brew cleanup mysql</code></pre>
     </div>
     
     
@@ -351,7 +368,7 @@ brew cleanup mysql</code></pre>
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="http://genji.wiki/2019/11/28/%E5%AE%89%E8%A3%85HomeBrew/" title="安装HomeBrew">http://genji.wiki/2019/11/28/%E5%AE%89%E8%A3%85HomeBrew/</a>
+    <a href="http://genji.wiki/2018/09/29/Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89/" title="Mybatis一级缓存导致的内存溢出（二）">http://genji.wiki/2018/09/29/Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -363,8 +380,9 @@ brew cleanup mysql</code></pre>
       <footer class="post-footer">
           
           <div class="post-tags">
-              <a href="/tags/MacBook/" rel="tag"><i class="fa fa-tag"></i> MacBook</a>
-              <a href="/tags/HomeBrew/" rel="tag"><i class="fa fa-tag"></i> HomeBrew</a>
+              <a href="/tags/JVM/" rel="tag"><i class="fa fa-tag"></i> JVM</a>
+              <a href="/tags/OOM/" rel="tag"><i class="fa fa-tag"></i> OOM</a>
+              <a href="/tags/Mybatis/" rel="tag"><i class="fa fa-tag"></i> Mybatis</a>
           </div>
 
         
@@ -373,12 +391,12 @@ brew cleanup mysql</code></pre>
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2018/09/29/Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89/" rel="prev" title="Mybatis一级缓存导致的内存溢出（二）">
-      <i class="fa fa-chevron-left"></i> Mybatis一级缓存导致的内存溢出（二）
+    <a href="/2018/08/06/Druid%E7%9B%91%E6%8E%A7%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E5%A4%84%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89/" rel="prev" title="Druid监控导致的内存溢出问题定位处理（一）">
+      <i class="fa fa-chevron-left"></i> Druid监控导致的内存溢出问题定位处理（一）
     </a></div>
       <div class="post-nav-item">
-    <a href="/2019/11/28/VMware-Fusion%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%81%BF%E5%BC%80%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%A3%80%E6%B5%8B/" rel="next" title="VMware Fusion虚拟机避开虚拟机检测">
-      VMware Fusion虚拟机避开虚拟机检测 <i class="fa fa-chevron-right"></i>
+    <a href="/2019/11/28/%E5%AE%89%E8%A3%85HomeBrew/" rel="next" title="安装HomeBrew">
+      安装HomeBrew <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -418,7 +436,7 @@ brew cleanup mysql</code></pre>
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1、简介"><span class="nav-text">1、简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2、安装"><span class="nav-text">2、安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3、常用命令"><span class="nav-text">3、常用命令</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1、服务器内存快照分析"><span class="nav-text">1、服务器内存快照分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2、定位引起内存溢出的关键对象"><span class="nav-text">2、定位引起内存溢出的关键对象</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3、分析引起内存溢出的原因"><span class="nav-text">3、分析引起内存溢出的原因</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4、总结"><span class="nav-text">4、总结</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -617,7 +635,7 @@ show_date_time();
       repo: 'heyshoop.github.io',
       owner: 'heyshoop',
       admin: ['heyshoop'],
-      id: 'd388209e0e83b3bac9181fe4d220ff37',
+      id: '618570ecefe21a3d5be2818eea83892c',
         language: 'zh-CN',
       distractionFreeMode: 'true'
     });
