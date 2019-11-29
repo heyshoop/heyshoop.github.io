@@ -64,7 +64,7 @@
 <meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129161407.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129163115.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129165827.png">
-<meta property="og:updated_time" content="2019-11-29T09:26:10.699Z">
+<meta property="og:updated_time" content="2019-11-29T09:30:11.011Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129154638.png">
 
@@ -252,7 +252,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-11-29 17:26:10" itemprop="dateModified" datetime="2019-11-29T17:26:10+08:00">2019-11-29</time>
+                <time title="修改时间：2019-11-29 17:30:11" itemprop="dateModified" datetime="2019-11-29T17:30:11+08:00">2019-11-29</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -328,9 +328,9 @@
 <li><p>收集案发现场数据，尽快恢复系统</p>
 <p>获取内存快照，根据适用场景有以下三种方式：</p>
 <p>1、使用 jmap 命令在案发现场手动生成 dump 文件</p>
-<p>jmap -dump:format=b,file=heap.dump <code>pid of java</code></p>
+<p><code>jmap -dump:format=b,file=heap.dump \`pid of java\`</code></p>
 <p>2、使用 JVM 参数自动在案发当场获取 dump 文件</p>
-<p>-XX:+HeapDumpOnOutOfMemoryError</p>
+<p><code>-XX:+HeapDumpOnOutOfMemoryError</code></p>
 <p>3、使用其它工具获取 dump 文件，主要针对本地开发环境：</p>
 <p>分析 <code>Heap Dump</code> 的工具都可以获取 <code>Heap Dump</code> 文件。<br>比如：<code>jdk</code> 自带的工具 <code>jvisualvm</code>。<br>其它工具：<code>Eclipse memory analyzer（jmat）</code>、<code>JProfiler</code> 等。</p>
 </li>
@@ -389,21 +389,16 @@
 </blockquote>
 </li>
 </ul>
-<pre><code>翻代码确认，发现配置正常，改小连接池大小，测试之，无效。
-
-
-&gt;假设C：数据库有死锁？
-
-但是与运维确认每次内存溢出只需重启应用即可恢复，数据库无需操作，PASS
-
-
-&gt;假设D：。。。。。
-
-。。。。。
-
-&gt;假设X：难道Druid连接池会导致内存溢出？
-
-检查Druid配置，发现代码中除了使用了连接池还配置了SQL监控，URL监控，那么监控数据存储在哪里了？难道默认是内存中？百度Google无果，直接动手压测，模拟50W请求，得到如下数据：成功的看到了内存溢出。
+<pre><code>翻代码确认，发现配置正常，改小连接池大小，测试之，无效。</code></pre><blockquote>
+<p>假设 C：数据库有死锁？</p>
+</blockquote>
+<pre><code>但是与运维确认每次内存溢出只需重启应用即可恢复，数据库无需操作，PASS</code></pre><blockquote>
+<p>假设 D：。。。。。</p>
+</blockquote>
+<pre><code>。。。。。</code></pre><blockquote>
+<p>假设 X：难道 Druid 连接池会导致内存溢出？</p>
+</blockquote>
+<pre><code>检查Druid配置，发现代码中除了使用了连接池还配置了SQL监控，URL监控，那么监控数据存储在哪里了？难道默认是内存中？百度Google无果，直接动手压测，模拟50W请求，得到如下数据：成功的看到了内存溢出。
 
 ![](https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129164503.png)
 
