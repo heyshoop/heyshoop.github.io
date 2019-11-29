@@ -64,7 +64,7 @@
 <meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129161407.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129163115.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129165827.png">
-<meta property="og:updated_time" content="2019-11-29T09:12:18.324Z">
+<meta property="og:updated_time" content="2019-11-29T09:18:12.107Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129154638.png">
 
@@ -252,7 +252,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-11-29 17:12:18" itemprop="dateModified" datetime="2019-11-29T17:12:18+08:00">2019-11-29</time>
+                <time title="修改时间：2019-11-29 17:18:12" itemprop="dateModified" datetime="2019-11-29T17:18:12+08:00">2019-11-29</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -390,42 +390,38 @@
 <p>  <img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129163115.png" alt></p>
 </li>
 </ul>
-<pre><code>(ｷ｀ﾟДﾟ´)!!为何内存会被大量SQL片段占领，莫非？？？果断开启断言（瞎猜）模式，我们要复现问题！</code></pre><blockquote>
-<p> 假设A：使用了静态变量定义SQL片段，导致资源未回收</p>
-</blockquote>
-<pre><code> 翻代码确认，发现SQL使用String对象拼接，非静态变量，但是该SQL进行了上百次的拼接必然造成资源浪费加重GC负担，有优化空间改StringBuild，测试之。
+<pre><code>(ｷ｀ﾟДﾟ´)!!为何内存会被大量SQL片段占领，莫非？？？果断开启断言（瞎猜）模式，我们要复现问题！
 
-![](https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129163425.png)
+
+&gt;假设A：使用了静态变量定义SQL片段，导致资源未回收
+翻代码确认，发现SQL使用String对象拼接，非静态变量，但是该SQL进行了上百次的拼接必然造成资源浪费加重GC负担,有优化空间改StringBuild，测试之。
 
 脚本跑起来~ Emm~~ 貌似没啥效果
 
-假设B：连接池不够用？
+&gt;假设B：连接池不够用？
 
 
 翻代码确认，发现配置正常，改小连接池大小，测试之，无效。
 
 
-假设C：数据库有死锁？
+&gt;假设C：数据库有死锁？
 
 但是与运维确认每次内存溢出只需重启应用即可恢复，数据库无需操作，PASS
 
 
-假设D：。。。。。
+&gt;假设D：。。。。。
 
 。。。。。
 
-
-假设X：难道Druid连接池会导致内存溢出？
+&gt;假设X：难道Druid连接池会导致内存溢出？
 
 检查Druid配置，发现代码中除了使用了连接池还配置了SQL监控，URL监控，那么监控数据存储在哪里了？难道默认是内存中？百度Google无果，直接动手压测，模拟50W请求，得到如下数据：成功的看到了内存溢出。
-
 
 ![](https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129164503.png)
 
 对比生产机内存快照，发现有戏！组成结果基本一致，可是没道理啊，难度Druid还有这种大坑？不行不敢确定，那么我们反向验证下，如果我关掉Druid的监控呢？说干就干，再跑50W请求：
 
 ![](https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129164702.png)
-
 
 欧克，果然有点意思，OOM消失了(๑•̀ㅂ•́)و✧
 
