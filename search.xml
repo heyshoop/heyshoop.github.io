@@ -129,22 +129,14 @@ brew cleanup mysql</code></pre>]]></content>
 <li><p>收集案发现场数据，尽快恢复系统</p>
 <p>  获取内存快照，根据适用场景有以下三种方式：</p>
 <p>  1、使用jmap命令在案发现场手动生成dump文件</p>
+<p>  jmap -dump:format=b,file=heap.dump <code>pid of java</code></p>
+<p>  2、使用JVM参数自动在案发当场获取dump文件</p>
+<p>  -XX:+HeapDumpOnOutOfMemoryError</p>
+<p>  3、使用其它工具获取dump文件，主要针对本地开发环境：</p>
+<p>  分析 <code>Heap Dump</code> 的工具都可以获取 <code>Heap Dump</code> 文件。<br>  比如：<code>jdk</code> 自带的工具 <code>jvisualvm</code>。<br>  其它工具：<code>Eclipse memory analyzer（jmat）</code>、<code>JProfiler</code> 等。</p>
 </li>
 </ul>
-<pre><code><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">jmap -dump:format=b,file=heap.dump `pid of java`</span><br></pre></td></tr></table></figure>
-
-
-2、使用JVM参数自动在案发当场获取dump文件
-
-
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-XX:+HeapDumpOnOutOfMemoryError</span><br></pre></td></tr></table></figure>
-
-3、使用其它工具获取dump文件，主要针对本地开发环境：
-
-分析 `Heap Dump` 的工具都可以获取 `Heap Dump` 文件。
-比如：`jdk` 自带的工具 `jvisualvm`。
-其它工具：`Eclipse memory analyzer（jmat）`、`JProfiler` 等。</code></pre><ul>
+<ul>
 <li><p>本地复现之jvisualvm的使用</p>
 <p>  无论是为了再现案发场景还是验证修复效果，都需要我们在本地环境中监控JVM的运行情况，SO以我熟悉的<code>jvisualvm</code>为例，简单说下使用方法</p>
 <blockquote>
@@ -190,7 +182,7 @@ brew cleanup mysql</code></pre>]]></content>
 <p>  <img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129163115.png" alt></p>
 </li>
 </ul>
-<pre><code>(ｷ｀ﾟДﾟ´)!!为何内存会被大量SQL片段占领，莫非？？？果断开启断言（瞎猜）模式，我们要复现问题！
+<pre><code>为何内存会被大量SQL片段占领，莫非？？？果断开启断言（瞎猜）模式，我们要复现问题！
 
 
 &gt;假设A：使用了静态变量定义SQL片段，导致资源未回收
