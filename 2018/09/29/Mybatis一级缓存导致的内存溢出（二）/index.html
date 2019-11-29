@@ -49,13 +49,13 @@
   };
 </script>
 
-  <meta name="description" content="接上篇 Druid 监控导致的内存溢出问题定位处理（一） JVM 内存溢出相关，废话不多说直接上分析过程。 1、服务器内存快照分析首先通过快照查看最大的二十个对象如下图：根据反馈数据可以发现前十个对象大小基本差不多，猜测应该由一个问题导致，点击去进一步定位问题。2、定位引起内存溢出的关键对象发现引起内存溢出的对象很明确为 mybatis 的 PerpetualCache 对象：">
+  <meta name="description" content="接上篇 Druid 监控导致的内存溢出问题定位处理（一） JVM 内存溢出相关，废话不多说直接上分析过程。">
 <meta name="keywords" content="JVM,OOM,Mybatis">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Mybatis一级缓存导致的内存溢出（二）">
 <meta property="og:url" content="http:&#x2F;&#x2F;genji.wiki&#x2F;2018&#x2F;09&#x2F;29&#x2F;Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89&#x2F;index.html">
 <meta property="og:site_name" content="Hey Shoop">
-<meta property="og:description" content="接上篇 Druid 监控导致的内存溢出问题定位处理（一） JVM 内存溢出相关，废话不多说直接上分析过程。 1、服务器内存快照分析首先通过快照查看最大的二十个对象如下图：根据反馈数据可以发现前十个对象大小基本差不多，猜测应该由一个问题导致，点击去进一步定位问题。2、定位引起内存溢出的关键对象发现引起内存溢出的对象很明确为 mybatis 的 PerpetualCache 对象：">
+<meta property="og:description" content="接上篇 Druid 监控导致的内存溢出问题定位处理（一） JVM 内存溢出相关，废话不多说直接上分析过程。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129201040.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129201323.png">
@@ -64,7 +64,7 @@
 <meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129201855.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129202001.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129202204.png">
-<meta property="og:updated_time" content="2019-11-29T12:26:50.225Z">
+<meta property="og:updated_time" content="2019-11-29T12:31:25.655Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129201040.png">
 
@@ -252,7 +252,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-11-29 20:26:50" itemprop="dateModified" datetime="2019-11-29T20:26:50+08:00">2019-11-29</time>
+                <time title="修改时间：2019-11-29 20:31:25" itemprop="dateModified" datetime="2019-11-29T20:31:25+08:00">2019-11-29</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -293,10 +293,12 @@
       
         <blockquote>
 <p>接上篇 <a href="http://genji.wiki/2018/08/06/Druid%E7%9B%91%E6%8E%A7%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E5%A4%84%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89/">Druid 监控导致的内存溢出问题定位处理（一）</a> JVM 内存溢出相关，废话不多说直接上分析过程。</p>
-</blockquote><h1 id="1、服务器内存快照分析"><a href="#1、服务器内存快照分析" class="headerlink" title="1、服务器内存快照分析"></a>1、服务器内存快照分析</h1><p>首先通过快照查看最大的二十个对象如下图：<br><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129201040.png" alt></p><p>根据反馈数据可以发现前十个对象大小基本差不多，猜测应该由一个问题导致，点击去进一步定位问题。</p><h1 id="2、定位引起内存溢出的关键对象"><a href="#2、定位引起内存溢出的关键对象" class="headerlink" title="2、定位引起内存溢出的关键对象"></a>2、定位引起内存溢出的关键对象</h1><p>发现引起内存溢出的对象很明确为 mybatis 的 PerpetualCache 对象：<br><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129201323.png" alt><br><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129201335.png" alt></p><a id="more"></a>
+</blockquote>
+<a id="more"></a>
 
-
-
+<h1 id="1、服务器内存快照分析"><a href="#1、服务器内存快照分析" class="headerlink" title="1、服务器内存快照分析"></a>1、服务器内存快照分析</h1><p>首先通过快照查看最大的二十个对象如下图：<br><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129201040.png" alt=""></p>
+<p>根据反馈数据可以发现前十个对象大小基本差不多，猜测应该由一个问题导致，点击去进一步定位问题。</p>
+<h1 id="2、定位引起内存溢出的关键对象"><a href="#2、定位引起内存溢出的关键对象" class="headerlink" title="2、定位引起内存溢出的关键对象"></a>2、定位引起内存溢出的关键对象</h1><p>发现引起内存溢出的对象很明确为 mybatis 的 PerpetualCache 对象：<br><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129201323.png" alt=""><br><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129201335.png" alt=""></p>
 <h1 id="3、分析引起内存溢出的原因"><a href="#3、分析引起内存溢出的原因" class="headerlink" title="3、分析引起内存溢出的原因"></a>3、分析引起内存溢出的原因</h1><ul>
 <li><p>猜测溢出</p>
 <p><code>PerpetualCache</code> 其实是 Mybatis 的一级缓存对象，且全部为 <code>HashMap</code> 类型对象，所以可以大胆猜测是由于 Mybatis 一级缓存不正确使用造成的，敢于如此猜测是因为：</p>
@@ -312,20 +314,20 @@
 
 <p>B.开启 Jvisualvm 监控，应用中开启下发业务，获取监控数据：</p>
 <p>如下图所示可以看到，本地程序在运行一段时间后已经处于假死状态，GC 回收活动频繁，可堆内存基本未见有效回收，CPU 过山车式的起伏，很快内存溢出了，至此可以得出结论我们找对了入手点：</p>
-<p><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129201838.png" alt></p>
-<p><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129201855.png" alt></p>
+<p><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129201838.png" alt=""></p>
+<p><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129201855.png" alt=""></p>
 </li>
 </ul>
 <ul>
 <li><p>修改溢出</p>
 <p>加断点分析下发业务发现，下发业务存在大量 for 循环引发大量数据库查询操作，且该操作参数不重复，也就导致了 Mybatis 的一级缓存一直无法命中，所以正好验证我们的猜测，在一次下发请求中 Mybatis 创建了海量的缓存数据，改部分数据在下发业务完成之前是无法释放的，占用了大量的内存资源，如果此时刚好服务器内存有限很容易引发 GC overhead limit exceded 错误，进而造成服务假死内存溢出：</p>
-<p><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129202001.png" alt></p>
+<p><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129202001.png" alt=""></p>
 <p>结合项目实际情况针对一级缓存的可利用率实在过低，由于参数一直变动，缓存命中几率极低，从 MyBatis 一级缓存来看，它以单纯的 HashMap 做缓存，没有容量控制，而一次 SqlSession 中通常来说并不会有大量的查询操作，因此只适用于一次 SqlSession，且项目中已开启二级缓存，所以我们考虑修改一级缓存规则：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-设置一级缓存模式为STATEMENT，默认为SESSION，SESSION为会话级别，STATEMENT为SQL级别-&gt;</span><br><span class="line">&lt;setting name=&quot;localCacheScope&quot; value=&quot;STATEMENT&quot;/&gt;</span><br><span class="line">&lt;!-PS：一级缓存的范围有SESSION和STATEMENT两种，默认是SESSION，如果我们不需要使用一级缓存，那么我们可以把一级缓存的范围指定为STATEMENT，这样每次执行完一个Mapper语句后都会将一级缓存清除。如果需要更改一级缓存的范围，请在Mybatis的配置文件中，在&lt;settings&gt;下通过localCacheScope指定。-&gt;</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>再次验证</p>
 <p>启动项目，开启下发业务，打开监控，效果如下：</p>
-<p><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129202204.png" alt></p>
+<p><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191129202204.png" alt=""></p>
 <p>818 家门店下发业务正常完成，期间堆内存回收稳定，无溢出情况出现（坡度较陡是因为本地 JVM 内存设置较低，为提高内存利用率，GC 回收频繁）。</p>
 </li>
 </ul>
