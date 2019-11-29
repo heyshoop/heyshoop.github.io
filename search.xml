@@ -90,6 +90,71 @@ brew cleanup mysql</code></pre>]]></content>
       </tags>
   </entry>
   <entry>
+    <title>Kafka同组下多消费者仅一个消费者消费的情况处理</title>
+    <url>/2019/04/10/Kafka%E5%90%8C%E7%BB%84%E4%B8%8B%E5%A4%9A%E6%B6%88%E8%B4%B9%E8%80%85%E4%BB%85%E4%B8%80%E4%B8%AA%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E7%9A%84%E6%83%85%E5%86%B5%E5%A4%84%E7%90%86/</url>
+    <content><![CDATA[<h1 id="1、问题描述"><a href="#1、问题描述" class="headerlink" title="1、问题描述"></a>1、问题描述</h1><p>线上某个服务有多个节点，每个节点都有一个消费者消费 Kafka 消息，查看日志发现仅有一个服务的消费者在正常运行，其他全部罢工中</p><h1 id="2、问题定位"><a href="#2、问题定位" class="headerlink" title="2、问题定位"></a>2、问题定位</h1><p>同组下监听同一 topic 中有多个消费者，但是只有一个消费者消费，一般情况是因为 Kafka 设置的<code>partition</code>的数量为 1,本地验证修改<code>partition</code>数量，问题消失。</p><a id="more"></a>
+
+<h1 id="3、解决办法"><a href="#3、解决办法" class="headerlink" title="3、解决办法"></a>3、解决办法</h1><p>在 kafka 服务器下运行如下命令修改 kafka 的<code>partition</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">./kafka-topics.sh --zookeeper localhost:2181 --alter --topic topic名称 --partitions 10</span><br></pre></td></tr></table></figure>
+
+<p>备注：topic 名称为正在使用的 topic 名称，后面那个数量为需要设置的 <code>partition</code> 的数量，这里设置为 10</p>
+<h1 id="4、总结与扩展"><a href="#4、总结与扩展" class="headerlink" title="4、总结与扩展"></a>4、总结与扩展</h1><p>又查阅了相关资料，总结了一下 kafka 中 partition 和消费者的对应关系如下：</p>
+<ul>
+<li><p>消费者多于 partition<br>同一个 <code>partition</code> 内的消息只能被同一个组中的一个 <code>consumer</code> 消费。当消费者数量多于 <code>partition</code> 的数量时，多余的消费者空闲。</p>
+<p>例子：</p>
+<p>有消息 1，2，3，4，5，6，7，8，9 ，<code>partition</code> 数量为 1，消费者数量为 2</p>
+<p>c1 消费：1，2，3，4，5，6，7，8，9</p>
+<p>c2 消费：</p>
+</li>
+<li><p>消费者小于 partition</p>
+<p>（1）.partition 不是消费者倍数</p>
+<pre><code>会有多个partition对应一个消费者
+
+例子：
+
+有消息1，2，3，4，5，6，7，8，9      partition数量为3，消费者数量为2
+
+c1消费：1，3，4，6，7，9
+
+c2消费：2，5，8</code></pre><p>（2）.partition 是消费者倍数</p>
+<pre><code>消息在同一个组之间的消费者之间均分
+
+例子：
+
+有消息1，2，3，4，5，6，7，8，9      partition数量为3，消费者数量为3
+
+c1消费：2，5，8
+
+c2消费：3，6，9
+
+c3消费：1，4，7</code></pre></li>
+<li><p>多组同 topic 情况</p>
+<p>每个组都会消费同样的消息，同一消息会被多组消息</p>
+<pre><code>例子：
+
+消息 1，2，3，4，5，6，7，8，9 `partition` 数量为 3，g1 组消费者数量为 3，g2 组消费者数量为 1
+
+g1 组：
+
+c1 消费：2，5，8
+
+c2 消费：3，6，9
+
+c3 消费：1，4，7
+
+g2 组：
+
+c1 消费：1，2，3，4，5，6，7，8，9</code></pre></li>
+</ul>
+]]></content>
+      <categories>
+        <category>JAVA</category>
+      </categories>
+      <tags>
+        <tag>Kafka</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Mybatis一级缓存导致的内存溢出（二）</title>
     <url>/2018/09/29/Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
     <content><![CDATA[<blockquote>
