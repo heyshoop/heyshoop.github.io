@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://genji.wiki/"/>
-  <updated>2019-11-29T09:41:34.763Z</updated>
+  <updated>2019-12-03T08:48:16.211Z</updated>
   <id>http://genji.wiki/</id>
   
   <author>
@@ -15,6 +15,35 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Jenkins强制刷新最新快照</title>
+    <link href="http://genji.wiki/2019/12/03/Jenkins%E5%BC%BA%E5%88%B6%E5%88%B7%E6%96%B0%E6%9C%80%E6%96%B0%E5%BF%AB%E7%85%A7/"/>
+    <id>http://genji.wiki/2019/12/03/Jenkins%E5%BC%BA%E5%88%B6%E5%88%B7%E6%96%B0%E6%9C%80%E6%96%B0%E5%BF%AB%E7%85%A7/</id>
+    <published>2019-12-03T08:22:35.000Z</published>
+    <updated>2019-12-03T08:48:16.211Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><p>问题背景：近期在某系统 SAAS 化改造中封装了大量接口，为了各应用接入方便，于是专门制作了 SDK，由于处于快速迭代期，SDK 版本号命名规范使用的快照<code>SNAPSHOT</code>。<br>然后问题出现了<code>Jenkins</code>在构建应用时由于 jar 包版本未变化，导致应用一直构建失败，jar 包并未按期望自动刷新。</p></blockquote><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><a id="more"></a><p><code>Jenkins</code>打包<code>maven</code>项目时，本质上还是执行的<code>maven</code>命令，所以只需要在 Build 配置项中添加<code>package -U</code></p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">clean package -U install -DskipTests -DbuildVersion=$BUILD_ID -P$env</span><br></pre></td></tr></table></figure><h1 id="添加验证"><a href="#添加验证" class="headerlink" title="添加验证"></a>添加验证</h1><p>如图，所有快照版本的 jar 包均可正常刷新，问题解决~</p><p><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20191203164729.png" alt></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;问题背景：近期在某系统 SAAS 化改造中封装了大量接口，为了各应用接入方便，于是专门制作了 SDK，由于处于快速迭代期，SDK 版本号命名规范使用的快照&lt;code&gt;SNAPSHOT&lt;/code&gt;。&lt;br&gt;然后问题出现了&lt;code&gt;Jenkins&lt;/code&gt;在构建应用时由于 jar 包版本未变化，导致应用一直构建失败，jar 包并未按期望自动刷新。&lt;/p&gt;
+&lt;/blockquote&gt;&lt;h1 id=&quot;解决方案&quot;&gt;&lt;a href=&quot;#解决方案&quot; class=&quot;headerlink&quot; title=&quot;解决方案&quot;&gt;&lt;/a&gt;解决方案&lt;/h1&gt;
+    
+    </summary>
+    
+    
+      <category term="JAVA" scheme="http://genji.wiki/categories/JAVA/"/>
+    
+    
+      <category term="Jenkins" scheme="http://genji.wiki/tags/Jenkins/"/>
+    
+      <category term="Maven" scheme="http://genji.wiki/tags/Maven/"/>
+    
+      <category term="SNAPSHOT" scheme="http://genji.wiki/tags/SNAPSHOT/"/>
+    
+  </entry>
   
   <entry>
     <title>VMware Fusion虚拟机避开虚拟机检测</title>
