@@ -22,7 +22,7 @@
 <script id="hexo-configurations">
   var NexT = window.NexT || {};
   var CONFIG = {
-    hostname: new URL('http://genji.wiki').hostname,
+    hostname: new URL('http://www.genji.wiki').hostname,
     root: '/',
     scheme: 'Pisces',
     version: '7.5.0',
@@ -53,14 +53,14 @@
 <meta name="keywords" content="Kafka">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kafka同组下多消费者仅一个消费者消费的情况处理">
-<meta property="og:url" content="http:&#x2F;&#x2F;genji.wiki&#x2F;2019&#x2F;04&#x2F;10&#x2F;Kafka%E5%90%8C%E7%BB%84%E4%B8%8B%E5%A4%9A%E6%B6%88%E8%B4%B9%E8%80%85%E4%BB%85%E4%B8%80%E4%B8%AA%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E7%9A%84%E6%83%85%E5%86%B5%E5%A4%84%E7%90%86&#x2F;index.html">
+<meta property="og:url" content="http:&#x2F;&#x2F;www.genji.wiki&#x2F;2019&#x2F;04&#x2F;10&#x2F;Kafka%E5%90%8C%E7%BB%84%E4%B8%8B%E5%A4%9A%E6%B6%88%E8%B4%B9%E8%80%85%E4%BB%85%E4%B8%80%E4%B8%AA%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E7%9A%84%E6%83%85%E5%86%B5%E5%A4%84%E7%90%86&#x2F;index.html">
 <meta property="og:site_name" content="Hey Shoop">
 <meta property="og:description" content="1、问题描述线上某个服务有多个节点，每个节点都有一个消费者消费 Kafka 消息，查看日志发现仅有一个服务的消费者在正常运行，其他全部罢工中2、问题定位同组下监听同一 topic 中有多个消费者，但是只有一个消费者消费，一般情况是因为 Kafka 设置的partition的数量为 1,本地验证修改partition数量，问题消失。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2019-11-29T12:52:50.362Z">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://genji.wiki/2019/04/10/Kafka%E5%90%8C%E7%BB%84%E4%B8%8B%E5%A4%9A%E6%B6%88%E8%B4%B9%E8%80%85%E4%BB%85%E4%B8%80%E4%B8%AA%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E7%9A%84%E6%83%85%E5%86%B5%E5%A4%84%E7%90%86/">
+<link rel="canonical" href="http://www.genji.wiki/2019/04/10/Kafka%E5%90%8C%E7%BB%84%E4%B8%8B%E5%A4%9A%E6%B6%88%E8%B4%B9%E8%80%85%E4%BB%85%E4%B8%80%E4%B8%AA%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E7%9A%84%E6%83%85%E5%86%B5%E5%A4%84%E7%90%86/">
 
 
 <script id="page-configurations">
@@ -214,7 +214,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://genji.wiki/2019/04/10/Kafka%E5%90%8C%E7%BB%84%E4%B8%8B%E5%A4%9A%E6%B6%88%E8%B4%B9%E8%80%85%E4%BB%85%E4%B8%80%E4%B8%AA%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E7%9A%84%E6%83%85%E5%86%B5%E5%A4%84%E7%90%86/">
+    <link itemprop="mainEntityOfPage" href="http://www.genji.wiki/2019/04/10/Kafka%E5%90%8C%E7%BB%84%E4%B8%8B%E5%A4%9A%E6%B6%88%E8%B4%B9%E8%80%85%E4%BB%85%E4%B8%80%E4%B8%AA%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E7%9A%84%E6%83%85%E5%86%B5%E5%A4%84%E7%90%86/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/header.jpeg">
@@ -351,7 +351,7 @@ c1 消费：1，2，3，4，5，6，7，8，9</code></pre></li>
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="http://genji.wiki/2019/04/10/Kafka%E5%90%8C%E7%BB%84%E4%B8%8B%E5%A4%9A%E6%B6%88%E8%B4%B9%E8%80%85%E4%BB%85%E4%B8%80%E4%B8%AA%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E7%9A%84%E6%83%85%E5%86%B5%E5%A4%84%E7%90%86/" title="Kafka同组下多消费者仅一个消费者消费的情况处理">http://genji.wiki/2019/04/10/Kafka%E5%90%8C%E7%BB%84%E4%B8%8B%E5%A4%9A%E6%B6%88%E8%B4%B9%E8%80%85%E4%BB%85%E4%B8%80%E4%B8%AA%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E7%9A%84%E6%83%85%E5%86%B5%E5%A4%84%E7%90%86/</a>
+    <a href="http://www.genji.wiki/2019/04/10/Kafka%E5%90%8C%E7%BB%84%E4%B8%8B%E5%A4%9A%E6%B6%88%E8%B4%B9%E8%80%85%E4%BB%85%E4%B8%80%E4%B8%AA%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E7%9A%84%E6%83%85%E5%86%B5%E5%A4%84%E7%90%86/" title="Kafka同组下多消费者仅一个消费者消费的情况处理">http://www.genji.wiki/2019/04/10/Kafka%E5%90%8C%E7%BB%84%E4%B8%8B%E5%A4%9A%E6%B6%88%E8%B4%B9%E8%80%85%E4%BB%85%E4%B8%80%E4%B8%AA%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E7%9A%84%E6%83%85%E5%86%B5%E5%A4%84%E7%90%86/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
