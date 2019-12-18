@@ -43,7 +43,19 @@
 </blockquote>
 <p>之后熟悉的操作</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo g</span><br><span class="line">hexo d</span><br></pre></td></tr></table></figure>
-]]></content>
+
+
+<h1 id="5、补充：定期清理Nginx日志"><a href="#5、补充：定期清理Nginx日志" class="headerlink" title="5、补充：定期清理Nginx日志"></a>5、补充：定期清理Nginx日志</h1><h2 id="修改Nginx日志地址"><a href="#修改Nginx日志地址" class="headerlink" title="修改Nginx日志地址"></a>修改Nginx日志地址</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vim /etc/nginx/nginx.conf</span><br><span class="line"># 修改日志内容如下</span><br><span class="line">error_log /etc/nginx/logs/error.log warn;</span><br><span class="line">access_log /etc/nginx/logs/access.log main;</span><br></pre></td></tr></table></figure>
+
+<h2 id="验证-amp-重启Nginx"><a href="#验证-amp-重启Nginx" class="headerlink" title="验证&amp;重启Nginx"></a>验证&amp;重启Nginx</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nginx -t</span><br><span class="line">systenctl restart nginx.service</span><br></pre></td></tr></table></figure>
+
+<h2 id="编写定时任务脚本"><a href="#编写定时任务脚本" class="headerlink" title="编写定时任务脚本"></a>编写定时任务脚本</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cd /etc/nginx</span><br><span class="line">mkdir sh</span><br><span class="line">cd sh</span><br><span class="line">vim delete_nginx_logs.sh</span><br></pre></td></tr></table></figure>
+<h2 id="添加以下代码"><a href="#添加以下代码" class="headerlink" title="添加以下代码"></a>添加以下代码</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#set the path to nginx log files</span><br><span class="line">log_files_path=&quot;/etc/nginx/logs/&quot;</span><br><span class="line">save_days=5</span><br><span class="line">#delete ? days ago nginx log files</span><br><span class="line">find $log_files_path -mtime +$save_days -exec rm -rf &#123;&#125; \;</span><br></pre></td></tr></table></figure>
+
+<h2 id="添加定时任务"><a href="#添加定时任务" class="headerlink" title="添加定时任务"></a>添加定时任务</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">crontab -e</span><br></pre></td></tr></table></figure>
+<p>添加一下内容:每天0点0分执行脚本</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00 00 * * * /bin/sh /etc/nginx/sh/delete_nginx_logs.sh</span><br></pre></td></tr></table></figure>
+<h2 id="重启crontab服务"><a href="#重启crontab服务" class="headerlink" title="重启crontab服务"></a>重启crontab服务</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">service crond restart</span><br></pre></td></tr></table></figure>]]></content>
       <categories>
         <category>hexo</category>
       </categories>
