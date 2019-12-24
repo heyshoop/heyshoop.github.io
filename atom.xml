@@ -5,9 +5,9 @@
   <subtitle>认真生活，快乐工作</subtitle>
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://www.genji.wiki/"/>
+  <link href="https://www.genji.wiki/"/>
   <updated>2019-12-18T12:16:30.610Z</updated>
-  <id>http://www.genji.wiki/</id>
+  <id>https://www.genji.wiki/</id>
   
   <author>
     <name>Anchor</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>Github/Coding Page到VPS的迁移之路</title>
-    <link href="http://www.genji.wiki/2019/12/16/Github-Coding-Page%E5%88%B0VPS%E7%9A%84%E8%BF%81%E7%A7%BB%E4%B9%8B%E8%B7%AF/"/>
-    <id>http://www.genji.wiki/2019/12/16/Github-Coding-Page%E5%88%B0VPS%E7%9A%84%E8%BF%81%E7%A7%BB%E4%B9%8B%E8%B7%AF/</id>
+    <link href="https://www.genji.wiki/2019/12/16/Github-Coding-Page%E5%88%B0VPS%E7%9A%84%E8%BF%81%E7%A7%BB%E4%B9%8B%E8%B7%AF/"/>
+    <id>https://www.genji.wiki/2019/12/16/Github-Coding-Page%E5%88%B0VPS%E7%9A%84%E8%BF%81%E7%A7%BB%E4%B9%8B%E8%B7%AF/</id>
     <published>2019-12-16T11:36:15.000Z</published>
     <updated>2019-12-18T12:16:30.610Z</updated>
     
@@ -34,21 +34,21 @@
     </summary>
     
     
-      <category term="hexo" scheme="http://www.genji.wiki/categories/hexo/"/>
+      <category term="hexo" scheme="https://www.genji.wiki/categories/hexo/"/>
     
     
-      <category term="Gihthub Page" scheme="http://www.genji.wiki/tags/Gihthub-Page/"/>
+      <category term="Gihthub Page" scheme="https://www.genji.wiki/tags/Gihthub-Page/"/>
     
-      <category term="Coding Page" scheme="http://www.genji.wiki/tags/Coding-Page/"/>
+      <category term="Coding Page" scheme="https://www.genji.wiki/tags/Coding-Page/"/>
     
-      <category term="VPS" scheme="http://www.genji.wiki/tags/VPS/"/>
+      <category term="VPS" scheme="https://www.genji.wiki/tags/VPS/"/>
     
   </entry>
   
   <entry>
     <title>SpringMVC项目实现Session共享</title>
-    <link href="http://www.genji.wiki/2019/12/11/SpringMVC%E9%A1%B9%E7%9B%AE%E5%AE%9E%E7%8E%B0Session%E5%85%B1%E4%BA%AB/"/>
-    <id>http://www.genji.wiki/2019/12/11/SpringMVC%E9%A1%B9%E7%9B%AE%E5%AE%9E%E7%8E%B0Session%E5%85%B1%E4%BA%AB/</id>
+    <link href="https://www.genji.wiki/2019/12/11/SpringMVC%E9%A1%B9%E7%9B%AE%E5%AE%9E%E7%8E%B0Session%E5%85%B1%E4%BA%AB/"/>
+    <id>https://www.genji.wiki/2019/12/11/SpringMVC%E9%A1%B9%E7%9B%AE%E5%AE%9E%E7%8E%B0Session%E5%85%B1%E4%BA%AB/</id>
     <published>2019-12-11T12:22:12.000Z</published>
     <updated>2019-12-11T12:45:17.016Z</updated>
     
@@ -63,19 +63,19 @@
     </summary>
     
     
-      <category term="JAVA" scheme="http://www.genji.wiki/categories/JAVA/"/>
+      <category term="JAVA" scheme="https://www.genji.wiki/categories/JAVA/"/>
     
     
-      <category term="Session" scheme="http://www.genji.wiki/tags/Session/"/>
+      <category term="Session" scheme="https://www.genji.wiki/tags/Session/"/>
     
-      <category term="SpringMVC" scheme="http://www.genji.wiki/tags/SpringMVC/"/>
+      <category term="SpringMVC" scheme="https://www.genji.wiki/tags/SpringMVC/"/>
     
   </entry>
   
   <entry>
     <title>Jenkins强制刷新最新快照</title>
-    <link href="http://www.genji.wiki/2019/12/03/Jenkins%E5%BC%BA%E5%88%B6%E5%88%B7%E6%96%B0%E6%9C%80%E6%96%B0%E5%BF%AB%E7%85%A7/"/>
-    <id>http://www.genji.wiki/2019/12/03/Jenkins%E5%BC%BA%E5%88%B6%E5%88%B7%E6%96%B0%E6%9C%80%E6%96%B0%E5%BF%AB%E7%85%A7/</id>
+    <link href="https://www.genji.wiki/2019/12/03/Jenkins%E5%BC%BA%E5%88%B6%E5%88%B7%E6%96%B0%E6%9C%80%E6%96%B0%E5%BF%AB%E7%85%A7/"/>
+    <id>https://www.genji.wiki/2019/12/03/Jenkins%E5%BC%BA%E5%88%B6%E5%88%B7%E6%96%B0%E6%9C%80%E6%96%B0%E5%BF%AB%E7%85%A7/</id>
     <published>2019-12-03T08:22:35.000Z</published>
     <updated>2019-12-04T12:02:27.446Z</updated>
     
@@ -90,21 +90,21 @@
     </summary>
     
     
-      <category term="JAVA" scheme="http://www.genji.wiki/categories/JAVA/"/>
+      <category term="JAVA" scheme="https://www.genji.wiki/categories/JAVA/"/>
     
     
-      <category term="Jenkins" scheme="http://www.genji.wiki/tags/Jenkins/"/>
+      <category term="Jenkins" scheme="https://www.genji.wiki/tags/Jenkins/"/>
     
-      <category term="Maven" scheme="http://www.genji.wiki/tags/Maven/"/>
+      <category term="Maven" scheme="https://www.genji.wiki/tags/Maven/"/>
     
-      <category term="SNAPSHOT" scheme="http://www.genji.wiki/tags/SNAPSHOT/"/>
+      <category term="SNAPSHOT" scheme="https://www.genji.wiki/tags/SNAPSHOT/"/>
     
   </entry>
   
   <entry>
     <title>VMware Fusion虚拟机避开虚拟机检测</title>
-    <link href="http://www.genji.wiki/2019/11/28/VMware-Fusion%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%81%BF%E5%BC%80%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%A3%80%E6%B5%8B/"/>
-    <id>http://www.genji.wiki/2019/11/28/VMware-Fusion%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%81%BF%E5%BC%80%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%A3%80%E6%B5%8B/</id>
+    <link href="https://www.genji.wiki/2019/11/28/VMware-Fusion%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%81%BF%E5%BC%80%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%A3%80%E6%B5%8B/"/>
+    <id>https://www.genji.wiki/2019/11/28/VMware-Fusion%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%81%BF%E5%BC%80%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%A3%80%E6%B5%8B/</id>
     <published>2019-11-28T11:33:06.000Z</published>
     <updated>2019-11-29T09:41:34.763Z</updated>
     
@@ -119,21 +119,21 @@
     </summary>
     
     
-      <category term="MacBook" scheme="http://www.genji.wiki/categories/MacBook/"/>
+      <category term="MacBook" scheme="https://www.genji.wiki/categories/MacBook/"/>
     
     
-      <category term="VMware" scheme="http://www.genji.wiki/tags/VMware/"/>
+      <category term="VMware" scheme="https://www.genji.wiki/tags/VMware/"/>
     
-      <category term="虚拟机" scheme="http://www.genji.wiki/tags/%E8%99%9A%E6%8B%9F%E6%9C%BA/"/>
+      <category term="虚拟机" scheme="https://www.genji.wiki/tags/%E8%99%9A%E6%8B%9F%E6%9C%BA/"/>
     
-      <category term="虚拟检测" scheme="http://www.genji.wiki/tags/%E8%99%9A%E6%8B%9F%E6%A3%80%E6%B5%8B/"/>
+      <category term="虚拟检测" scheme="https://www.genji.wiki/tags/%E8%99%9A%E6%8B%9F%E6%A3%80%E6%B5%8B/"/>
     
   </entry>
   
   <entry>
     <title>安装HomeBrew</title>
-    <link href="http://www.genji.wiki/2019/11/28/%E5%AE%89%E8%A3%85HomeBrew/"/>
-    <id>http://www.genji.wiki/2019/11/28/%E5%AE%89%E8%A3%85HomeBrew/</id>
+    <link href="https://www.genji.wiki/2019/11/28/%E5%AE%89%E8%A3%85HomeBrew/"/>
+    <id>https://www.genji.wiki/2019/11/28/%E5%AE%89%E8%A3%85HomeBrew/</id>
     <published>2019-11-28T07:32:47.000Z</published>
     <updated>2019-11-29T09:40:41.077Z</updated>
     
@@ -149,19 +149,19 @@
     </summary>
     
     
-      <category term="MacBook" scheme="http://www.genji.wiki/categories/MacBook/"/>
+      <category term="MacBook" scheme="https://www.genji.wiki/categories/MacBook/"/>
     
     
-      <category term="MacBook" scheme="http://www.genji.wiki/tags/MacBook/"/>
+      <category term="MacBook" scheme="https://www.genji.wiki/tags/MacBook/"/>
     
-      <category term="HomeBrew" scheme="http://www.genji.wiki/tags/HomeBrew/"/>
+      <category term="HomeBrew" scheme="https://www.genji.wiki/tags/HomeBrew/"/>
     
   </entry>
   
   <entry>
     <title>Kafka同组下多消费者仅一个消费者消费的情况处理</title>
-    <link href="http://www.genji.wiki/2019/04/10/Kafka%E5%90%8C%E7%BB%84%E4%B8%8B%E5%A4%9A%E6%B6%88%E8%B4%B9%E8%80%85%E4%BB%85%E4%B8%80%E4%B8%AA%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E7%9A%84%E6%83%85%E5%86%B5%E5%A4%84%E7%90%86/"/>
-    <id>http://www.genji.wiki/2019/04/10/Kafka%E5%90%8C%E7%BB%84%E4%B8%8B%E5%A4%9A%E6%B6%88%E8%B4%B9%E8%80%85%E4%BB%85%E4%B8%80%E4%B8%AA%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E7%9A%84%E6%83%85%E5%86%B5%E5%A4%84%E7%90%86/</id>
+    <link href="https://www.genji.wiki/2019/04/10/Kafka%E5%90%8C%E7%BB%84%E4%B8%8B%E5%A4%9A%E6%B6%88%E8%B4%B9%E8%80%85%E4%BB%85%E4%B8%80%E4%B8%AA%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E7%9A%84%E6%83%85%E5%86%B5%E5%A4%84%E7%90%86/"/>
+    <id>https://www.genji.wiki/2019/04/10/Kafka%E5%90%8C%E7%BB%84%E4%B8%8B%E5%A4%9A%E6%B6%88%E8%B4%B9%E8%80%85%E4%BB%85%E4%B8%80%E4%B8%AA%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E7%9A%84%E6%83%85%E5%86%B5%E5%A4%84%E7%90%86/</id>
     <published>2019-04-10T12:42:52.000Z</published>
     <updated>2019-11-29T12:52:50.362Z</updated>
     
@@ -174,17 +174,17 @@
     </summary>
     
     
-      <category term="JAVA" scheme="http://www.genji.wiki/categories/JAVA/"/>
+      <category term="JAVA" scheme="https://www.genji.wiki/categories/JAVA/"/>
     
     
-      <category term="Kafka" scheme="http://www.genji.wiki/tags/Kafka/"/>
+      <category term="Kafka" scheme="https://www.genji.wiki/tags/Kafka/"/>
     
   </entry>
   
   <entry>
     <title>Mybatis一级缓存导致的内存溢出（二）</title>
-    <link href="http://www.genji.wiki/2018/09/29/Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89/"/>
-    <id>http://www.genji.wiki/2018/09/29/Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89/</id>
+    <link href="https://www.genji.wiki/2018/09/29/Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89/"/>
+    <id>https://www.genji.wiki/2018/09/29/Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89/</id>
     <published>2018-09-29T12:06:29.000Z</published>
     <updated>2019-11-29T12:31:25.655Z</updated>
     
@@ -199,21 +199,21 @@
     </summary>
     
     
-      <category term="JAVA" scheme="http://www.genji.wiki/categories/JAVA/"/>
+      <category term="JAVA" scheme="https://www.genji.wiki/categories/JAVA/"/>
     
     
-      <category term="JVM" scheme="http://www.genji.wiki/tags/JVM/"/>
+      <category term="JVM" scheme="https://www.genji.wiki/tags/JVM/"/>
     
-      <category term="OOM" scheme="http://www.genji.wiki/tags/OOM/"/>
+      <category term="OOM" scheme="https://www.genji.wiki/tags/OOM/"/>
     
-      <category term="Mybatis" scheme="http://www.genji.wiki/tags/Mybatis/"/>
+      <category term="Mybatis" scheme="https://www.genji.wiki/tags/Mybatis/"/>
     
   </entry>
   
   <entry>
     <title>Druid监控导致的内存溢出问题定位处理（一）</title>
-    <link href="http://www.genji.wiki/2018/08/06/Druid%E7%9B%91%E6%8E%A7%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E5%A4%84%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89/"/>
-    <id>http://www.genji.wiki/2018/08/06/Druid%E7%9B%91%E6%8E%A7%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E5%A4%84%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89/</id>
+    <link href="https://www.genji.wiki/2018/08/06/Druid%E7%9B%91%E6%8E%A7%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E5%A4%84%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89/"/>
+    <id>https://www.genji.wiki/2018/08/06/Druid%E7%9B%91%E6%8E%A7%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E5%A4%84%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89/</id>
     <published>2018-08-06T06:03:15.000Z</published>
     <updated>2019-11-29T09:47:22.224Z</updated>
     
@@ -226,21 +226,21 @@
     </summary>
     
     
-      <category term="JAVA" scheme="http://www.genji.wiki/categories/JAVA/"/>
+      <category term="JAVA" scheme="https://www.genji.wiki/categories/JAVA/"/>
     
     
-      <category term="JVM" scheme="http://www.genji.wiki/tags/JVM/"/>
+      <category term="JVM" scheme="https://www.genji.wiki/tags/JVM/"/>
     
-      <category term="OOM" scheme="http://www.genji.wiki/tags/OOM/"/>
+      <category term="OOM" scheme="https://www.genji.wiki/tags/OOM/"/>
     
-      <category term="Druid" scheme="http://www.genji.wiki/tags/Druid/"/>
+      <category term="Druid" scheme="https://www.genji.wiki/tags/Druid/"/>
     
   </entry>
   
   <entry>
     <title>JAVA技术栈总结</title>
-    <link href="http://www.genji.wiki/2016/12/06/JAVA%E6%8A%80%E6%9C%AF%E6%A0%88%E6%80%BB%E7%BB%93/"/>
-    <id>http://www.genji.wiki/2016/12/06/JAVA%E6%8A%80%E6%9C%AF%E6%A0%88%E6%80%BB%E7%BB%93/</id>
+    <link href="https://www.genji.wiki/2016/12/06/JAVA%E6%8A%80%E6%9C%AF%E6%A0%88%E6%80%BB%E7%BB%93/"/>
+    <id>https://www.genji.wiki/2016/12/06/JAVA%E6%8A%80%E6%9C%AF%E6%A0%88%E6%80%BB%E7%BB%93/</id>
     <published>2016-12-06T05:49:03.000Z</published>
     <updated>2019-12-18T06:23:42.245Z</updated>
     
@@ -253,19 +253,19 @@
     </summary>
     
     
-      <category term="JAVA" scheme="http://www.genji.wiki/categories/JAVA/"/>
+      <category term="JAVA" scheme="https://www.genji.wiki/categories/JAVA/"/>
     
     
-      <category term="JAVA" scheme="http://www.genji.wiki/tags/JAVA/"/>
+      <category term="JAVA" scheme="https://www.genji.wiki/tags/JAVA/"/>
     
-      <category term="面试总结" scheme="http://www.genji.wiki/tags/%E9%9D%A2%E8%AF%95%E6%80%BB%E7%BB%93/"/>
+      <category term="面试总结" scheme="https://www.genji.wiki/tags/%E9%9D%A2%E8%AF%95%E6%80%BB%E7%BB%93/"/>
     
   </entry>
   
   <entry>
     <title>Hello World</title>
-    <link href="http://www.genji.wiki/2016/10/24/hello-world/"/>
-    <id>http://www.genji.wiki/2016/10/24/hello-world/</id>
+    <link href="https://www.genji.wiki/2016/10/24/hello-world/"/>
+    <id>https://www.genji.wiki/2016/10/24/hello-world/</id>
     <published>2016-10-23T16:00:00.000Z</published>
     <updated>2019-12-19T02:39:49.729Z</updated>
     

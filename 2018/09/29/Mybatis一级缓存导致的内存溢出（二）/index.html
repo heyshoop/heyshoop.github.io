@@ -22,7 +22,7 @@
 <script id="hexo-configurations">
   var NexT = window.NexT || {};
   var CONFIG = {
-    hostname: new URL('http://www.genji.wiki').hostname,
+    hostname: new URL('https://www.genji.wiki').hostname,
     root: '/',
     scheme: 'Pisces',
     version: '7.5.0',
@@ -53,7 +53,7 @@
 <meta name="keywords" content="JVM,OOM,Mybatis">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Mybatis一级缓存导致的内存溢出（二）">
-<meta property="og:url" content="http:&#x2F;&#x2F;www.genji.wiki&#x2F;2018&#x2F;09&#x2F;29&#x2F;Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89&#x2F;index.html">
+<meta property="og:url" content="https:&#x2F;&#x2F;www.genji.wiki&#x2F;2018&#x2F;09&#x2F;29&#x2F;Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89&#x2F;index.html">
 <meta property="og:site_name" content="Hey Shoop">
 <meta property="og:description" content="接上篇 Druid 监控导致的内存溢出问题定位处理（一） JVM 内存溢出相关，废话不多说直接上分析过程。">
 <meta property="og:locale" content="zh-CN">
@@ -68,7 +68,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20191129201040.png">
 
-<link rel="canonical" href="http://www.genji.wiki/2018/09/29/Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89/">
+<link rel="canonical" href="https://www.genji.wiki/2018/09/29/Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89/">
 
 
 <script id="page-configurations">
@@ -222,7 +222,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.genji.wiki/2018/09/29/Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89/">
+    <link itemprop="mainEntityOfPage" href="https://www.genji.wiki/2018/09/29/Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/header.jpeg">
@@ -370,7 +370,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="http://www.genji.wiki/2018/09/29/Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89/" title="Mybatis一级缓存导致的内存溢出（二）">http://www.genji.wiki/2018/09/29/Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89/</a>
+    <a href="https://www.genji.wiki/2018/09/29/Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89/" title="Mybatis一级缓存导致的内存溢出（二）">https://www.genji.wiki/2018/09/29/Mybatis%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88%E4%BA%8C%EF%BC%89/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
