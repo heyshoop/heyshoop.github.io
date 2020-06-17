@@ -75,6 +75,34 @@
       </tags>
   </entry>
   <entry>
+    <title>hexo博客ERR_INVALID_ARG_TYPE错误问题处理</title>
+    <url>/2020/03/18/hexo%E5%8D%9A%E5%AE%A2ERR-INVALID-ARG-TYPE%E9%94%99%E8%AF%AF%E9%97%AE%E9%A2%98%E5%A4%84%E7%90%86/</url>
+    <content><![CDATA[<blockquote>
+<p>近期工作比较忙，导致很长时间没有更新博客，近期随手更新了下文档<code>hexo d</code>时意外出现了，<code>ERR_INVALID_ARG_TYPE</code>异常······</p>
+</blockquote><p>错误信息大体如下：</p><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FATAL Something&apos;s wrong. Maybe you can find the solution here: https://hexo.io/docs/troubleshooting.html</span><br><span class="line"></span><br><span class="line">TypeError [ERR_INVALID_ARG_TYPE]: The &quot;mode&quot; argument must be integer. Received an instance of Object</span><br><span class="line">at copyFile (fs.js:1890:10)</span><br></pre></td></tr></table></figure><a id="more"></a>
+
+
+
+<p>经排查发现是由于 cordova 不支持 node14 及以上导致的，怪不得一直未动过的代码突然不可用了，SO 知道了根源所在，处理起来也简单，降低 node 版本即可。</p>
+<p>首先安装 n 模块</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo npm install -g n</span><br></pre></td></tr></table></figure>
+
+<p>指定使用 14 版本以下，这里我选了<code>13.14.0</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo n 13.14.0</span><br></pre></td></tr></table></figure>
+
+<p>等待安装完成，再次执行 hexo 命令</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo g</span><br><span class="line">hexo d</span><br></pre></td></tr></table></figure>
+
+<p>欧克推送顺利，问题解决~</p>
+]]></content>
+      <categories>
+        <category>hexo</category>
+      </categories>
+      <tags>
+        <tag>hexo</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Github/Coding Page到VPS的迁移之路</title>
     <url>/2019/12/16/Github-Coding-Page%E5%88%B0VPS%E7%9A%84%E8%BF%81%E7%A7%BB%E4%B9%8B%E8%B7%AF/</url>
     <content><![CDATA[<blockquote>
