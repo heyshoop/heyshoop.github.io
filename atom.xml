@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://www.genji.wiki/"/>
-  <updated>2020-06-17T16:02:12.677Z</updated>
+  <updated>2020-06-18T10:14:25.946Z</updated>
   <id>https://www.genji.wiki/</id>
   
   <author>
@@ -15,6 +15,37 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>VManagePlatform安装Windows虚拟机找不到任何驱动器</title>
+    <link href="https://www.genji.wiki/2020/06/18/VManagePlatform%E5%AE%89%E8%A3%85Windows%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%89%BE%E4%B8%8D%E5%88%B0%E4%BB%BB%E4%BD%95%E9%A9%B1%E5%8A%A8%E5%99%A8/"/>
+    <id>https://www.genji.wiki/2020/06/18/VManagePlatform%E5%AE%89%E8%A3%85Windows%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%89%BE%E4%B8%8D%E5%88%B0%E4%BB%BB%E4%BD%95%E9%A9%B1%E5%8A%A8%E5%99%A8/</id>
+    <published>2020-06-17T16:13:58.000Z</published>
+    <updated>2020-06-18T10:14:25.946Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><p>刚刚折腾完<code>VManagePlatform</code>的部署，然后使用中发现在安装 Windows 系统时一直无法找到安装硬盘，也就是常见的<code>找不到任何驱动器</code>错误，<br>查阅了下资料发现<code>KVM</code>默认使用的硬盘格式为<code>virtio</code>。使用<code>virtio</code>接口的硬盘，我们必须加载<code>virtio</code>硬盘驱动。如果不加载该驱动<code>windows installer</code>会无法找到虚拟磁盘。</p></blockquote><a id="more"></a><p>错误信息如图：<br><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20200618180513.jpeg" alt></p><p>解决方案很简单，通过虚拟机配置多添加一个虚拟光驱，放入<code>virtio-winv</code>驱动镜像，然后重启虚拟机，在错误信息界面选择<code>加载驱动程序</code>，然后浏览文件，从刚才添加的光驱中选择驱动</p><p><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20200618180908.png" alt></p><blockquote><p>这里试了好多目录，我按照的是 Windows10 发现只有 2k08 的目录好用，其他系统请自行尝试，另外<code>virtio-winv</code>驱动镜像不太好找，这里提供一份<a href="https://pan.baidu.com/s/1o-O7MDgkbpWsI-W_xzCiKg" target="_blank" rel="noopener">百度网盘的分享</a>，提取码:y9rc</p></blockquote><p>正确识别启动后如图所示：</p><p><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20200618181315.png" alt></p><p>选择下一步等待驱动安装完毕即可，之后返回即可正常看到虚拟硬盘~</p><p><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20200618181422.png" alt></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;刚刚折腾完&lt;code&gt;VManagePlatform&lt;/code&gt;的部署，然后使用中发现在安装 Windows 系统时一直无法找到安装硬盘，也就是常见的&lt;code&gt;找不到任何驱动器&lt;/code&gt;错误，&lt;br&gt;查阅了下资料发现&lt;code&gt;KVM&lt;/code&gt;默认使用的硬盘格式为&lt;code&gt;virtio&lt;/code&gt;。使用&lt;code&gt;virtio&lt;/code&gt;接口的硬盘，我们必须加载&lt;code&gt;virtio&lt;/code&gt;硬盘驱动。如果不加载该驱动&lt;code&gt;windows installer&lt;/code&gt;会无法找到虚拟磁盘。&lt;/p&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+    
+      <category term="KVM" scheme="https://www.genji.wiki/categories/KVM/"/>
+    
+    
+      <category term="KVM" scheme="https://www.genji.wiki/tags/KVM/"/>
+    
+      <category term="VManagePlatform" scheme="https://www.genji.wiki/tags/VManagePlatform/"/>
+    
+      <category term="Windows" scheme="https://www.genji.wiki/tags/Windows/"/>
+    
+      <category term="virtio-win" scheme="https://www.genji.wiki/tags/virtio-win/"/>
+    
+  </entry>
   
   <entry>
     <title>CentOS8部署安装VManagePlatform</title>

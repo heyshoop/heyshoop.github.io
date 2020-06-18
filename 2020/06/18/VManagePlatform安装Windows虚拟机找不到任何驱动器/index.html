@@ -49,29 +49,37 @@
   };
 </script>
 
-  <meta name="keywords" content="阿里孩舞,五月西恩,Anchor,阁楼麻雀,码农,程序猿,Genji,JAVA">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Hey Shoop">
-<meta property="og:url" content="https:&#x2F;&#x2F;www.genji.wiki&#x2F;page&#x2F;2&#x2F;index.html">
+  <meta name="description" content="刚刚折腾完VManagePlatform的部署，然后使用中发现在安装 Windows 系统时一直无法找到安装硬盘，也就是常见的找不到任何驱动器错误，查阅了下资料发现KVM默认使用的硬盘格式为virtio。使用virtio接口的硬盘，我们必须加载virtio硬盘驱动。如果不加载该驱动windows installer会无法找到虚拟磁盘。">
+<meta name="keywords" content="KVM,VManagePlatform,Windows,virtio-win">
+<meta property="og:type" content="article">
+<meta property="og:title" content="VManagePlatform安装Windows虚拟机找不到任何驱动器">
+<meta property="og:url" content="https:&#x2F;&#x2F;www.genji.wiki&#x2F;2020&#x2F;06&#x2F;18&#x2F;VManagePlatform%E5%AE%89%E8%A3%85Windows%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%89%BE%E4%B8%8D%E5%88%B0%E4%BB%BB%E4%BD%95%E9%A9%B1%E5%8A%A8%E5%99%A8&#x2F;index.html">
 <meta property="og:site_name" content="Hey Shoop">
+<meta property="og:description" content="刚刚折腾完VManagePlatform的部署，然后使用中发现在安装 Windows 系统时一直无法找到安装硬盘，也就是常见的找不到任何驱动器错误，查阅了下资料发现KVM默认使用的硬盘格式为virtio。使用virtio接口的硬盘，我们必须加载virtio硬盘驱动。如果不加载该驱动windows installer会无法找到虚拟磁盘。">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20200618180513.jpeg">
+<meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20200618180908.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20200618181315.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20200618181422.png">
+<meta property="og:updated_time" content="2020-06-18T10:14:25.946Z">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;genji-1256166567.cos.ap-chengdu.myqcloud.com&#x2F;genji&#x2F;20200618180513.jpeg">
 
-<link rel="canonical" href="https://www.genji.wiki/page/2/">
+<link rel="canonical" href="https://www.genji.wiki/2020/06/18/VManagePlatform%E5%AE%89%E8%A3%85Windows%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%89%BE%E4%B8%8D%E5%88%B0%E4%BB%BB%E4%BD%95%E9%A9%B1%E5%8A%A8%E5%99%A8/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome: true,
-    isPost: false,
+    isHome: false,
+    isPost: true,
     isPage: false,
     isArchive: false
   };
 </script>
 
-  <title>Hey Shoop</title>
+  <title>VManagePlatform安装Windows虚拟机找不到任何驱动器 | Hey Shoop</title>
   
 
 
@@ -207,11 +215,11 @@
             
 
   <div class="posts-expand">
-        
+      
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://www.genji.wiki/2018/08/06/Druid%E7%9B%91%E6%8E%A7%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E5%A4%84%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89/">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.genji.wiki/2020/06/18/VManagePlatform%E5%AE%89%E8%A3%85Windows%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%89%BE%E4%B8%8D%E5%88%B0%E4%BB%BB%E4%BD%95%E9%A9%B1%E5%8A%A8%E5%99%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/header.jpeg">
@@ -224,8 +232,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/08/06/Druid%E7%9B%91%E6%8E%A7%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E5%A4%84%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89/" class="post-title-link" itemprop="url">Druid监控导致的内存溢出问题定位处理（一）</a>
+          VManagePlatform安装Windows虚拟机找不到任何驱动器
         </h1>
 
         <div class="post-meta">
@@ -234,24 +241,18 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2018-08-06 14:03:15" itemprop="dateCreated datePublished" datetime="2018-08-06T14:03:15+08:00">2018-08-06</time>
+              <time title="创建时间：2020-06-18 00:13:58 / 修改时间：18:14:25" itemprop="dateCreated datePublished" datetime="2020-06-18T00:13:58+08:00">2020-06-18</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-11-29 17:47:22" itemprop="dateModified" datetime="2019-11-29T17:47:22+08:00">2019-11-29</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JAVA/" itemprop="url" rel="index">
-                    <span itemprop="name">JAVA</span>
+                  <a href="/categories/KVM/" itemprop="url" rel="index">
+                    <span itemprop="name">KVM</span>
                   </a>
                 </span>
             </span>
@@ -262,103 +263,7 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>6.7k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>6 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="0、起因"><a href="#0、起因" class="headerlink" title="0、起因"></a>0、起因</h1><p>一台部署于商户私有云中的应用频繁宕机，经查为 OOM，周期大约一周一次，较规律，所谓千里之堤毁于蚁穴，初步怀疑是轻微的内存泄漏不断积累导致的内存溢出，所以再次宕机出现时果断 dump 内存镜像开始分析</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2018/08/06/Druid%E7%9B%91%E6%8E%A7%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E5%A4%84%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://www.genji.wiki/2016/12/06/JAVA%E6%8A%80%E6%9C%AF%E6%A0%88%E6%80%BB%E7%BB%93/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/header.jpeg">
-      <meta itemprop="name" content="Anchor">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hey Shoop">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2016/12/06/JAVA%E6%8A%80%E6%9C%AF%E6%A0%88%E6%80%BB%E7%BB%93/" class="post-title-link" itemprop="url">JAVA技术栈总结</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2016-12-06 13:49:03" itemprop="dateCreated datePublished" datetime="2016-12-06T13:49:03+08:00">2016-12-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-12-18 14:23:42" itemprop="dateModified" datetime="2019-12-18T14:23:42+08:00">2019-12-18</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JAVA/" itemprop="url" rel="index">
-                    <span itemprop="name">JAVA</span>
-                  </a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>55</span>
+              <span>393</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -377,100 +282,64 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          这是一篇加密文章，内容可能是个人日常吐槽或者特殊技术分享。如果你确实想看，请与我联系。
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2016/12/06/JAVA%E6%8A%80%E6%9C%AF%E6%A0%88%E6%80%BB%E7%BB%93/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
+        <blockquote>
+<p>刚刚折腾完<code>VManagePlatform</code>的部署，然后使用中发现在安装 Windows 系统时一直无法找到安装硬盘，也就是常见的<code>找不到任何驱动器</code>错误，<br>查阅了下资料发现<code>KVM</code>默认使用的硬盘格式为<code>virtio</code>。使用<code>virtio</code>接口的硬盘，我们必须加载<code>virtio</code>硬盘驱动。如果不加载该驱动<code>windows installer</code>会无法找到虚拟磁盘。</p>
+</blockquote><a id="more"></a>
+<p>错误信息如图：<br><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20200618180513.jpeg" alt></p>
+<p>解决方案很简单，通过虚拟机配置多添加一个虚拟光驱，放入<code>virtio-winv</code>驱动镜像，然后重启虚拟机，在错误信息界面选择<code>加载驱动程序</code>，然后浏览文件，从刚才添加的光驱中选择驱动</p>
+<p><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20200618180908.png" alt></p>
+<blockquote>
+<p>这里试了好多目录，我按照的是 Windows10 发现只有 2k08 的目录好用，其他系统请自行尝试，另外<code>virtio-winv</code>驱动镜像不太好找，这里提供一份<a href="https://pan.baidu.com/s/1o-O7MDgkbpWsI-W_xzCiKg" target="_blank" rel="noopener">百度网盘的分享</a>，提取码:y9rc</p>
+</blockquote>
+<p>正确识别启动后如图所示：</p>
+<p><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20200618181315.png" alt></p>
+<p>选择下一步等待驱动安装完毕即可，之后返回即可正常看到虚拟硬盘~</p>
+<p><img src="https://genji-1256166567.cos.ap-chengdu.myqcloud.com/genji/20200618181422.png" alt></p>
+
     </div>
     
     
     
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
         
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://www.genji.wiki/2016/10/24/hello-world/">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/header.jpeg">
-      <meta itemprop="name" content="Anchor">
-      <meta itemprop="description" content="">
-    </span>
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Anchor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://www.genji.wiki/2020/06/18/VManagePlatform%E5%AE%89%E8%A3%85Windows%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%89%BE%E4%B8%8D%E5%88%B0%E4%BB%BB%E4%BD%95%E9%A9%B1%E5%8A%A8%E5%99%A8/" title="VManagePlatform安装Windows虚拟机找不到任何驱动器">https://www.genji.wiki/2020/06/18/VManagePlatform%E5%AE%89%E8%A3%85Windows%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%89%BE%E4%B8%8D%E5%88%B0%E4%BB%BB%E4%BD%95%E9%A9%B1%E5%8A%A8%E5%99%A8/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hey Shoop">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
+
+      <footer class="post-footer">
           
-            <a href="/2016/10/24/hello-world/" class="post-title-link" itemprop="url">Hello World</a>
-        </h1>
+          <div class="post-tags">
+              <a href="/tags/KVM/" rel="tag"><i class="fa fa-tag"></i> KVM</a>
+              <a href="/tags/VManagePlatform/" rel="tag"><i class="fa fa-tag"></i> VManagePlatform</a>
+              <a href="/tags/Windows/" rel="tag"><i class="fa fa-tag"></i> Windows</a>
+              <a href="/tags/virtio-win/" rel="tag"><i class="fa fa-tag"></i> virtio-win</a>
+          </div>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
+        
 
-              <time title="创建时间：2016-10-24 00:00:00" itemprop="dateCreated datePublished" datetime="2016-10-24T00:00:00+08:00">2016-10-24</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-12-19 10:39:49" itemprop="dateModified" datetime="2019-12-19T10:39:49+08:00">2019-12-19</time>
-              </span>
 
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>159</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>是的，Hello World!</p><p>当我们学习一门编程语言时，都是从“Hello,World!”开始。所有程序员在其职业生涯中，都至少接触过一个经典的“Hello,World!”程序。</p><p>通常程序员会使用多种编程语言，多的甚至实现了十几种。 </p><p>一直有记笔记的习惯，但是第一次尝试写blog，SO</p><p>那就让我们从Hello World开始吧！</p>
-      
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/05/CentOS8%E9%83%A8%E7%BD%B2%E5%AE%89%E8%A3%85VManagePlatform/" rel="prev" title="CentOS8部署安装VManagePlatform">
+      <i class="fa fa-chevron-left"></i> CentOS8部署安装VManagePlatform
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
       </footer>
+    
   </article>
   
   
@@ -478,15 +347,10 @@
 
   </div>
 
-  
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
-  </nav>
-
-
 
           </div>
           
+    <div class="comments" id="gitalk-container"></div>
 
         </div>
           
@@ -681,6 +545,23 @@ show_date_time();
 
   
 
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '827618e1a36e70d56d2a',
+      clientSecret: '4ac7950b490210be8e97394ee724d953d007cddc',
+      repo: 'heyshoop.github.io',
+      owner: 'heyshoop',
+      admin: ['heyshoop'],
+      id: '0a9eb40f4c13547ebbe1805d2c87e0cc',
+        language: 'zh-CN',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
 
   
     <script type="text/javascript" color="0,0,0" opacity='0.5' zIndex="-1" count="150" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
