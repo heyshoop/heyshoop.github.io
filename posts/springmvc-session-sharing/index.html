@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="icon" type="image/svg+xml" href="/avatar.svg"/>
+    <meta name="theme-color" content="#0d0e0e"/>
+    <title>SpringMVC项目实现Session共享 · 阿里孩舞</title>
+    <script type="module" crossorigin src="/assets/index-B8E3Zrjo.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CsAgeU0E.css">
+  <meta name="description" content="记录老 SpringMVC 项目借助 Spring Session 与 Redis 实现集群 Session 共享的配置，包括 Jedis 依赖、web.xml 过滤器顺序、连接工厂和会话超时设置，供单节点应用 SAAS 化改造参考。"/>
+    <link rel="canonical" href="https://www.alihai5.com/posts/springmvc-session-sharing/"/>
+    <link rel="alternate" type="application/rss+xml" title="阿里孩舞·幂等了吗？" href="https://www.alihai5.com/feed.xml"/>
+    <meta property="og:site_name" content="阿里孩舞"/>
+    <meta property="og:locale" content="zh-CN"/>
+    <meta property="og:title" content="SpringMVC项目实现Session共享 · 阿里孩舞"/>
+    <meta property="og:description" content="记录老 SpringMVC 项目借助 Spring Session 与 Redis 实现集群 Session 共享的配置，包括 Jedis 依赖、web.xml 过滤器顺序、连接工厂和会话超时设置，供单节点应用 SAAS 化改造参考。"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://www.alihai5.com/posts/springmvc-session-sharing/"/>
+    <meta property="og:image" content="https://www.alihai5.com/media/og-default.svg"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="SpringMVC项目实现Session共享 · 阿里孩舞"/>
+    <meta name="twitter:description" content="记录老 SpringMVC 项目借助 Spring Session 与 Redis 实现集群 Session 共享的配置，包括 Jedis 依赖、web.xml 过滤器顺序、连接工厂和会话超时设置，供单节点应用 SAAS 化改造参考。"/>
+    <meta name="twitter:image" content="https://www.alihai5.com/media/og-default.svg"/>
+    <meta property="article:published_time" content="2019-12-11T12:22:12.000Z"/>
+    <meta name="robots" content="index,follow"/>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"SpringMVC项目实现Session共享","description":"记录老 SpringMVC 项目借助 Spring Session 与 Redis 实现集群 Session 共享的配置，包括 Jedis 依赖、web.xml 过滤器顺序、连接工厂和会话超时设置，供单节点应用 SAAS 化改造参考。","inLanguage":"zh-CN","datePublished":"2019-12-11T12:22:12.000Z","dateModified":"2019-12-11T12:22:12.000Z","mainEntityOfPage":"https://www.alihai5.com/posts/springmvc-session-sharing/","author":{"@type":"Person","name":"heyshoop"},"publisher":{"@type":"Person","name":"heyshoop"},"keywords":"Session, SpringMVC","articleSection":"JAVA"}</script>
+  </head>
+  <body>
+    <div id="root"><link rel="preload" as="image" href="/avatar.svg"/><link rel="preload" as="image" href="/media/content/covers/darkness.jpg"/><div class="neural page-post"><header class="topbar"><a class="brand" href="/" aria-label="阿里孩舞 首页"><span class="brand-mark" aria-hidden="true"><img src="/avatar.svg" alt=""/></span><span class="brand-text">阿里孩舞<!-- --> <b>/ <!-- -->个人博客</b><small>赛博炼丹与生活补丁<!-- --> · <!-- -->AI alchemy, life patches and legacy code</small></span></a><nav aria-label="主导航"><a class="" href="/">首页<em>Home</em></a><a class="" href="/ai/">赛博炼丹<em>AI Alchemy</em></a><a class="" href="/life/">生活补丁<em>Life Patches</em></a><a class="" href="/legacy/">古法编程<em>Legacy</em></a><a class="" href="/tags/">主题<em>Topics</em></a><a class="" href="/about/">关于<em>About</em></a></nav><div class="top-actions"><a class="pill ghost" href="/legacy/">古法编程 <em>Legacy</em></a></div></header><div class="page page-article"><header class="article-hero glass"><img class="article-cover" src="/media/content/covers/darkness.jpg" alt="黑红烟雾背景中持双枪的面具角色"/><p class="eyebrow">古法编程<!-- --> <span>2019年12月11日<!-- --> · <!-- -->1<!-- --> 分钟 · <!-- -->JAVA</span></p><h1>SpringMVC项目实现Session共享</h1><p class="article-description">记录老 SpringMVC 项目借助 Spring Session 与 Redis 实现集群 Session 共享的配置，包括 Jedis 依赖、web.xml 过滤器顺序、连接工厂和会话超时设置，供单节点应用 SAAS 化改造参考。</p></header><div class="article-layout"><article class="prose glass"><blockquote>
+<p>近期接到一个老项目的改造工作，需要将其由单商户单节点应用 SAAS 化，由于老项目基于 SpringMVC 构建，未做前后端分离，无法直接接入现有平台 JWT，综合考虑继续沿用 Session 机制，使用 Spring Session 实现集群 Session 共享。事情不复杂，主要难点在于处理各种老 jar 包间的冲突问题，经过一下午尝试发现以下版本 jar 包不会触发彩蛋，特记录以下。</p>
+</blockquote>
+<h1 id="1pomxml-添加项目依赖">1、pom.xml 添加项目依赖</h1>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-xml"><span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">dependency</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">groupId</span><span style="color:#E1E4E8">>redis.clients&#x3C;/</span><span style="color:#85E89D">groupId</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">artifactId</span><span style="color:#E1E4E8">>jedis&#x3C;/</span><span style="color:#85E89D">artifactId</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">version</span><span style="color:#E1E4E8">>2.6.2&#x3C;/</span><span style="color:#85E89D">version</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">dependency</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">dependency</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">groupId</span><span style="color:#E1E4E8">>org.springframework.session&#x3C;/</span><span style="color:#85E89D">groupId</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">artifactId</span><span style="color:#E1E4E8">>spring-session-data-redis&#x3C;/</span><span style="color:#85E89D">artifactId</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">version</span><span style="color:#E1E4E8">>1.3.5.RELEASE&#x3C;/</span><span style="color:#85E89D">version</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">dependency</span><span style="color:#E1E4E8">></span></span></code></pre>
+<h1 id="2webxml-添加拦截器">2、web.xml 添加拦截器</h1>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-xml"><span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">filter</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">filter-name</span><span style="color:#E1E4E8">>springSessionRepositoryFilter&#x3C;/</span><span style="color:#85E89D">filter-name</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">filter-class</span><span style="color:#E1E4E8">>org.springframework.web.filter.DelegatingFilterProxy&#x3C;/</span><span style="color:#85E89D">filter-class</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">filter</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">filter-mapping</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">filter-name</span><span style="color:#E1E4E8">>springSessionRepositoryFilter&#x3C;/</span><span style="color:#85E89D">filter-name</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">url-pattern</span><span style="color:#E1E4E8">>/*&#x3C;/</span><span style="color:#85E89D">url-pattern</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">filter-mapping</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">context-param</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">param-name</span><span style="color:#E1E4E8">>contextConfigLocation&#x3C;/</span><span style="color:#85E89D">param-name</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">param-value</span><span style="color:#E1E4E8">>classpath:spring-session-redis.xml&#x3C;/</span><span style="color:#85E89D">param-value</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">context-param</span><span style="color:#E1E4E8">></span></span></code></pre>
+<blockquote>
+<p>补充一句，注意此处，springsession 拦截器位置要尽量靠上，实际操作中发现如果放在拦截器第一位可能导致中文乱码，建议放在<code>SetCharacterEncoding</code>之后~</p>
+</blockquote>
+<h1 id="3applicationcontextxml-添加配置">3、applicationContext.xml 添加配置</h1>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-xml"><span class="line"><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">bean</span><span style="color:#B392F0"> id</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"jedisConnectionFactory"</span><span style="color:#B392F0"> class</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"org.springframework.data.redis.connection.jedis.JedisConnectionFactory"</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">property</span><span style="color:#B392F0"> name</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"hostName"</span><span style="color:#B392F0"> value</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"${config.redis.host}"</span><span style="color:#E1E4E8">/></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">property</span><span style="color:#B392F0"> name</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"port"</span><span style="color:#B392F0"> value</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"${config.redis.port}"</span><span style="color:#E1E4E8">/></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">property</span><span style="color:#B392F0"> name</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"password"</span><span style="color:#B392F0"> value</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"${config.redis.auth}"</span><span style="color:#E1E4E8">/></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">property</span><span style="color:#B392F0"> name</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"database"</span><span style="color:#B392F0"> value</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"${config.redis.index}"</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;/</span><span style="color:#85E89D">bean</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">bean</span><span style="color:#B392F0"> id</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"redisTemplate"</span><span style="color:#B392F0"> class</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"org.springframework.data.redis.core.StringRedisTemplate"</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">property</span><span style="color:#B392F0"> name</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"connectionFactory"</span><span style="color:#B392F0"> ref</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"jedisConnectionFactory"</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;/</span><span style="color:#85E89D">bean</span><span style="color:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">bean</span><span style="color:#B392F0"> id</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"redisHttpSessionConfiguration"</span><span style="color:#B392F0"> class</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration"</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">property</span><span style="color:#B392F0"> name</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"maxInactiveIntervalInSeconds"</span><span style="color:#B392F0"> value</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"7200"</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;/</span><span style="color:#85E89D">bean</span><span style="color:#E1E4E8">></span></span></code></pre>
+<h1 id="4验证">4、验证</h1>
+<p>这就不再啰嗦了，可根据自己习惯，配置 Nginx+Docker 等方式快速验证。</p></article><nav class="toc glass" aria-label="目录"><h3>目录 <em>Contents</em></h3><ol><li style="padding-left:0"><a href="#1pomxml-添加项目依赖">1、pom.xml 添加项目依赖</a></li><li style="padding-left:0"><a href="#2webxml-添加拦截器">2、web.xml 添加拦截器</a></li><li style="padding-left:0"><a href="#3applicationcontextxml-添加配置">3、applicationContext.xml 添加配置</a></li><li style="padding-left:0"><a href="#4验证">4、验证</a></li></ol></nav></div><footer class="article-footer"><section class="link-panel glass"><h3>标签与概念 <em>Tags &amp; concepts</em></h3><div class="chip-row"><a class="chip" href="/tags/session/">#<!-- -->Session</a><a class="chip" href="/tags/springmvc/">#<!-- -->SpringMVC</a></div></section><nav class="prev-next" aria-label="上下篇"><a class="pn-card glass" href="/posts/kafka-single-consumer/"><small>上一篇 <em>Older</em></small><b>Kafka同组下多消费者仅一个消费者消费的情况处理</b></a><a class="pn-card glass" href="/posts/docker-troubleshooting/"><small>下一篇 <em>Newer</em></small><b>Docker 疑难杂症汇总</b></a></nav></footer></div><footer class="site-foot public-footer"><p>本博客为个人非营利站点：记录赛博炼丹、生活补丁与古法编程档案；无广告、无推广、无统计追踪，不收集访客个人数据。<em>Non-commercial · no ads · no tracking.</em></p><p>每一篇笔记，都是网络里的一个节点。<em>Every note is a node in the network.</em></p></footer></div></div>
+  </body>
+</html>

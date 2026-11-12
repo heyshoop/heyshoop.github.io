@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="icon" type="image/svg+xml" href="/avatar.svg"/>
+    <meta name="theme-color" content="#0d0e0e"/>
+    <title>MySQL 常用函数&amp;数据类型 · 阿里孩舞</title>
+    <script type="module" crossorigin src="/assets/index-B8E3Zrjo.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CsAgeU0E.css">
+  <meta name="description" content="以表格汇总 MySQL 字符串、数学、日期时间、流程及其他常用函数，并列出字符串、数值、日期时间和二进制数据类型的说明与取值范围。"/>
+    <link rel="canonical" href="https://www.alihai5.com/posts/mysql-functions/"/>
+    <link rel="alternate" type="application/rss+xml" title="阿里孩舞·幂等了吗？" href="https://www.alihai5.com/feed.xml"/>
+    <meta property="og:site_name" content="阿里孩舞"/>
+    <meta property="og:locale" content="zh-CN"/>
+    <meta property="og:title" content="MySQL 常用函数&amp;数据类型 · 阿里孩舞"/>
+    <meta property="og:description" content="以表格汇总 MySQL 字符串、数学、日期时间、流程及其他常用函数，并列出字符串、数值、日期时间和二进制数据类型的说明与取值范围。"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://www.alihai5.com/posts/mysql-functions/"/>
+    <meta property="og:image" content="https://www.alihai5.com/media/og-default.svg"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="MySQL 常用函数&amp;数据类型 · 阿里孩舞"/>
+    <meta name="twitter:description" content="以表格汇总 MySQL 字符串、数学、日期时间、流程及其他常用函数，并列出字符串、数值、日期时间和二进制数据类型的说明与取值范围。"/>
+    <meta name="twitter:image" content="https://www.alihai5.com/media/og-default.svg"/>
+    <meta property="article:published_time" content="2022-02-23T05:32:16.000Z"/>
+    <meta name="robots" content="index,follow"/>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"MySQL 常用函数&数据类型","description":"以表格汇总 MySQL 字符串、数学、日期时间、流程及其他常用函数，并列出字符串、数值、日期时间和二进制数据类型的说明与取值范围。","inLanguage":"zh-CN","datePublished":"2022-02-23T05:32:16.000Z","dateModified":"2022-02-23T05:32:16.000Z","mainEntityOfPage":"https://www.alihai5.com/posts/mysql-functions/","author":{"@type":"Person","name":"heyshoop"},"publisher":{"@type":"Person","name":"heyshoop"},"keywords":"MySQL","articleSection":"MySQL"}</script>
+  </head>
+  <body>
+    <div id="root"><link rel="preload" as="image" href="/avatar.svg"/><link rel="preload" as="image" href="/media/content/covers/xcn.jpg"/><div class="neural page-post"><header class="topbar"><a class="brand" href="/" aria-label="阿里孩舞 首页"><span class="brand-mark" aria-hidden="true"><img src="/avatar.svg" alt=""/></span><span class="brand-text">阿里孩舞<!-- --> <b>/ <!-- -->个人博客</b><small>赛博炼丹与生活补丁<!-- --> · <!-- -->AI alchemy, life patches and legacy code</small></span></a><nav aria-label="主导航"><a class="" href="/">首页<em>Home</em></a><a class="" href="/ai/">赛博炼丹<em>AI Alchemy</em></a><a class="" href="/life/">生活补丁<em>Life Patches</em></a><a class="" href="/legacy/">古法编程<em>Legacy</em></a><a class="" href="/tags/">主题<em>Topics</em></a><a class="" href="/about/">关于<em>About</em></a></nav><div class="top-actions"><a class="pill ghost" href="/legacy/">古法编程 <em>Legacy</em></a></div></header><div class="page page-article"><header class="article-hero glass"><img class="article-cover" src="/media/content/covers/xcn.jpg" alt="粉蓝双辫的动漫女性肩扛球棒"/><p class="eyebrow">古法编程<!-- --> <span>2022年2月23日<!-- --> · <!-- -->3<!-- --> 分钟 · <!-- -->MySQL</span></p><h1>MySQL 常用函数&amp;数据类型</h1><p class="article-description">以表格汇总 MySQL 字符串、数学、日期时间、流程及其他常用函数，并列出字符串、数值、日期时间和二进制数据类型的说明与取值范围。</p></header><div class="article-layout"><article class="prose glass"><h1 id="mysql-常用函数汇总">MySQL 常用函数汇总</h1>
+<h1 id="字符串函数">字符串函数</h1>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CONCAT(s1,s2,……)</td>
+<td>字符串连接</td>
+</tr>
+<tr>
+<td>INSERT(str,x,y,instr)</td>
+<td>将指定开始标记到结束的字符串替换为指定字符串</td>
+</tr>
+<tr>
+<td>LOWER(str)</td>
+<td>将字符串所有字符转为小写</td>
+</tr>
+<tr>
+<td>UPPER(str)</td>
+<td>将字符串所有字符串转为大写</td>
+</tr>
+<tr>
+<td>LEFT(str,x)</td>
+<td>返回字符串 str 最左边的 x 个字符</td>
+</tr>
+<tr>
+<td>RIGHT(str,x)</td>
+<td>返回字符串 str 最右边的 x 个字符</td>
+</tr>
+<tr>
+<td>LPAD(str,n,pad)</td>
+<td>在 str 最左边填充 n 个 pad</td>
+</tr>
+<tr>
+<td>RPAD(str,n,pad)</td>
+<td>在 str 最右边填充 n 个 pad</td>
+</tr>
+<tr>
+<td>LTRIM(str)</td>
+<td>去掉字符串 str 左侧的空格</td>
+</tr>
+<tr>
+<td>RTRIM(str)</td>
+<td>去掉字符串 str 右侧的空格</td>
+</tr>
+<tr>
+<td>REPEAT(str,x)</td>
+<td>返回 str 重复 x 次的结果</td>
+</tr>
+<tr>
+<td>STRCMP(s1,s2)</td>
+<td>比较字符串 s1 和 s2</td>
+</tr>
+<tr>
+<td>REPLACE(str,a,b)</td>
+<td>用字符串 b 替换字符串 str 中所有出现的字符串 a</td>
+</tr>
+<tr>
+<td>TRIM(str)</td>
+<td>去掉字符串行尾和行头的空格</td>
+</tr>
+<tr>
+<td>SUBSTRING(str,x,y)</td>
+<td>返回从字符串 str x 位置起 y 个字符长度的字串</td>
+</tr>
+</tbody>
+</table>
+<h1 id="数学函数">数学函数</h1>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ABS(x)</td>
+<td>返回 x 的绝对值</td>
+</tr>
+<tr>
+<td>CEIL(x)</td>
+<td>返回大于 x 的最小整数值</td>
+</tr>
+<tr>
+<td>FLOOR(x)</td>
+<td>返回小于 x 的最大整数值</td>
+</tr>
+<tr>
+<td>MOD(x,y)</td>
+<td>返回 x/y 的模</td>
+</tr>
+<tr>
+<td>RAND()</td>
+<td>返回 0～1 内的随机值</td>
+</tr>
+<tr>
+<td>ROUND(x,y)</td>
+<td>返回参数 x 的四舍五入的有 y 位小数的值</td>
+</tr>
+<tr>
+<td>TRUNCATE(x,y)</td>
+<td>返回数字 x 截断位 y 位小数的结果</td>
+</tr>
+</tbody>
+</table>
+<h1 id="日期和时间函数">日期和时间函数</h1>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CURDATE()</td>
+<td>返回当前日期</td>
+</tr>
+<tr>
+<td>CURTIME()</td>
+<td>返回当前时间</td>
+</tr>
+<tr>
+<td>NOW()</td>
+<td>返回当前的日期和时间</td>
+</tr>
+<tr>
+<td>UNIX_TIMESTAMP(date)</td>
+<td>返回日期 date 的 UNIX 时间戳</td>
+</tr>
+<tr>
+<td>FROM_UNIXTIME</td>
+<td>返回 UNIX 时间戳的日期值</td>
+</tr>
+<tr>
+<td>WEEK(date)</td>
+<td>返回日期 date 为一年中的第几周</td>
+</tr>
+<tr>
+<td>YEAR(date)</td>
+<td>返回日期 date 的年份</td>
+</tr>
+<tr>
+<td>HOUR(time)</td>
+<td>返回 time 的小时值</td>
+</tr>
+<tr>
+<td>MINUTE(time)</td>
+<td>返回 time 的分钟值</td>
+</tr>
+<tr>
+<td>MONTHNAME(date)</td>
+<td>返回 date 的月份名</td>
+</tr>
+<tr>
+<td>DATE_FORMAT(date,fmt)</td>
+<td>返回按字符串 fmt 格式日期 date 值</td>
+</tr>
+<tr>
+<td>DATE_ADD(date,interval expr type)</td>
+<td>返回一个日期或时间值加上一个时间间隔的时间值</td>
+</tr>
+<tr>
+<td>DATEDIFF(expr,expr2)</td>
+<td>返回起始时间 expr 和结束时间 expr2 之间的天数</td>
+</tr>
+</tbody>
+</table>
+<h1 id="流程函数">流程函数</h1>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IF(value,t f)</td>
+<td>如果 value 是真，返回 t；否则返回 f</td>
+</tr>
+<tr>
+<td>IFNULL(value1,value2)</td>
+<td>如果 value1 不为空，返回 value1，否则返回 value2</td>
+</tr>
+<tr>
+<td>CASE WHEN [value1] THEN[result1]...ELSE[default]END</td>
+<td>如果 value1 是真，返回 result1，否则返回 result</td>
+</tr>
+<tr>
+<td>CASE[expr] WHEN [value1]THEN[result1]...ELSE[default]END</td>
+<td>如果 expr 等于 value1，返回 result1，否则返回 default</td>
+</tr>
+</tbody>
+</table>
+<h1 id="其他常用函数">其他常用函数</h1>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DATEBASE()</td>
+<td>返回当前数据库名</td>
+</tr>
+<tr>
+<td>VERSION()</td>
+<td>返回当前数据库版本</td>
+</tr>
+<tr>
+<td>USER()</td>
+<td>返回当前登录用户名</td>
+</tr>
+<tr>
+<td>INET_ATON(ip)</td>
+<td>返回 ip 地址的数字表示</td>
+</tr>
+<tr>
+<td>INET_NTOA(num)</td>
+<td>返回数字代表的 ip 地址</td>
+</tr>
+<tr>
+<td>PASSWORD(str)</td>
+<td>返回字符串 str 的加密版本</td>
+</tr>
+<tr>
+<td>MD5()</td>
+<td>返回字符串 str 的 md5 值</td>
+</tr>
+</tbody>
+</table>
+<h1 id="mysql-数据类型">MySQL 数据类型</h1>
+<h2 id="串数据类型">串数据类型</h2>
+<table>
+<thead>
+<tr>
+<th>数据类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CHAR</td>
+<td>1～255 个字符的定长串。它的长度必须在创建时指定，否则 MySQL 假定为 CHAR(1)</td>
+</tr>
+<tr>
+<td>ENUM</td>
+<td>接受最多 64 K 个串组成的一个预定义集合的某个串</td>
+</tr>
+<tr>
+<td>LONGTEXT</td>
+<td>与 TEXT 相同，但最大长度为 4GB</td>
+</tr>
+<tr>
+<td>MEDIUMTEXT</td>
+<td>与 TEXT 相同，但最大长度为 16K</td>
+</tr>
+<tr>
+<td>SET</td>
+<td>接受最多 64 个串组成的一个预定义集合的零个或多个串</td>
+</tr>
+<tr>
+<td>TEXT</td>
+<td>最大长度为 64K 的变长文本</td>
+</tr>
+<tr>
+<td>TINYTEXT</td>
+<td>与 TEXT 相同，但最大长度为 255 字节</td>
+</tr>
+<tr>
+<td>VARCHAR</td>
+<td>长度可变，最多不超过 255 字节。如果在创建时指定为 VARCHAR(n)，则可存储 0 到 n 个字符的变长串（其中 n≤255）</td>
+</tr>
+</tbody>
+</table>
+<h2 id="数值数据类型">数值数据类型</h2>
+<table>
+<thead>
+<tr>
+<th>数据类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BIT</td>
+<td>位字段，1～64 位。（在 MySQL 5 之前，BIT 在功能上等价于 TINYINT</td>
+</tr>
+<tr>
+<td>BIGINT</td>
+<td>整数值，支持9223372036854775808～9223372036854775807（如果是 UNSIGNED，为 0～18446744073709551615）的数</td>
+</tr>
+<tr>
+<td>BOOLEAN（或 BOOL）</td>
+<td>布尔标志，或者为 0 或者为 1，主要用于开/关（on/off）标志</td>
+</tr>
+<tr>
+<td>DECIMAL（或 DEC）</td>
+<td>精度可变的浮点值</td>
+</tr>
+<tr>
+<td>DOUBLE</td>
+<td>双精度浮点值</td>
+</tr>
+<tr>
+<td>FLOAT</td>
+<td>单精度浮点值</td>
+</tr>
+<tr>
+<td>INT（或 INTEGER）</td>
+<td>整数值，支持2147483648～2147483647（如果是 UNSIGNED，为 0～4294967295）的数</td>
+</tr>
+<tr>
+<td>MEDIUMINT</td>
+<td>整数值，支持8388608～8388607（如果是 UNSIGNED，为 0～16777215）的数</td>
+</tr>
+<tr>
+<td>REAL</td>
+<td>4 字节的浮点值</td>
+</tr>
+<tr>
+<td>SMALLINT</td>
+<td>整数值，支持32768～32767（如果是 UNSIGNED，为 0～65535）的数</td>
+</tr>
+<tr>
+<td>TINYINT</td>
+<td>整数值，支持128～127（如果为 UNSIGNED，为 0～255）的数</td>
+</tr>
+</tbody>
+</table>
+<h2 id="日期和时间数据类型">日期和时间数据类型</h2>
+<table>
+<thead>
+<tr>
+<th>数据类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DATE</td>
+<td>表示 1000-01-01～9999-12-31 的日期，格式为 YYYY-MM-DD</td>
+</tr>
+<tr>
+<td>DATETIME</td>
+<td>DATE 和 TIME 的组合</td>
+</tr>
+<tr>
+<td>TIMESTAMP</td>
+<td>功能和 DATETIME 相同（但范围较小）</td>
+</tr>
+<tr>
+<td>TIME</td>
+<td>格式为 HH:MM:SS</td>
+</tr>
+<tr>
+<td>YEAR</td>
+<td>用 2 位数字表示，范围是 70（1970 年）～69（2069 年），用 4 位数字表示，范围是 1901 年～2155 年</td>
+</tr>
+</tbody>
+</table>
+<h2 id="二进制数据类型">二进制数据类型</h2>
+<table>
+<thead>
+<tr>
+<th>数据类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BLOB</td>
+<td>Blob 最大长度为 64KB</td>
+</tr>
+<tr>
+<td>MEDIUMBLOB</td>
+<td>Blob 最大长度为 16MB</td>
+</tr>
+<tr>
+<td>LONGBLOB</td>
+<td>Blob 最大长度为 4GB</td>
+</tr>
+<tr>
+<td>TINYBLOB</td>
+<td>Blob 最大长度为 255 字节</td>
+</tr>
+</tbody>
+</table></article><nav class="toc glass" aria-label="目录"><h3>目录 <em>Contents</em></h3><ol><li style="padding-left:0"><a href="#mysql-常用函数汇总">MySQL 常用函数汇总</a></li><li style="padding-left:0"><a href="#字符串函数">字符串函数</a></li><li style="padding-left:0"><a href="#数学函数">数学函数</a></li><li style="padding-left:0"><a href="#日期和时间函数">日期和时间函数</a></li><li style="padding-left:0"><a href="#流程函数">流程函数</a></li><li style="padding-left:0"><a href="#其他常用函数">其他常用函数</a></li><li style="padding-left:0"><a href="#mysql-数据类型">MySQL 数据类型</a></li><li style="padding-left:12px"><a href="#串数据类型">串数据类型</a></li><li style="padding-left:12px"><a href="#数值数据类型">数值数据类型</a></li><li style="padding-left:12px"><a href="#日期和时间数据类型">日期和时间数据类型</a></li><li style="padding-left:12px"><a href="#二进制数据类型">二进制数据类型</a></li></ol></nav></div><footer class="article-footer"><section class="link-panel glass"><h3>标签与概念 <em>Tags &amp; concepts</em></h3><div class="chip-row"><a class="chip" href="/tags/mysql/">#<!-- -->MySQL</a></div></section><section class="link-panel glass"><h3>反链 <em>Backlinks</em></h3><div class="chip-row"><a class="chip" href="/posts/java-interview-questions/">浪浪山打工人旅游指南（一）Java 面试题【汇总篇】</a></div></section><nav class="prev-next" aria-label="上下篇"><a class="pn-card glass" href="/posts/mysql-primary-key/"><small>上一篇 <em>Older</em></small><b>MySQL 主键设计盘点</b></a><a class="pn-card glass" href="/posts/mysql-36-rules/"><small>下一篇 <em>Newer</em></small><b>MySQL 数据库开发的三十六条军规</b></a></nav></footer></div><footer class="site-foot public-footer"><p>本博客为个人非营利站点：记录赛博炼丹、生活补丁与古法编程档案；无广告、无推广、无统计追踪，不收集访客个人数据。<em>Non-commercial · no ads · no tracking.</em></p><p>每一篇笔记，都是网络里的一个节点。<em>Every note is a node in the network.</em></p></footer></div></div>
+  </body>
+</html>

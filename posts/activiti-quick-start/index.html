@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="icon" type="image/svg+xml" href="/avatar.svg"/>
+    <meta name="theme-color" content="#0d0e0e"/>
+    <title>工作流引擎Activiti快速入门 · 阿里孩舞</title>
+    <script type="module" crossorigin src="/assets/index-B8E3Zrjo.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CsAgeU0E.css">
+  <meta name="description" content="介绍 Activiti 工作流引擎的适用场景、BPMN 2.0 基本概念与核心服务，并以请假流程示例演示流程部署、实例启动、待办查询和任务处理。"/>
+    <link rel="canonical" href="https://www.alihai5.com/posts/activiti-quick-start/"/>
+    <link rel="alternate" type="application/rss+xml" title="阿里孩舞·幂等了吗？" href="https://www.alihai5.com/feed.xml"/>
+    <meta property="og:site_name" content="阿里孩舞"/>
+    <meta property="og:locale" content="zh-CN"/>
+    <meta property="og:title" content="工作流引擎Activiti快速入门 · 阿里孩舞"/>
+    <meta property="og:description" content="介绍 Activiti 工作流引擎的适用场景、BPMN 2.0 基本概念与核心服务，并以请假流程示例演示流程部署、实例启动、待办查询和任务处理。"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://www.alihai5.com/posts/activiti-quick-start/"/>
+    <meta property="og:image" content="https://www.alihai5.com/media/og-default.svg"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="工作流引擎Activiti快速入门 · 阿里孩舞"/>
+    <meta name="twitter:description" content="介绍 Activiti 工作流引擎的适用场景、BPMN 2.0 基本概念与核心服务，并以请假流程示例演示流程部署、实例启动、待办查询和任务处理。"/>
+    <meta name="twitter:image" content="https://www.alihai5.com/media/og-default.svg"/>
+    <meta property="article:published_time" content="2020-06-23T05:32:16.000Z"/>
+    <meta name="robots" content="index,follow"/>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"工作流引擎Activiti快速入门","description":"介绍 Activiti 工作流引擎的适用场景、BPMN 2.0 基本概念与核心服务，并以请假流程示例演示流程部署、实例启动、待办查询和任务处理。","inLanguage":"zh-CN","datePublished":"2020-06-23T05:32:16.000Z","dateModified":"2020-06-23T05:32:16.000Z","mainEntityOfPage":"https://www.alihai5.com/posts/activiti-quick-start/","author":{"@type":"Person","name":"heyshoop"},"publisher":{"@type":"Person","name":"heyshoop"},"keywords":"Activiti","articleSection":"JAVA"}</script>
+  </head>
+  <body>
+    <div id="root"><link rel="preload" as="image" href="/avatar.svg"/><link rel="preload" as="image" href="/media/content/covers/gy.jpg"/><div class="neural page-post"><header class="topbar"><a class="brand" href="/" aria-label="阿里孩舞 首页"><span class="brand-mark" aria-hidden="true"><img src="/avatar.svg" alt=""/></span><span class="brand-text">阿里孩舞<!-- --> <b>/ <!-- -->个人博客</b><small>赛博炼丹与生活补丁<!-- --> · <!-- -->AI alchemy, life patches and legacy code</small></span></a><nav aria-label="主导航"><a class="" href="/">首页<em>Home</em></a><a class="" href="/ai/">赛博炼丹<em>AI Alchemy</em></a><a class="" href="/life/">生活补丁<em>Life Patches</em></a><a class="" href="/legacy/">古法编程<em>Legacy</em></a><a class="" href="/tags/">主题<em>Topics</em></a><a class="" href="/about/">关于<em>About</em></a></nav><div class="top-actions"><a class="pill ghost" href="/legacy/">古法编程 <em>Legacy</em></a></div></header><div class="page page-article"><header class="article-hero glass"><img class="article-cover" src="/media/content/covers/gy.jpg" alt="背负枪械双翼的机甲人物插画"/><p class="eyebrow">古法编程<!-- --> <span>2020年6月23日<!-- --> · <!-- -->7<!-- --> 分钟 · <!-- -->JAVA</span></p><h1>工作流引擎Activiti快速入门</h1><p class="article-description">介绍 Activiti 工作流引擎的适用场景、BPMN 2.0 基本概念与核心服务，并以请假流程示例演示流程部署、实例启动、待办查询和任务处理。</p></header><div class="article-layout"><article class="prose glass"><blockquote>
+<p>Activiti是一个用Java编写的开源工作流引擎，可以执行BPMN 2.0中描述的业务流程。Activiti流程引擎优势在系统开发的易用性和轻量性上。每一项 BPM 业务功能 Activiti 流程引擎都以服务的形式提供给开发人员。通过使用这些服务，开发人员能够构建出功能丰富、轻便且高效的 BPM 应用程序。</p>
+</blockquote>
+<h1 id="一为什么要是用工作流引擎">一、为什么要是用工作流引擎</h1>
+<p>假定我们有一个支付订单状态需要维护，它的状态图如下：
+<img src="/media/content/activiti-quick-start/202212291345843.png" alt="">
+它的状态跃迁自左向右，清晰名了，而且没有<strong>处理角色</strong>的概念，此时我们使用代码控制好状态流转即可，无需使用框架。
+再来看另外一个场景，假定我们有一个企业内部采购订单，它的状态图如下：
+<img src="/media/content/activiti-quick-start/202212291345372.png" alt=""></p>
+<p>这个采购订单的状态复杂多变，状态的转换不稳定性很强，随时有可能增加新的状态；而且不同状态的处理人也是不同的，存在权限管理功能，若此时我们仍然使用一个状态字段来维持状态变更，无疑会困难重重。
+工作流引擎就是为了解决这类问题而生的，我们可以观察当前实体(如支付订单、采购订单)是否具有如下特性，由此来确定是否需要引入工作流引擎。</p>
+<ol>
+<li>状态的个数及其稳定性，个数多且不稳定，适合使用工作流引擎。</li>
+<li>每个状态的处理人，处理人角色多且不稳定，适合使用工作流引擎。</li>
+</ol>
+<p>工作流引擎实际上是放大了状态管理的功能，它根据既有流程图（基于BPMN2规范）的指示，指定每一次状态跃迁的处理角色，在状态变更时持久化评论、表单、附件等数据，保存了完整处理轨迹。</p>
+<blockquote>
+<p><strong>工作流引擎 vs 规则引擎</strong></p>
+<ol>
+<li>工作流更像是管理状态跃迁的，规则引擎不关心状态跃迁，它关注的是处理过程中复杂条件的组合。</li>
+<li>工作流引擎中包含“人”的任务，天生包含处理人角色控制；规则引擎不关心“人”的任务，不做特殊区分。</li>
+<li>工作流引擎是宏观控制、规则引擎是微观控制。</li>
+</ol>
+</blockquote>
+<h1 id="二bpmn20规范简介">二、BPMN2.0规范简介</h1>
+<p>业务流程模型和标记法（BPMN, Business Process Model and Notation）是一套图形化表示法，用于以图形的方式详细说明各种业务流程。
+它最初由业务流程管理倡议组织（BPMI, Business Process Management Initiative）开发，名称为”Business Process Modeling Notation”，即“业务流程建模标记法”。BPMI于2005年与对象管理组织（OMG, Object Management Group）合并。2011年1月OMG发布2.0版本（时至今日，没人会用1.0版本了），同时改为现在的名称。
+BPMN2.0规范的实现，实质上是一个按照特定规范编写的XML文件，使用特定的BPMN设计器，即可以图形化的形式查看和编辑该文件。Activiti以代码的形式实现了这套图形化表示法，使任务的流转依赖图形，而非具体的实现代码。
+<img src="/media/content/activiti-quick-start/202212291345902.png" alt="">
+如上图所示，BPMN2.0规范包含了三个部分Gateway(网关)、Event(事件)、Activities(活动)。</p>
+<blockquote>
+<ol>
+<li><strong>Gateway（网关）</strong>：exclusiveGateway-排他网关，在做判断时使用，除了排他网关还有几个其它类型的网关。</li>
+<li><strong>Event（事件）</strong>：startEvent-开始事件、endEvent-结束事件，规范要求一个完整流程图必须包含这两个部分。</li>
+<li><strong>Activities（活动）</strong>：task-任务、sequenceFlow-连接线，活动是流程的主体部分，内部包含的类型相对较多。</li>
+</ol>
+</blockquote>
+<h1 id="三activiti核心api">三、Activiti核心API</h1>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ProcessEngine</td>
+<td>流程引擎，可以获得其他所有的Service。</td>
+</tr>
+<tr>
+<td>RepositoryService</td>
+<td>Repository中存储了流程定义文件、部署和支持数据等信息；RepositoryService提供了对repository的存取服务。</td>
+</tr>
+<tr>
+<td>RuntimeService</td>
+<td>提供启动流程、查询流程实例、设置获取流程实例变量等功能。</td>
+</tr>
+<tr>
+<td>TaskService</td>
+<td>提供运行时任务查询、领取、完成、删除以及变量设置等功能。</td>
+</tr>
+<tr>
+<td>HistoryService</td>
+<td>用于获取正在运行或已经完成的流程实例的信息。</td>
+</tr>
+<tr>
+<td>FormService</td>
+<td>提供定制任务表单和存储表单数据的功能，注意存储表单数据可选的功能，也可以向自建数据表中提交数据。</td>
+</tr>
+<tr>
+<td>IdentityService</td>
+<td>提供对内建账户体系的管理功能，注意它是可选的服务，可以是用外部账户体系。</td>
+</tr>
+<tr>
+<td>ManagementService</td>
+<td>较少使用，与流程管理无关，主要用于Activiti系统的日常维护。</td>
+</tr>
+</tbody>
+</table>
+<p>完成一次流程的处理，常见步骤以及他们使用的Service如下图所示：
+<img src="/media/content/activiti-quick-start/202212291346663.png" alt=""></p>
+<h2 id="1流程流程实例">1、流程&#x26;流程实例</h2>
+<p>流程由遵守BPMN2.0规范的xml文件指定，定义流程即完成流程文件的设计。
+流程发布后，使用RuntimeService可以开启一个流程实例，每个流程可以开启N次流程实例，且实例之间的数据相互隔离。</p>
+<h2 id="2用户任务">2、用户任务</h2>
+<p>用户任务是BPMN2.0规范中Activities(活动)组件下的重要组成部分，在Activiti中对应Task类；区别于其他类型的任务，用户任务需要进行领取操作，不会自动执行，且领取从待处理任务列表中移除，其他候选人不可见。</p>
+<h2 id="3用户角色">3、用户&#x26;角色</h2>
+<p>Activiti中内建了一个简单的账户体系，用户和角色是多对多的关系；IdentityService中提供了对用户、角色操作的API。
+另外，用户、角色与任务的联系，仅仅通过userId或groupId，不要求必须使用内建账户体系；由于内建的过于简单，开发者完全可以使用自有的账户体系。</p>
+<h2 id="4受让人候选人候选组">4、受让人、候选人、候选组</h2>
+<p>对用户任务做领取操作(claim)，即指定了该任务的受让人，每个任务只能有一个受让人，不能多次领取（但可以再次转让）。
+任务的候选人和候选组支持配置多个，目的是指定处理该任务的人，不在候选列表中的人不允许处理该任务。另外，候选人、候选组可以流程文件中指定，也可以在监听事件中动态指定。</p>
+<h2 id="5变量">5、变量</h2>
+<p>Activiti支持以key/value的形式，对变量做持久化处理。变量通常有两个重要作用：</p>
+<ol>
+<li>存储一些跟流程相关的业务数据，例如处理任务时提交的表单数据。</li>
+<li>流程定义文件中，可以通过UEL表达式获取存储的变量，例如，在互斥网关中选择正确的传出顺序流。</li>
+</ol>
+<h2 id="6表单">6、表单</h2>
+<p>用户处理任务时，通常需要填写备注说明等表单数据，Activiti的FormService对此提供了支持，表单实现如下三种可选的方式：</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>开启方式</th>
+<th>数据存储位置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>动态表单</td>
+<td>流程定义文件中的activiti:formProperty属性</td>
+<td>与变量一样，以key/value的形式存储在变量表</td>
+</tr>
+<tr>
+<td>外置表单</td>
+<td>流程定义文件中的activiti:formkey属性</td>
+<td>与变量一样，以key/value的形式存储在变量表</td>
+</tr>
+<tr>
+<td>普通表单</td>
+<td>脱离Activiti掌控，开发人员自行创建表单和数据表，并使表单和任务关联即可</td>
+<td>任意位置</td>
+</tr>
+</tbody>
+</table>
+<p>三种方式中，<strong>动态表单</strong>由于无法指定样式，使用场景不多；<strong>外置表单</strong>的赋值和提交都依托Activiti引擎。实际使用中主要使用第三种方式<strong>普通表单</strong>，它的页面渲染赋值都由个人掌控，Activiti仅负责流程流转相关工作，页面渲染部分保持独立会使结构更清晰。</p>
+<h2 id="7监听器">7、监听器</h2>
+<p>任务执行时，开发者常常需要触发一些自定义的动作，如动态分配候选人、任务结束时发送通知等；Activiti为开发者提供了两种方式来满足此类需求。</p>
+<ol>
+<li>执行监听器：监听一组有限的流程执行操作，如start、end和take；</li>
+<li>事件监听器：每当流程实例产生变化时，监听器都能得到通知消息（<a href="https://www.activiti.org/userguide/#eventDispatcherEventTypes">官方文档</a>）；</li>
+</ol>
+<h1 id="四请假流程实例">四、请假流程实例</h1>
+<p><img src="/media/content/activiti-quick-start/202212291346290.png" alt="">
+先上代码，项目Demo：<a href="https://cdn.jsdelivr.net/gh/heyshoop/imageRepository@master/images/202212291348547.zip">activiti-demo</a>，配置本地正确的数据库链接，然后启动项目，Activiti会自动初始化数据库建表。</p>
+<blockquote>
+<p>Activiti的表都以act_开头，第二部分是表示表的用途的两个字母缩写标识，用途也和服务的API对应。</p>
+</blockquote>
+<ul>
+<li>act_hi_*：'hi’表示 history，此前缀的表包含历史数据，如历史(结束)流程实例，变量，任务等等。</li>
+<li>act_ge_*：'ge’表示 general，此前缀的表为通用数据，用于不同场景中。</li>
+<li>act_evt_*：'evt’表示 event，此前缀的表为事件日志。</li>
+<li>act_procdef_*：'procdef’表示 processdefine，此前缀的表为记录流程定义信息。</li>
+<li>act_re_*：'re’表示 repository，此前缀的表包含了流程定义和流程静态资源(图片，规则等等)。</li>
+<li>act_ru_*：'ru’表示 runtime，此前缀的表是记录运行时的数据，包含流程实例，任务，变量，异步任务等运行中的数据。Activiti只在流程实例执行过程中保存这些数据，在流程结束时就会删除这些记录。</li>
+</ul>
+<h2 id="1画流程图">1、画流程图</h2>
+<p>流程图本质是一个符合BPMN2.0规范的xml文件，由拖拽式的设计软件完成，方式有很多，我在Git上准备的项目中内置了一个Vue版本的流程图设计工具，可以直接使用该模块来制作流程图。
+<img src="/media/content/activiti-quick-start/202212291347080.png" alt=""></p>
+<h2 id="2部署流程">2、部署流程</h2>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-java"><span class="line"><span style="color:#6A737D">/**</span></span>
+<span class="line"><span style="color:#6A737D">     * 流程部署</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Test</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> deploy</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">        RepositoryService repositoryService </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> processEngine.</span><span style="color:#B392F0">getRepositoryService</span><span style="color:#E1E4E8">();</span><span style="color:#6A737D">//资源对象</span></span>
+<span class="line"><span style="color:#E1E4E8">        Deployment deployment </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> repositoryService.</span><span style="color:#B392F0">createDeployment</span><span style="color:#E1E4E8">()</span><span style="color:#6A737D">//创建一个部署对象</span></span>
+<span class="line"><span style="color:#E1E4E8">                .</span><span style="color:#B392F0">name</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"请假流程"</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">                .</span><span style="color:#B392F0">addClasspathResource</span><span style="color:#E1E4E8">(BPMN)</span></span>
+<span class="line"><span style="color:#E1E4E8">                .</span><span style="color:#B392F0">deploy</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"部署ID："</span><span style="color:#F97583">+</span><span style="color:#E1E4E8">deployment.</span><span style="color:#B392F0">getId</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">        System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"部署名称："</span><span style="color:#F97583">+</span><span style="color:#E1E4E8">deployment.</span><span style="color:#B392F0">getName</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span></code></pre>
+<h2 id="3启动流程">3、启动流程</h2>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-java"><span class="line"><span style="color:#6A737D">/**</span></span>
+<span class="line"><span style="color:#6A737D">     * 启动流程实例分配任务给个人</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Test</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> start</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#6A737D">        //脑补一下这个是从前台传过来的数据</span></span>
+<span class="line"><span style="color:#E1E4E8">        String userKey</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"张三"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#6A737D">        //每一个流程有对应的一个key这个是某一个流程内固定的写在bpmn内的</span></span>
+<span class="line"><span style="color:#E1E4E8">        String processDefinitionKey </span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"myProcess"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        HashMap&#x3C;</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">Object</span><span style="color:#E1E4E8">> variables</span><span style="color:#F97583">=new</span><span style="color:#E1E4E8"> HashMap&#x3C;>();</span></span>
+<span class="line"><span style="color:#6A737D">        //userKey在上文的流程变量中指定了</span></span>
+<span class="line"><span style="color:#E1E4E8">        variables.</span><span style="color:#B392F0">put</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"userKey"</span><span style="color:#E1E4E8">, userKey);</span></span>
+<span class="line"><span style="color:#E1E4E8">        variables.</span><span style="color:#B392F0">put</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"day"</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">        variables.</span><span style="color:#B392F0">put</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"users"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"李四"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">        ProcessInstance instance </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> runtimeService</span></span>
+<span class="line"><span style="color:#E1E4E8">                .</span><span style="color:#B392F0">startProcessInstanceByKey</span><span style="color:#E1E4E8">(processDefinitionKey,variables);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">        System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"流程实例ID:"</span><span style="color:#F97583">+</span><span style="color:#E1E4E8">instance.</span><span style="color:#B392F0">getId</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">        System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"流程定义ID:"</span><span style="color:#F97583">+</span><span style="color:#E1E4E8">instance.</span><span style="color:#B392F0">getProcessDefinitionId</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span></code></pre>
+<h2 id="4查询待办">4、查询待办</h2>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-java"><span class="line"><span style="color:#6A737D">/**</span></span>
+<span class="line"><span style="color:#6A737D">     * 查询当前人的个人任务</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Test</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> findTask</span><span style="color:#E1E4E8">(){</span></span>
+<span class="line"><span style="color:#E1E4E8">        String assignee </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> "张三"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        List&#x3C;</span><span style="color:#F97583">Task</span><span style="color:#E1E4E8">> list </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> taskService.</span><span style="color:#B392F0">createTaskQuery</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">taskAssignee</span><span style="color:#E1E4E8">(assignee).</span><span style="color:#B392F0">orderByTaskCreateTime</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">desc</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">list</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8">(list</span><span style="color:#F97583">!=</span><span style="color:#79B8FF">null</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> list.</span><span style="color:#B392F0">size</span><span style="color:#E1E4E8">()</span><span style="color:#F97583">></span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">){</span></span>
+<span class="line"><span style="color:#F97583">            for</span><span style="color:#E1E4E8">(Task task</span><span style="color:#F97583">:</span><span style="color:#E1E4E8">list){</span></span>
+<span class="line"><span style="color:#E1E4E8">                System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"任务ID:"</span><span style="color:#F97583">+</span><span style="color:#E1E4E8">task.</span><span style="color:#B392F0">getId</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">                System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"任务名称:"</span><span style="color:#F97583">+</span><span style="color:#E1E4E8">task.</span><span style="color:#B392F0">getName</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">                System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"任务的创建时间:"</span><span style="color:#F97583">+</span><span style="color:#E1E4E8">task.</span><span style="color:#B392F0">getCreateTime</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">                System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"任务的办理人:"</span><span style="color:#F97583">+</span><span style="color:#E1E4E8">task.</span><span style="color:#B392F0">getAssignee</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">                System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"流程实例ID："</span><span style="color:#F97583">+</span><span style="color:#E1E4E8">task.</span><span style="color:#B392F0">getProcessInstanceId</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">                System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"执行对象ID:"</span><span style="color:#F97583">+</span><span style="color:#E1E4E8">task.</span><span style="color:#B392F0">getExecutionId</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">                System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"流程定义ID:"</span><span style="color:#F97583">+</span><span style="color:#E1E4E8">task.</span><span style="color:#B392F0">getProcessDefinitionId</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">                System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"getOwner:"</span><span style="color:#F97583">+</span><span style="color:#E1E4E8">task.</span><span style="color:#B392F0">getOwner</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">                System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"getCategory:"</span><span style="color:#F97583">+</span><span style="color:#E1E4E8">task.</span><span style="color:#B392F0">getCategory</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">                System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"getDescription:"</span><span style="color:#F97583">+</span><span style="color:#E1E4E8">task.</span><span style="color:#B392F0">getDescription</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">                System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"getFormKey:"</span><span style="color:#F97583">+</span><span style="color:#E1E4E8">task.</span><span style="color:#B392F0">getFormKey</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">                Map&#x3C;</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">Object</span><span style="color:#E1E4E8">> map </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> task.</span><span style="color:#B392F0">getProcessVariables</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">                for</span><span style="color:#E1E4E8"> (Map.Entry&#x3C;</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">Object</span><span style="color:#E1E4E8">> m </span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> map.</span><span style="color:#B392F0">entrySet</span><span style="color:#E1E4E8">()) {</span></span>
+<span class="line"><span style="color:#E1E4E8">                    System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"key:"</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> m.</span><span style="color:#B392F0">getKey</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">+</span><span style="color:#9ECBFF"> " value:"</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> m.</span><span style="color:#B392F0">getValue</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">                }</span></span>
+<span class="line"><span style="color:#F97583">                for</span><span style="color:#E1E4E8"> (Map.Entry&#x3C;</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">Object</span><span style="color:#E1E4E8">> m </span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> task.</span><span style="color:#B392F0">getTaskLocalVariables</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">entrySet</span><span style="color:#E1E4E8">()) {</span></span>
+<span class="line"><span style="color:#E1E4E8">                    System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"key:"</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> m.</span><span style="color:#B392F0">getKey</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">+</span><span style="color:#9ECBFF"> " value:"</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> m.</span><span style="color:#B392F0">getValue</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">                }</span></span>
+<span class="line"><span style="color:#E1E4E8">            }</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span></code></pre>
+<h2 id="5处理待办">5、处理待办</h2>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-java"><span class="line"><span style="color:#6A737D">/**</span></span>
+<span class="line"><span style="color:#6A737D">     * 完成任务</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Test</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> completeTask</span><span style="color:#E1E4E8">(){</span></span>
+<span class="line"><span style="color:#6A737D">        //任务ID</span></span>
+<span class="line"><span style="color:#E1E4E8">        String taskId </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> "9ac93504-0ef0-11ec-99d7-acde48001122"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        HashMap&#x3C;</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">Object</span><span style="color:#E1E4E8">> variables</span><span style="color:#F97583">=new</span><span style="color:#E1E4E8"> HashMap&#x3C;>();</span></span>
+<span class="line"><span style="color:#E1E4E8">        variables.</span><span style="color:#B392F0">put</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"days"</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span><span style="color:#6A737D">//userKey在上文的流程变量中指定了</span></span>
+<span class="line"><span style="color:#E1E4E8">        taskService.</span><span style="color:#B392F0">complete</span><span style="color:#E1E4E8">(taskId,variables);</span></span>
+<span class="line"><span style="color:#E1E4E8">        System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"完成任务：任务ID："</span><span style="color:#F97583">+</span><span style="color:#E1E4E8">taskId);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span></code></pre>
+<h2 id="">..........</h2>
+<p>时间有限，更多接口可自行尝试实现</p></article><nav class="toc glass" aria-label="目录"><h3>目录 <em>Contents</em></h3><ol><li style="padding-left:0"><a href="#一为什么要是用工作流引擎">一、为什么要是用工作流引擎</a></li><li style="padding-left:0"><a href="#二bpmn20规范简介">二、BPMN2.0规范简介</a></li><li style="padding-left:0"><a href="#三activiti核心api">三、Activiti核心API</a></li><li style="padding-left:12px"><a href="#1流程流程实例">1、流程&amp;流程实例</a></li><li style="padding-left:12px"><a href="#2用户任务">2、用户任务</a></li><li style="padding-left:12px"><a href="#3用户角色">3、用户&amp;角色</a></li><li style="padding-left:12px"><a href="#4受让人候选人候选组">4、受让人、候选人、候选组</a></li><li style="padding-left:12px"><a href="#5变量">5、变量</a></li><li style="padding-left:12px"><a href="#6表单">6、表单</a></li><li style="padding-left:12px"><a href="#7监听器">7、监听器</a></li><li style="padding-left:0"><a href="#四请假流程实例">四、请假流程实例</a></li><li style="padding-left:12px"><a href="#1画流程图">1、画流程图</a></li><li style="padding-left:12px"><a href="#2部署流程">2、部署流程</a></li><li style="padding-left:12px"><a href="#3启动流程">3、启动流程</a></li><li style="padding-left:12px"><a href="#4查询待办">4、查询待办</a></li><li style="padding-left:12px"><a href="#5处理待办">5、处理待办</a></li><li style="padding-left:12px"><a href="#">..........</a></li></ol></nav></div><footer class="article-footer"><section class="link-panel glass"><h3>标签与概念 <em>Tags &amp; concepts</em></h3><div class="chip-row"><a class="chip" href="/tags/activiti/">#<!-- -->Activiti</a></div></section><nav class="prev-next" aria-label="上下篇"><a class="pn-card glass" href="/posts/docker-troubleshooting/"><small>上一篇 <em>Older</em></small><b>Docker 疑难杂症汇总</b></a><a class="pn-card glass" href="/posts/java-tech-stack-basics/"><small>下一篇 <em>Newer</em></small><b>Java 技术栈（基础篇）</b></a></nav></footer></div><footer class="site-foot public-footer"><p>本博客为个人非营利站点：记录赛博炼丹、生活补丁与古法编程档案；无广告、无推广、无统计追踪，不收集访客个人数据。<em>Non-commercial · no ads · no tracking.</em></p><p>每一篇笔记，都是网络里的一个节点。<em>Every note is a node in the network.</em></p></footer></div></div>
+  </body>
+</html>

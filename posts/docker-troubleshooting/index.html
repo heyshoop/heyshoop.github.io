@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="icon" type="image/svg+xml" href="/avatar.svg"/>
+    <meta name="theme-color" content="#0d0e0e"/>
+    <title>Docker 疑难杂症汇总 · 阿里孩舞</title>
+    <script type="module" crossorigin src="/assets/index-B8E3Zrjo.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CsAgeU0E.css">
+  <meta name="description" content="汇总二十六项 Docker 与 Compose 使用问题的排查记录，涉及存储目录迁移、磁盘及 inode 不足、容器异常、网络与网段、字符集、私有仓库、时区和环境变量配置。"/>
+    <link rel="canonical" href="https://www.alihai5.com/posts/docker-troubleshooting/"/>
+    <link rel="alternate" type="application/rss+xml" title="阿里孩舞·幂等了吗？" href="https://www.alihai5.com/feed.xml"/>
+    <meta property="og:site_name" content="阿里孩舞"/>
+    <meta property="og:locale" content="zh-CN"/>
+    <meta property="og:title" content="Docker 疑难杂症汇总 · 阿里孩舞"/>
+    <meta property="og:description" content="汇总二十六项 Docker 与 Compose 使用问题的排查记录，涉及存储目录迁移、磁盘及 inode 不足、容器异常、网络与网段、字符集、私有仓库、时区和环境变量配置。"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://www.alihai5.com/posts/docker-troubleshooting/"/>
+    <meta property="og:image" content="https://www.alihai5.com/media/og-default.svg"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Docker 疑难杂症汇总 · 阿里孩舞"/>
+    <meta name="twitter:description" content="汇总二十六项 Docker 与 Compose 使用问题的排查记录，涉及存储目录迁移、磁盘及 inode 不足、容器异常、网络与网段、字符集、私有仓库、时区和环境变量配置。"/>
+    <meta name="twitter:image" content="https://www.alihai5.com/media/og-default.svg"/>
+    <meta property="article:published_time" content="2020-06-23T05:32:16.000Z"/>
+    <meta name="robots" content="index,follow"/>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Docker 疑难杂症汇总","description":"汇总二十六项 Docker 与 Compose 使用问题的排查记录，涉及存储目录迁移、磁盘及 inode 不足、容器异常、网络与网段、字符集、私有仓库、时区和环境变量配置。","inLanguage":"zh-CN","datePublished":"2020-06-23T05:32:16.000Z","dateModified":"2020-06-23T05:32:16.000Z","mainEntityOfPage":"https://www.alihai5.com/posts/docker-troubleshooting/","author":{"@type":"Person","name":"heyshoop"},"publisher":{"@type":"Person","name":"heyshoop"},"keywords":"Docker","articleSection":"Docker"}</script>
+  </head>
+  <body>
+    <div id="root"><link rel="preload" as="image" href="/avatar.svg"/><link rel="preload" as="image" href="/media/content/covers/lion.jpg"/><div class="neural page-post"><header class="topbar"><a class="brand" href="/" aria-label="阿里孩舞 首页"><span class="brand-mark" aria-hidden="true"><img src="/avatar.svg" alt=""/></span><span class="brand-text">阿里孩舞<!-- --> <b>/ <!-- -->个人博客</b><small>赛博炼丹与生活补丁<!-- --> · <!-- -->AI alchemy, life patches and legacy code</small></span></a><nav aria-label="主导航"><a class="" href="/">首页<em>Home</em></a><a class="" href="/ai/">赛博炼丹<em>AI Alchemy</em></a><a class="" href="/life/">生活补丁<em>Life Patches</em></a><a class="" href="/legacy/">古法编程<em>Legacy</em></a><a class="" href="/tags/">主题<em>Topics</em></a><a class="" href="/about/">关于<em>About</em></a></nav><div class="top-actions"><a class="pill ghost" href="/legacy/">古法编程 <em>Legacy</em></a></div></header><div class="page page-article"><header class="article-hero glass"><img class="article-cover" src="/media/content/covers/lion.jpg" alt="彩色烟雾背景前的狮子特写插画"/><p class="eyebrow">古法编程<!-- --> <span>2020年6月23日<!-- --> · <!-- -->27<!-- --> 分钟 · <!-- -->Docker</span></p><h1>Docker 疑难杂症汇总</h1><p class="article-description">汇总二十六项 Docker 与 Compose 使用问题的排查记录，涉及存储目录迁移、磁盘及 inode 不足、容器异常、网络与网段、字符集、私有仓库、时区和环境变量配置。</p></header><div class="article-layout"><article class="prose glass"><h2 id="1-docker-迁移存储目录">1. Docker 迁移存储目录</h2>
+<p><strong>默认情况系统会将 Docker 容器存放在 /var/lib/docker 目录下</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 今天通过监控系统，发现公司其中一台服务器的磁盘快慢，随即上去看了下，发现 /var/lib/docker 这个目录特别大。由上述原因，我们都知道，在 /var/lib/docker 中存储的都是相关于容器的存储，所以也不能随便的将其删除掉。</li>
+<li>那就准备迁移 docker 的存储目录吧，或者对 /var 设备进行扩容来达到相同的目的。更多关于 dockerd 的详细参数，请点击查看 <a href="https://docs.docker.com/engine/reference/commandline/dockerd/">官方文档</a> 地址。</li>
+<li>但是需要注意的一点就是，尽量不要用软链， 因为一些 docker 容器编排系统不支持这样做，比如我们所熟知的 k8s 就在内。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 发现容器启动不了了 </span></span>
+<span class="line"><span style="color:#B392F0">ERROR:</span><span style="color:#9ECBFF"> cannot</span><span style="color:#9ECBFF">  create</span><span style="color:#9ECBFF"> temporary</span><span style="color:#9ECBFF"> directory!</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#6A737D"># 查看系统存储情况 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> du</span><span style="color:#79B8FF"> -h</span><span style="color:#79B8FF"> --max-depth=1</span><span style="color:#E1E4E8"> </span></span></code></pre>
+<ul>
+<li><strong>[解决方法 1] 添加软链接</strong></li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 1.停止docker服务 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> systemctl</span><span style="color:#9ECBFF"> stop</span><span style="color:#9ECBFF"> docker</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#6A737D"># 2.开始迁移目录 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> mv</span><span style="color:#9ECBFF"> /var/lib/docker</span><span style="color:#9ECBFF"> /data/</span></span>
+<span class="line"><span style="color:#6A737D"># 3.添加软链接 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> ln</span><span style="color:#79B8FF"> -s</span><span style="color:#9ECBFF"> /data/docker</span><span style="color:#9ECBFF"> /var/lib/docker</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#6A737D"># 4.启动docker服务 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> systemctl</span><span style="color:#9ECBFF"> start</span><span style="color:#9ECBFF"> docker</span><span style="color:#E1E4E8"> </span></span></code></pre>
+<ul>
+<li><strong>[解决方法 2] 改动 docker 配置文件</strong></li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># [方式一] 改动docker启动配置文件 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> vim</span><span style="color:#9ECBFF"> /lib/systemd/system/docker.service</span><span style="color:#9ECBFF"> ExecStart=/usr/bin/dockerd</span><span style="color:#79B8FF"> --graph=/data/docker/</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#6A737D"># [方式二] 改动docker启动配置文件 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> vim</span><span style="color:#9ECBFF"> /etc/docker/daemon.json</span><span style="color:#9ECBFF"> {</span><span style="color:#9ECBFF">     "live-restore":</span><span style="color:#79B8FF"> true</span><span style="color:#9ECBFF">,</span><span style="color:#9ECBFF">     "graph":</span><span style="color:#E1E4E8"> [ </span><span style="color:#9ECBFF">"/data/docker/"</span><span style="color:#9ECBFF"> ]</span><span style="color:#9ECBFF"> }</span><span style="color:#E1E4E8"> </span></span></code></pre>
+<ul>
+<li><strong>[操作注意事项]</strong> 在迁移 docker 目录的时候注意使用的命令，要么使用 mv 命令直接移动，要么使用 cp 命令复制文件，但是需要注意同时复制文件权限和对应属性，不然在使用的时候可能会存在权限问题。如果容器中，也是使用 root 用户，则不会存在该问题，但是也是需要按照正确的操作来迁移目录。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 使用mv命令 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> mv</span><span style="color:#9ECBFF"> /var/lib/docker</span><span style="color:#9ECBFF"> /data/docker</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#6A737D"># 使用cp命令 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> cp</span><span style="color:#79B8FF"> -arv</span><span style="color:#9ECBFF"> /data/docker</span><span style="color:#9ECBFF"> /data2/docker</span><span style="color:#E1E4E8"> </span></span></code></pre>
+<ul>
+<li>因为启动的容器使用的是普通用户运行进程的，且在运行当中需要使用 /tmp 目录，结果提示没有权限。在我们导入容器镜像的时候，其实是会将容器启动时需要的各个目录的权限和属性都赋予了。如果我们直接是 cp 命令单纯复制文件内容的话，就会出现属性不一致的情况，同时还会有一定的安全问题。</li>
+</ul>
+<hr>
+<h2 id="2-docker-设备空间不足">2. Docker 设备空间不足</h2>
+<p><a href="https://stackoverflow.com/questions/50140939/increase-docker-container-size-from-default-10gb-on-rhel7/52971594#52971594">Increase Docker container size from default 10GB on rhel7.</a></p>
+<ul>
+<li><strong>[问题起因一]</strong> 容器在导入或者启动的时候，如果提示磁盘空间不足的，那么多半是真的因为物理磁盘空间真的有问题导致的。如下所示，我们可以看到 / 分区确实满了。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 查看物理磁盘空间 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> df</span><span style="color:#79B8FF"> -Th</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">Filesystem</span><span style="color:#9ECBFF">    Size</span><span style="color:#9ECBFF">    Used</span><span style="color:#9ECBFF">    Avail</span><span style="color:#9ECBFF">    Use%</span><span style="color:#9ECBFF">    Mounted</span><span style="color:#9ECBFF"> on</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">/dev/vda1</span><span style="color:#9ECBFF">      40G</span><span style="color:#9ECBFF">     40G</span><span style="color:#9ECBFF">       0G</span><span style="color:#9ECBFF">    100%</span><span style="color:#9ECBFF">    /</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">tmpfs</span><span style="color:#9ECBFF">         7.8G</span><span style="color:#79B8FF">       0</span><span style="color:#9ECBFF">     7.8G</span><span style="color:#9ECBFF">      0%</span><span style="color:#9ECBFF">    /dev/shm</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">/dev/vdb1</span><span style="color:#9ECBFF">     493G</span><span style="color:#9ECBFF">    289G</span><span style="color:#9ECBFF">     179G</span><span style="color:#9ECBFF">     62%</span><span style="color:#9ECBFF">    /mnt</span><span style="color:#E1E4E8"> </span></span></code></pre>
+<ul>
+<li>如果发现真的是物理磁盘空间满了的话，就需要查看到底是什么占据了如此大的空间，导致因为容器没有空间无法启动。其中，docker 自带的命令就是一个很好的能够帮助我们发现问题的工具。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 查看基本信息 </span></span>
+<span class="line"><span style="color:#6A737D"># 硬件驱动使用的是devicemapper，空间池为docker-252 </span></span>
+<span class="line"><span style="color:#6A737D"># 磁盘可用容量仅剩16.78MB，可用供我们使用 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> docker</span><span style="color:#9ECBFF"> info</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">Containers:</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">Images:</span><span style="color:#79B8FF"> 28</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">Storage</span><span style="color:#9ECBFF"> Driver:</span><span style="color:#9ECBFF"> devicemapper</span></span>
+<span class="line"><span style="color:#B392F0">  Pool</span><span style="color:#9ECBFF"> Name:</span><span style="color:#9ECBFF"> docker-252:1-787932-pool</span></span>
+<span class="line"><span style="color:#B392F0">  Pool</span><span style="color:#9ECBFF"> Blocksize:</span><span style="color:#79B8FF"> 65.54</span><span style="color:#9ECBFF"> kB</span></span>
+<span class="line"><span style="color:#B392F0">  Backing</span><span style="color:#9ECBFF"> Filesystem:</span><span style="color:#9ECBFF"> extfs</span></span>
+<span class="line"><span style="color:#B392F0">  Data</span><span style="color:#9ECBFF"> file:</span><span style="color:#9ECBFF"> /dev/loop0</span></span>
+<span class="line"><span style="color:#B392F0">  Metadata</span><span style="color:#9ECBFF"> file:</span><span style="color:#9ECBFF"> /dev/loop1</span></span>
+<span class="line"><span style="color:#B392F0">  Data</span><span style="color:#9ECBFF"> Space</span><span style="color:#9ECBFF"> Used:</span><span style="color:#79B8FF"> 1.225</span><span style="color:#9ECBFF"> GB</span></span>
+<span class="line"><span style="color:#B392F0">  Data</span><span style="color:#9ECBFF"> Space</span><span style="color:#9ECBFF"> Total:</span><span style="color:#79B8FF"> 107.4</span><span style="color:#9ECBFF"> GB</span></span>
+<span class="line"><span style="color:#B392F0">  Data</span><span style="color:#9ECBFF"> Space</span><span style="color:#9ECBFF"> Available:</span><span style="color:#79B8FF"> 16.78</span><span style="color:#9ECBFF"> MB</span></span>
+<span class="line"><span style="color:#B392F0">  Metadata</span><span style="color:#9ECBFF"> Space</span><span style="color:#9ECBFF"> Used:</span><span style="color:#79B8FF"> 2.073</span><span style="color:#9ECBFF"> MB</span></span>
+<span class="line"><span style="color:#B392F0">  Metadata</span><span style="color:#9ECBFF"> Space</span><span style="color:#9ECBFF"> Total:</span><span style="color:#79B8FF"> 2.147</span><span style="color:#9ECBFF"> GB</span><span style="color:#E1E4E8"> </span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 通过查看信息，我们知道正是因为 docker 可用的磁盘空间不足，所以导致启动的时候没有足够的空间进行加载启动镜像。解决的方法也很简单，第一就是清理无效数据文件释放磁盘空间(<strong>清除日志</strong>)，第二就是修改 docker 数据的存放路径(<strong>大分区</strong>)。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 显示哪些容器目录具有最大的日志文件 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> du</span><span style="color:#79B8FF"> -d1</span><span style="color:#79B8FF"> -h</span><span style="color:#9ECBFF"> /var/lib/docker/containers</span><span style="color:#F97583"> |</span><span style="color:#B392F0"> sort</span><span style="color:#79B8FF"> -h</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#6A737D"># 清除您选择的容器日志文件的内容 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> cat</span><span style="color:#9ECBFF"> /dev/null</span><span style="color:#F97583"> ></span><span style="color:#9ECBFF"> /var/lib/docker/containers/container_id/container_log_name</span><span style="color:#E1E4E8"> </span></span></code></pre>
+<hr>
+<ul>
+<li><strong>[问题起因二]</strong> 显然我遇到的不是上一种情况，而是在启动容器的时候，容器启动之后不久就显示是 unhealthy 的状态，通过如下日志发现，原来是复制配置文件启动的时候，提示磁盘空间不足。</li>
+<li>后面发现是因为 CentOS7 的系统使用的 docker 容器默认的创建大小就是 10G 而已，然而我们使用的容器却超过了这个限制，导致无法启动时提示空间不足。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#B392F0">2019-08-16</span><span style="color:#9ECBFF"> 11:11:15,816</span><span style="color:#9ECBFF"> INFO</span><span style="color:#9ECBFF"> spawned:</span><span style="color:#9ECBFF"> 'app-demo'</span><span style="color:#9ECBFF"> with</span><span style="color:#9ECBFF"> pid</span><span style="color:#79B8FF"> 835</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">2019-08-16</span><span style="color:#9ECBFF"> 11:11:16,268</span><span style="color:#9ECBFF"> INFO</span><span style="color:#9ECBFF"> exited:</span><span style="color:#9ECBFF"> app</span><span style="color:#E1E4E8"> (exit </span><span style="color:#9ECBFF">status</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">; </span><span style="color:#B392F0">not</span><span style="color:#9ECBFF"> expected</span><span style="color:#E1E4E8">) </span></span>
+<span class="line"><span style="color:#B392F0">2019-08-16</span><span style="color:#9ECBFF"> 11:11:17,270</span><span style="color:#9ECBFF"> INFO</span><span style="color:#9ECBFF"> gave</span><span style="color:#9ECBFF"> up:</span><span style="color:#9ECBFF"> app</span><span style="color:#9ECBFF"> entered</span><span style="color:#9ECBFF"> FATAL</span><span style="color:#9ECBFF"> state,</span><span style="color:#9ECBFF"> too</span><span style="color:#9ECBFF"> many</span><span style="color:#9ECBFF"> start</span><span style="color:#9ECBFF"> retries</span><span style="color:#9ECBFF"> too</span><span style="color:#9ECBFF"> quickly</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">cp:</span><span style="color:#9ECBFF"> cannot</span><span style="color:#9ECBFF"> create</span><span style="color:#9ECBFF"> regular</span><span style="color:#9ECBFF"> file</span><span style="color:#9ECBFF"> '/etc/supervisor/conf.d/grpc-app-demo.conf':</span><span style="color:#9ECBFF"> No</span><span style="color:#9ECBFF"> space</span><span style="color:#9ECBFF"> left</span><span style="color:#9ECBFF"> on</span><span style="color:#9ECBFF"> device</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">cp:</span><span style="color:#9ECBFF"> cannot</span><span style="color:#9ECBFF"> create</span><span style="color:#9ECBFF"> regular</span><span style="color:#9ECBFF"> file</span><span style="color:#9ECBFF"> '/etc/supervisor/conf.d/grpc-app-demo.conf':</span><span style="color:#9ECBFF"> No</span><span style="color:#9ECBFF"> space</span><span style="color:#9ECBFF"> left</span><span style="color:#9ECBFF"> on</span><span style="color:#9ECBFF"> device</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">cp:</span><span style="color:#9ECBFF"> cannot</span><span style="color:#9ECBFF"> create</span><span style="color:#9ECBFF"> regular</span><span style="color:#9ECBFF"> file</span><span style="color:#9ECBFF"> '/etc/supervisor/conf.d/grpc-app-demo.conf':</span><span style="color:#9ECBFF"> No</span><span style="color:#9ECBFF"> space</span><span style="color:#9ECBFF"> left</span><span style="color:#9ECBFF"> on</span><span style="color:#9ECBFF"> device</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">cp:</span><span style="color:#9ECBFF"> cannot</span><span style="color:#9ECBFF"> create</span><span style="color:#9ECBFF"> regular</span><span style="color:#9ECBFF"> file</span><span style="color:#9ECBFF"> '/etc/supervisor/conf.d/grpc-app-demo.conf':</span><span style="color:#9ECBFF"> No</span><span style="color:#9ECBFF"> space</span><span style="color:#9ECBFF"> left</span><span style="color:#9ECBFF"> on</span><span style="color:#9ECBFF"> device</span><span style="color:#E1E4E8"> </span></span></code></pre>
+<ul>
+<li><strong>[解决方法 1] 改动 docker 启动配置文件</strong></li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># /etc/docker/daemon.json </span></span>
+<span class="line"><span style="color:#E1E4E8">{     </span></span>
+<span class="line"><span style="color:#B392F0">  "live-restore"</span><span style="color:#79B8FF">:</span><span style="color:#79B8FF"> true</span><span style="color:#9ECBFF">,</span><span style="color:#E1E4E8">     </span></span>
+<span class="line"><span style="color:#B392F0">  "storage-opt"</span><span style="color:#79B8FF">:</span><span style="color:#E1E4E8"> [ </span><span style="color:#9ECBFF">"dm.basesize=20G"</span><span style="color:#9ECBFF"> ]</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#E1E4E8">} </span></span></code></pre>
+<ul>
+<li><strong>[解决方法 2] 改动 systemctl 的 docker 启动文件</strong></li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 1.stop the docker service </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> systemctl</span><span style="color:#9ECBFF"> stop</span><span style="color:#9ECBFF"> docker</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#6A737D"># 2.rm exised container </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> rm</span><span style="color:#79B8FF"> -rf</span><span style="color:#9ECBFF"> /var/lib/docker</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#6A737D"># 2.edit your docker service file </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> vim</span><span style="color:#9ECBFF"> /usr/lib/systemd/system/docker.service</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#6A737D"># 3.find the execution line</span></span>
+<span class="line"><span style="color:#E1E4E8"> ExecStart</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">/usr/bin/dockerd</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">and</span><span style="color:#9ECBFF"> change</span><span style="color:#9ECBFF"> it</span><span style="color:#9ECBFF"> to:</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#E1E4E8">ExecStart</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">/usr/bin/dockerd</span><span style="color:#B392F0"> --storage-opt</span><span style="color:#9ECBFF"> dm.basesize=20G</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#6A737D"># 4.start docker service again </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> systemctl</span><span style="color:#9ECBFF"> start</span><span style="color:#9ECBFF"> docker</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#6A737D"># 5.reload daemon </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> systemctl</span><span style="color:#9ECBFF"> daemon-reload</span><span style="color:#E1E4E8"> </span></span></code></pre>
+<hr>
+<ul>
+<li><strong>[问题起因三]</strong> 还有一种情况也会让容器无法启动，并提示磁盘空间不足，但是使用命令查看发现并不是因为物理磁盘真的不足导致的。而是，因为对于分区的 inode 节点数满了导致的。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 报错信息 No space left on device </span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 因为 ext3 文件系统使用 inode table 存储 inode 信息，而 xfs 文件系统使用 B+ tree 来进行存储。考虑到性能问题，默认情况下这个 B+ tree 只会使用前 1TB 空间，当这 1TB 空间被写满后，就会导致无法写入 inode 信息，报磁盘空间不足的错误。我们可以在 mount 时，指定 inode64 即可将这个 B+ tree 使用的空间扩展到整个文件系统。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 查看系统的inode节点使用情况 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> df</span><span style="color:#79B8FF"> -i</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#6A737D"># 尝试重新挂载 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> mount</span><span style="color:#79B8FF"> -o</span><span style="color:#9ECBFF"> remount</span><span style="color:#79B8FF"> -o</span><span style="color:#9ECBFF"> noatime,nodiratime,inode64,nobarrier</span><span style="color:#9ECBFF"> /dev/vda1</span><span style="color:#E1E4E8"> </span></span></code></pre>
+<ul>
+<li><strong>[补充知识]</strong> 文件储存在硬盘上，硬盘的最小存储单位叫做 <strong>扇区</strong>(Sector)。每个扇区储存 512 字节(相当于0.5KB)。操作系统读取硬盘的时候，不会一个个扇区地读取，这样效率太低，而是一次性连续读取多个扇区，即一次性读取一个<strong>块</strong>(block)。这种由多个扇区组成的<strong>块</strong>，是文件存取的最小单位。<strong>块</strong>的大小，最常见的是4KB，即连续八个 sector 组成一个 block 块。文件数据都储存在<strong>块</strong>中，那么很显然，我们还必须找到一个地方储存文件的元信息，比如文件的创建者、文件的创建日期、文件的大小等等。这种储存文件元信息的区域就叫做<strong>索引节点</strong>(inode)。每一个文件都有对应的 inode，里面包含了除了文件名以外的所有文件信息。</li>
+<li>inode 也会消耗硬盘空间，所以硬盘格式化的时候，操作系统自动将硬盘分成两个区域。一个是数据区，存放文件数据；另一个是 inode 区(inode table)，存放 inode 所包含的信息。每个 inode 节点的大小，一般是 128 字节或 256 字节。inode 节点的总数，在格式化时就给定，一般是每1KB或每2KB就设置一个 inode 节点。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 每个节点信息的内容 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> stat</span><span style="color:#9ECBFF"> check_port_live.sh</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">   File:</span><span style="color:#9ECBFF"> check_port_live.sh</span></span>
+<span class="line"><span style="color:#B392F0">   Size:</span><span style="color:#79B8FF"> 225</span><span style="color:#9ECBFF">           Blocks:</span><span style="color:#79B8FF"> 8</span><span style="color:#9ECBFF">          IO</span><span style="color:#9ECBFF"> Block:</span><span style="color:#79B8FF"> 4096</span><span style="color:#9ECBFF">   regular</span><span style="color:#9ECBFF"> file</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">Device:</span><span style="color:#9ECBFF"> 822h/2082d</span><span style="color:#9ECBFF">    Inode:</span><span style="color:#79B8FF"> 99621663</span><span style="color:#9ECBFF">    Links:</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">Access:</span><span style="color:#E1E4E8"> (0755/-rwxr-xr-x)  Uid: ( </span><span style="color:#B392F0">1006/</span><span style="color:#9ECBFF">  escape</span><span style="color:#E1E4E8">)   Gid: ( </span><span style="color:#B392F0">1006/</span><span style="color:#9ECBFF">  escape</span><span style="color:#E1E4E8">) </span></span>
+<span class="line"><span style="color:#B392F0">Access:</span><span style="color:#9ECBFF"> 2019-07-29</span><span style="color:#9ECBFF"> 14:59:59.498076903</span><span style="color:#9ECBFF"> +0800</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">Modify:</span><span style="color:#9ECBFF"> 2019-07-29</span><span style="color:#9ECBFF"> 14:59:59.498076903</span><span style="color:#9ECBFF"> +0800</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">Change:</span><span style="color:#9ECBFF"> 2019-07-29</span><span style="color:#9ECBFF"> 23:20:27.834866649</span><span style="color:#9ECBFF"> +0800</span><span style="color:#E1E4E8">  </span></span>
+<span class="line"><span style="color:#B392F0">  Birth:</span><span style="color:#9ECBFF"> -</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#6A737D"># 磁盘的inode使用情况 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> df</span><span style="color:#79B8FF"> -i</span><span style="color:#9ECBFF"> Filesystem</span><span style="color:#9ECBFF">                 Inodes</span><span style="color:#9ECBFF">   IUsed</span><span style="color:#9ECBFF">     IFree</span><span style="color:#9ECBFF"> IUse%</span><span style="color:#9ECBFF"> Mounted</span><span style="color:#9ECBFF"> on</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">udev</span><span style="color:#79B8FF">                     16478355</span><span style="color:#79B8FF">     801</span><span style="color:#79B8FF">  16477554</span><span style="color:#9ECBFF">    1%</span><span style="color:#9ECBFF"> /dev</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">tmpfs</span><span style="color:#79B8FF">                    16487639</span><span style="color:#79B8FF">    2521</span><span style="color:#79B8FF">  16485118</span><span style="color:#9ECBFF">    1%</span><span style="color:#9ECBFF"> /run</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">/dev/sdc2</span><span style="color:#79B8FF">               244162560</span><span style="color:#79B8FF"> 4788436</span><span style="color:#79B8FF"> 239374124</span><span style="color:#9ECBFF">    2%</span><span style="color:#9ECBFF"> /</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">tmpfs</span><span style="color:#79B8FF">                    16487639</span><span style="color:#79B8FF">       5</span><span style="color:#79B8FF">  16487634</span><span style="color:#9ECBFF">    1%</span><span style="color:#9ECBFF"> /dev/shm</span><span style="color:#E1E4E8"> </span></span></code></pre>
+<hr>
+<h2 id="3-docker-缺共享链接库">3. Docker 缺共享链接库</h2>
+<p><strong>Docker 命令需要对/tmp 目录下面有访问权限</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 给系统安装完 compose 之后，查看版本的时候，提示缺少一个名为 libz.so.1 的共享链接库。第一反应就是，是不是系统少安装那个软件包导致的。随即，搜索了一下，将相关的依赖包都给安装了，却还是提示同样的问题。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 提示错误信息 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> docker-compose</span><span style="color:#79B8FF"> --version</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">error</span><span style="color:#9ECBFF"> while</span><span style="color:#9ECBFF"> loading</span><span style="color:#9ECBFF"> shared</span><span style="color:#9ECBFF"> libraries:</span><span style="color:#9ECBFF"> libz.so.1:</span><span style="color:#9ECBFF"> failed</span><span style="color:#9ECBFF"> to</span><span style="color:#9ECBFF"> map</span><span style="color:#9ECBFF"> segment</span><span style="color:#9ECBFF"> from</span><span style="color:#9ECBFF"> shared</span><span style="color:#9ECBFF"> object:</span><span style="color:#9ECBFF"> Operation</span><span style="color:#9ECBFF"> not</span><span style="color:#9ECBFF"> permitted</span><span style="color:#E1E4E8"> </span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 后来发现，是因为系统中 docker 没有对 /tmp 目录的访问权限导致，需要重新将其挂载一次，就可以解决了。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 重新挂载 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> mount</span><span style="color:#9ECBFF"> /tmp</span><span style="color:#79B8FF"> -o</span><span style="color:#9ECBFF"> remount,exec</span><span style="color:#E1E4E8"> </span></span></code></pre>
+<hr>
+<h2 id="4-docker-容器文件损坏">4. Docker 容器文件损坏</h2>
+<p><strong>对 dockerd 的配置有可能会影响到系统稳定</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 容器文件损坏，经常会导致容器无法操作。正常的 docker 命令已经无法操控这台容器了，无法关闭、重启、删除。正巧，前天就需要这个的问题，主要的原因是因为重新对 docker 的默认容器进行了重新的分配限制导致的。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 操作容器遇到类似的错误 </span></span>
+<span class="line"><span style="color:#B392F0">b</span><span style="color:#B392F0">'devicemapper: Error running deviceCreate (CreateSnapDeviceRaw) dm_task_run failed'</span><span style="color:#E1E4E8"> </span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 可以通过以下操作将容器删除/重建。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 1.关闭docker </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> systemctl</span><span style="color:#9ECBFF"> stop</span><span style="color:#9ECBFF"> docker</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#6A737D"># 2.删除容器文件 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> rm</span><span style="color:#79B8FF"> -rf</span><span style="color:#9ECBFF"> /var/lib/docker/containers</span></span>
+<span class="line"><span style="color:#6A737D"> # 3.重新整理容器元数据 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> thin_check</span><span style="color:#9ECBFF"> /var/lib/docker/devicemapper/devicemapper/metadata</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> thin_check</span><span style="color:#79B8FF"> --clear-needs-check-flag</span><span style="color:#9ECBFF"> /var/lib/docker/devicemapper/devicemapper/metadata</span></span>
+<span class="line"><span style="color:#6A737D"># 4.重启docker </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> systemctl</span><span style="color:#9ECBFF"> start</span><span style="color:#9ECBFF"> docker</span><span style="color:#E1E4E8"> </span></span></code></pre>
+<hr>
+<h2 id="5-docker-容器优雅重启">5. Docker 容器优雅重启</h2>
+<p><strong>不停止服务器上面运行的容器，重启 dockerd 服务是多么好的一件事</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 默认情况下，当 Docker 守护程序终止时，它会关闭正在运行的容器。从 Docker-ce 1.12 开始，可以在配置文件中添加 live-restore 参数，以便在守护程序变得不可用时容器保持运行。需要注意的是 Windows 平台暂时还是不支持该参数的配置。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># Keep containers alive during daemon downtime </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> vim</span><span style="color:#9ECBFF"> /etc/docker/daemon.yaml</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#E1E4E8">{  </span></span>
+<span class="line"><span style="color:#B392F0"> "live-restore"</span><span style="color:#79B8FF">:</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#E1E4E8">} </span></span>
+<span class="line"><span style="color:#6A737D"># 在守护进程停机期间保持容器存活 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> dockerd</span><span style="color:#79B8FF"> --live-restore</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#6A737D"># 只能使用reload重载 #</span></span>
+<span class="line"><span style="color:#B392F0"> 相当于发送SIGHUP信号量给dockerd守护进程</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> systemctl</span><span style="color:#9ECBFF"> reload</span><span style="color:#9ECBFF"> docker</span><span style="color:#E1E4E8"> </span></span>
+<span class="line"><span style="color:#6A737D"># 但是对应网络的设置需要restart才能生效 </span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> systemctl</span><span style="color:#9ECBFF"> restart</span><span style="color:#9ECBFF"> docker</span><span style="color:#E1E4E8"> </span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 可以通过以下操作将容器删除/重建。</li>
+</ul>
+<p><strong>json</strong></p>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-yaml"><span class="line"><span style="color:#6A737D"># /etc/docker/daemon.yaml</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#9ECBFF">    "registry-mirrors"</span><span style="color:#E1E4E8">: [</span><span style="color:#9ECBFF">"https://vec0xydj.mirror.aliyuncs.com"</span><span style="color:#E1E4E8">],  </span><span style="color:#6A737D"># 配置获取官方镜像的仓库地址</span></span>
+<span class="line"><span style="color:#9ECBFF">    "experimental"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,  </span><span style="color:#6A737D"># 启用实验功能</span></span>
+<span class="line"><span style="color:#9ECBFF">    "default-runtime"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"nvidia"</span><span style="color:#E1E4E8">,  </span><span style="color:#6A737D"># 容器的默认OCI运行时(默认为runc)</span></span>
+<span class="line"><span style="color:#9ECBFF">    "live-restore"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,  </span><span style="color:#6A737D"># 重启dockerd服务的时候容易不终止</span></span>
+<span class="line"><span style="color:#9ECBFF">    "runtimes"</span><span style="color:#E1E4E8">: {  </span><span style="color:#6A737D"># 配置容器运行时</span></span>
+<span class="line"><span style="color:#9ECBFF">        "nvidia"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#9ECBFF">            "path"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"/usr/bin/nvidia-container-runtime"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">            "runtimeArgs"</span><span style="color:#E1E4E8">: []</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#9ECBFF">    "default-address-pools"</span><span style="color:#E1E4E8">: [  </span><span style="color:#6A737D"># 配置容器使用的子网地址池</span></span>
+<span class="line"><span style="color:#E1E4E8">        {</span></span>
+<span class="line"><span style="color:#9ECBFF">            "scope"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"local"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">            "base":"172.17.0.0/12"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">            "size":24</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    ]</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> vim</span><span style="color:#9ECBFF"> /etc/docker/daemon.json</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#B392F0">  "default-address-pools"</span><span style="color:#9ECBFF"> :</span><span style="color:#E1E4E8"> [</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">      "base"</span><span style="color:#9ECBFF"> :</span><span style="color:#9ECBFF"> "172.240.0.0/16",</span></span>
+<span class="line"><span style="color:#B392F0">      "size"</span><span style="color:#9ECBFF"> :</span><span style="color:#79B8FF"> 24</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  ]</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<hr>
+<h2 id="6-docker-容器无法删除">6. Docker 容器无法删除</h2>
+<p><strong>找不到对应容器进程是最吓人的</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 今天遇到 docker 容器无法停止/终止/删除，以为这个容器可能又出现了 dockerd 守护进程托管的情况，但是通过 ps -ef  无法查到对应的运行进程。哎，后来开始开始查 supervisor 以及 Dockerfile 中的进程，都没有。这种情况的可能原因是容器启动之后，主机因任何原因重新启动并且没有优雅地终止容器。剩下的文件现在阻止你重新生成旧名称的新容器，因为系统认为旧容器仍然存在。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 删除容器</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> docker</span><span style="color:#9ECBFF"> rm</span><span style="color:#79B8FF"> -f</span><span style="color:#9ECBFF"> f8e8c3..</span></span>
+<span class="line"><span style="color:#B392F0">Error</span><span style="color:#9ECBFF"> response</span><span style="color:#9ECBFF"> from</span><span style="color:#9ECBFF"> daemon:</span><span style="color:#9ECBFF"> Conflict,</span><span style="color:#9ECBFF"> cannot</span><span style="color:#9ECBFF"> remove</span><span style="color:#9ECBFF"> the</span><span style="color:#9ECBFF"> default</span><span style="color:#9ECBFF"> name</span><span style="color:#9ECBFF"> of</span><span style="color:#9ECBFF"> the</span><span style="color:#9ECBFF"> container</span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 找到 /var/lib/docker/containers/ 下的对应容器的文件夹，将其删除，然后重启一下 dockerd 即可。我们会发现，之前无法删除的容器没有了。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 删除容器文件</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> rm</span><span style="color:#79B8FF"> -rf</span><span style="color:#9ECBFF"> /var/lib/docker/containers/f8e8c3...65720</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 重启服务</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> systemctl</span><span style="color:#9ECBFF"> restart</span><span style="color:#9ECBFF"> docker.service</span></span></code></pre>
+<hr>
+<h2 id="7-docker-容器中文异常">7. Docker 容器中文异常</h2>
+<p><strong>容器存在问题话，记得优先在官网查询</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 今天登陆之前部署的 MySQL 数据库查询，发现使用 SQL 语句无法查询中文字段，即使直接输入中文都没有办法显示。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 查看容器支持的字符集</span></span>
+<span class="line"><span style="color:#B392F0">root@b18f56aa1e15:#</span><span style="color:#9ECBFF"> locale</span><span style="color:#79B8FF"> -a</span></span>
+<span class="line"><span style="color:#B392F0">C</span></span>
+<span class="line"><span style="color:#B392F0">C.UTF-8</span></span>
+<span class="line"><span style="color:#B392F0">POSIX</span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> Docker 部署的 MySQL 系统使用的是 POSIX 字符集。然而 POSIX 字符集是不支持中文的，而 C.UTF-8 是支持中文的只要把系统中的环境 LANG 改为 "C.UTF-8" 格式即可解决问题。同理，在 K8S 进入 pod 不能输入中文也可用此方法解决。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 临时解决</span></span>
+<span class="line"><span style="color:#B392F0">docker</span><span style="color:#9ECBFF"> exec</span><span style="color:#79B8FF"> -it</span><span style="color:#9ECBFF"> some-mysql</span><span style="color:#9ECBFF"> env</span><span style="color:#9ECBFF"> LANG=C.UTF-8</span><span style="color:#9ECBFF"> /bin/bash</span></span></code></pre>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 永久解决</span></span>
+<span class="line"><span style="color:#B392F0">docker</span><span style="color:#9ECBFF"> run</span><span style="color:#79B8FF"> --name</span><span style="color:#9ECBFF"> some-mysql</span><span style="color:#79B8FF"> \</span></span>
+<span class="line"><span style="color:#79B8FF">    -e</span><span style="color:#9ECBFF"> MYSQL_ROOT_PASSWORD=my-secret-pw</span><span style="color:#79B8FF"> \</span></span>
+<span class="line"><span style="color:#79B8FF">    -d</span><span style="color:#9ECBFF"> mysql:tag</span><span style="color:#79B8FF"> --character-set-server=utf8mb4</span><span style="color:#79B8FF"> \</span></span>
+<span class="line"><span style="color:#79B8FF">    --collation-server=utf8mb4_unicode_ci</span></span></code></pre>
+<hr>
+<h2 id="8-docker-容器网络互通">8. Docker 容器网络互通</h2>
+<p><strong>了解 Docker 的四种网络模型</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 在本机部署 Nginx 容器想代理本机启动的 Python 后端服务程序，但是对代码服务如下的配置，结果访问的时候一直提示 502 错误。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 启动Nginx服务</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> docker</span><span style="color:#9ECBFF"> run</span><span style="color:#79B8FF"> -d</span><span style="color:#79B8FF"> -p</span><span style="color:#9ECBFF"> 80:80</span><span style="color:#E1E4E8"> $PWD</span><span style="color:#9ECBFF">:/etc/nginx</span><span style="color:#9ECBFF"> nginx</span></span></code></pre>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#B392F0">server</span><span style="color:#9ECBFF"> {</span></span>
+<span class="line"><span style="color:#79B8FF">    ...</span></span>
+<span class="line"><span style="color:#B392F0">    location</span><span style="color:#9ECBFF"> /api</span><span style="color:#9ECBFF"> {</span></span>
+<span class="line"><span style="color:#B392F0">        proxy_pass</span><span style="color:#9ECBFF"> http://localhost:8080</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#79B8FF">    ...</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 后面发现是因为 nginx.conf 配置文件中的 localhost 配置的有问题，由于 Nginx 是在容器中运行，所以 localhost 为容器中的 localhost，而非本机的 localhost，所以导致无法访问。</li>
+<li>可以将 nginx.conf 中的 localhost 改为宿主机的 IP 地址，就可以解决 502 的错误。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 查询宿主机IP地址 => 172.17.0.1</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> ip</span><span style="color:#9ECBFF"> addr</span><span style="color:#9ECBFF"> show</span><span style="color:#9ECBFF"> docker0</span></span>
+<span class="line"><span style="color:#B392F0">docker0:</span><span style="color:#F97583"> &#x3C;</span><span style="color:#9ECBFF">BROADCAST,MULTICAST,UP,LOWER_U</span><span style="color:#E1E4E8">P</span><span style="color:#F97583">></span><span style="color:#9ECBFF"> mtu</span><span style="color:#79B8FF"> 1500</span><span style="color:#9ECBFF"> qdisc</span><span style="color:#9ECBFF"> noqueue</span><span style="color:#9ECBFF"> state</span><span style="color:#9ECBFF"> UP</span><span style="color:#9ECBFF"> group</span><span style="color:#9ECBFF"> default</span></span>
+<span class="line"><span style="color:#B392F0">    link/ether</span><span style="color:#9ECBFF"> 02:42:d5:4c:f2:1e</span><span style="color:#9ECBFF"> brd</span><span style="color:#9ECBFF"> ff:ff:ff:ff:ff:ff</span></span>
+<span class="line"><span style="color:#B392F0">    inet</span><span style="color:#9ECBFF"> 172.17.0.1/16</span><span style="color:#9ECBFF"> scope</span><span style="color:#9ECBFF"> global</span><span style="color:#9ECBFF"> docker0</span></span>
+<span class="line"><span style="color:#B392F0">       valid_lft</span><span style="color:#9ECBFF"> forever</span><span style="color:#9ECBFF"> preferred_lft</span><span style="color:#9ECBFF"> forever</span></span>
+<span class="line"><span style="color:#B392F0">    inet6</span><span style="color:#9ECBFF"> fe80::42:d5ff:fe4c:f21e/64</span><span style="color:#9ECBFF"> scope</span><span style="color:#9ECBFF"> link</span></span>
+<span class="line"><span style="color:#B392F0">       valid_lft</span><span style="color:#9ECBFF"> forever</span><span style="color:#9ECBFF"> preferred_lft</span><span style="color:#9ECBFF"> forever</span></span></code></pre>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#B392F0">server</span><span style="color:#9ECBFF"> {</span></span>
+<span class="line"><span style="color:#79B8FF">    ...</span></span>
+<span class="line"><span style="color:#B392F0">    location</span><span style="color:#9ECBFF"> /api</span><span style="color:#9ECBFF"> {</span></span>
+<span class="line"><span style="color:#B392F0">        proxy_pass</span><span style="color:#9ECBFF"> http://172.17.0.1:8080</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#79B8FF">    ...</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<ul>
+<li>当容器使用 host 网络时，容器与宿主共用网络，这样就能在容器中访问宿主机网络，那么容器的 localhost 就是宿主机的 localhost 了。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 服务的启动方式有所改变(没有映射出来端口)</span></span>
+<span class="line"><span style="color:#6A737D"># 因为本身与宿主机共用了网络，宿主机暴露端口等同于容器中暴露端口</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> docker</span><span style="color:#9ECBFF"> run</span><span style="color:#79B8FF"> -d</span><span style="color:#79B8FF"> -p</span><span style="color:#9ECBFF"> 80:80</span><span style="color:#79B8FF"> --network=host</span><span style="color:#E1E4E8"> $PWD</span><span style="color:#9ECBFF">:/etc/nginx</span><span style="color:#9ECBFF"> nginxx</span></span></code></pre>
+<hr>
+<h2 id="9-docker-容器总线错误">9. Docker 容器总线错误</h2>
+<p><strong>总线错误看到的时候还是挺吓人了</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 在 docker 容器中运行程序的时候，提示 bus error 错误。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 总线报错</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> inv</span><span style="color:#9ECBFF"> app.user_op</span><span style="color:#79B8FF"> --name=zhangsan</span></span>
+<span class="line"><span style="color:#B392F0">Bus</span><span style="color:#9ECBFF"> error</span><span style="color:#E1E4E8"> (core </span><span style="color:#9ECBFF">dumped</span><span style="color:#E1E4E8">)</span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 原因是在 docker 运行的时候，shm 分区设置太小导致 share memory 不够。不设置 --shm-size 参数时，docker 给容器默认分配的 shm 大小为 64M，导致程序启动时不足。具体原因还是因为安装 pytorch 包导致了，多进程跑任务的时候，docker 容器分配的共享内存太小，导致 torch 要在 tmpfs 上面放模型数据用于子线程的 <a href="https://github.com/pytorch/pytorch/issues/2244">共享不足</a>，就出现报错了。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 问题原因</span></span>
+<span class="line"><span style="color:#B392F0">root@18...35:/opt/app#</span><span style="color:#9ECBFF"> df</span><span style="color:#79B8FF"> -TH</span></span>
+<span class="line"><span style="color:#B392F0">Filesystem</span><span style="color:#9ECBFF">     Type</span><span style="color:#9ECBFF">     Size</span><span style="color:#9ECBFF">  Used</span><span style="color:#9ECBFF"> Avail</span><span style="color:#9ECBFF"> Use%</span><span style="color:#9ECBFF"> Mounted</span><span style="color:#9ECBFF"> on</span></span>
+<span class="line"><span style="color:#B392F0">overlay</span><span style="color:#9ECBFF">        overlay</span><span style="color:#9ECBFF">  2.0T</span><span style="color:#9ECBFF">  221G</span><span style="color:#9ECBFF">  1.4T</span><span style="color:#9ECBFF">   3%</span><span style="color:#9ECBFF"> /</span></span>
+<span class="line"><span style="color:#B392F0">tmpfs</span><span style="color:#9ECBFF">          tmpfs</span><span style="color:#9ECBFF">     68M</span><span style="color:#79B8FF">     0</span><span style="color:#9ECBFF">   68M</span><span style="color:#9ECBFF">   0%</span><span style="color:#9ECBFF"> /dev</span></span>
+<span class="line"><span style="color:#B392F0">shm</span><span style="color:#9ECBFF">            tmpfs</span><span style="color:#9ECBFF">     68M</span><span style="color:#9ECBFF">   41k</span><span style="color:#9ECBFF">   68M</span><span style="color:#9ECBFF">   1%</span><span style="color:#9ECBFF"> /dev/shm</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 启动docker的时候加上--shm-size参数(单位为b,k,m或g)</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> docker</span><span style="color:#9ECBFF"> run</span><span style="color:#79B8FF"> -it</span><span style="color:#79B8FF"> --rm</span><span style="color:#79B8FF"> --shm-size=200m</span><span style="color:#9ECBFF"> pytorch/pytorch:latest</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 在docker-compose添加对应配置</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> shm_size:</span><span style="color:#9ECBFF"> '2gb'</span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 还有一种情况就是容器内的磁盘空间不足，也会导致 bus error 这样的报错，所以如果出现了，清除多余文件和目录或者分配一个大的磁盘空间，就可以解决了。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 磁盘空间不足</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> df</span><span style="color:#79B8FF"> -Th</span></span>
+<span class="line"><span style="color:#B392F0">Filesystem</span><span style="color:#9ECBFF">     Type</span><span style="color:#9ECBFF">     Size</span><span style="color:#9ECBFF">  Used</span><span style="color:#9ECBFF"> Avail</span><span style="color:#9ECBFF"> Use%</span><span style="color:#9ECBFF"> Mounted</span><span style="color:#9ECBFF"> on</span></span>
+<span class="line"><span style="color:#B392F0">overlay</span><span style="color:#9ECBFF">        overlay</span><span style="color:#9ECBFF">    1T</span><span style="color:#9ECBFF">    1T</span><span style="color:#9ECBFF">    0G</span><span style="color:#9ECBFF"> 100%</span><span style="color:#9ECBFF"> /</span></span>
+<span class="line"><span style="color:#B392F0">shm</span><span style="color:#9ECBFF">            tmpfs</span><span style="color:#9ECBFF">     64M</span><span style="color:#9ECBFF">   24K</span><span style="color:#9ECBFF">   64M</span><span style="color:#9ECBFF">   1%</span><span style="color:#9ECBFF"> /dev/shm</span></span></code></pre>
+<hr>
+<h2 id="10-docker-nfs-挂载报错">10. Docker NFS 挂载报错</h2>
+<p><strong>NFS 挂载之后容器程序使用异常为内核版本太低导致的</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 我们将服务部署到 openshift 集群中，启动服务调用资源文件的时候，报错信息如下所示。从报错信息中，得知是在 Python3 程序执行 read_file() 读取文件的内容，给文件加锁的时候报错了。但是奇怪的是，本地调试的时候发现服务都是可以正常运行的，文件加锁也是没问题的。后来发现，在 openshift 集群中使用的是 NFS 挂载的共享磁盘。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 报错信息</span></span>
+<span class="line"><span style="color:#B392F0">Traceback</span><span style="color:#E1E4E8"> (most </span><span style="color:#9ECBFF">recent</span><span style="color:#9ECBFF"> call</span><span style="color:#9ECBFF"> last</span><span style="color:#E1E4E8">):</span></span>
+<span class="line"><span style="color:#79B8FF">    ......</span></span>
+<span class="line"><span style="color:#B392F0">    File</span><span style="color:#9ECBFF"> "xxx/utils/storage.py",</span><span style="color:#9ECBFF"> line</span><span style="color:#9ECBFF"> 34,</span><span style="color:#9ECBFF"> in</span><span style="color:#9ECBFF"> xxx.utils.storage.LocalStorage.read_file</span></span>
+<span class="line"><span style="color:#B392F0">OSError:</span><span style="color:#E1E4E8"> [Errno </span><span style="color:#9ECBFF">9]</span><span style="color:#9ECBFF"> Bad</span><span style="color:#9ECBFF"> file</span><span style="color:#9ECBFF"> descriptor</span></span></code></pre>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 文件加锁代码</span></span>
+<span class="line"><span style="color:#79B8FF">...</span></span>
+<span class="line"><span style="color:#B392F0">    with</span><span style="color:#9ECBFF"> open</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">self.mount(path</span><span style="color:#E1E4E8">)</span><span style="color:#9ECBFF">,</span><span style="color:#9ECBFF"> 'rb'</span><span style="color:#E1E4E8">) as fileobj:</span></span>
+<span class="line"><span style="color:#B392F0">        fcntl.flock(fileobj,</span><span style="color:#9ECBFF"> fcntl.LOCK_EX</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#B392F0">        data</span><span style="color:#9ECBFF"> =</span><span style="color:#9ECBFF"> fileobj.read</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#9ECBFF"> data</span></span>
+<span class="line"><span style="color:#79B8FF">...</span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 从下面的信息得知，要在 Linux 中使用 flock() 的话，就需要升级内核版本到 2.6.11+ 才行。后来才发现，这实际上是由 RedHat 內核中的一个错误引起的，并在 kernel-3.10.0-693.18.1.el7 版本中得到修复。 所以对于 NFSv3 和 NFSv4 服务而已，就需要升级 Linux 内核版本才能够解决这个问题。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># https://t.codebug.vip/questions-930901.htm</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> In</span><span style="color:#9ECBFF"> Linux</span><span style="color:#9ECBFF"> kernels</span><span style="color:#9ECBFF"> up</span><span style="color:#9ECBFF"> to</span><span style="color:#9ECBFF"> 2.6.11,</span><span style="color:#9ECBFF"> flock</span><span style="color:#E1E4E8">() </span><span style="color:#9ECBFF">does</span><span style="color:#9ECBFF"> not</span><span style="color:#9ECBFF"> lock</span><span style="color:#9ECBFF"> files</span><span style="color:#9ECBFF"> over</span><span style="color:#9ECBFF"> NFS</span><span style="color:#E1E4E8"> (i.e.,</span></span>
+<span class="line"><span style="color:#B392F0">the</span><span style="color:#9ECBFF"> scope</span><span style="color:#9ECBFF"> of</span><span style="color:#9ECBFF"> locks</span><span style="color:#9ECBFF"> was</span><span style="color:#9ECBFF"> limited</span><span style="color:#9ECBFF"> to</span><span style="color:#9ECBFF"> the</span><span style="color:#9ECBFF"> local</span><span style="color:#9ECBFF"> system</span><span style="color:#E1E4E8">). [...] Since Linux 2.6.12,</span></span>
+<span class="line"><span style="color:#B392F0">NFS</span><span style="color:#9ECBFF"> clients</span><span style="color:#9ECBFF"> support</span><span style="color:#9ECBFF"> flock</span><span style="color:#E1E4E8">() </span><span style="color:#9ECBFF">locks</span><span style="color:#9ECBFF"> by</span><span style="color:#9ECBFF"> emulating</span><span style="color:#9ECBFF"> them</span><span style="color:#9ECBFF"> as</span><span style="color:#9ECBFF"> byte-range</span><span style="color:#9ECBFF"> locks</span><span style="color:#9ECBFF"> on</span><span style="color:#9ECBFF"> the</span><span style="color:#9ECBFF"> entire</span><span style="color:#9ECBFF"> file.</span></span></code></pre>
+<hr>
+<h2 id="11-docker-使用默认网段">11. Docker 使用默认网段</h2>
+<p><strong>启动的容器网络无法相互通信，很是奇怪！</strong></p>
+<ul>
+<li>
+<p><strong>[问题起因]</strong> 我们在使用 Docker 启动服务的时候，发现有时候服务之前可以相互连通，而有时启动的多个服务之前却出现了无法访问的情况。究其原因，发现原来是因为使用的内部私有地址网段不一致导致的。有的服务启动到了 172.17 - 172.31 的网段，有的服务跑到了 192.169.0 - 192.168.224 的网段，这样导致服务启动之后出现无法访问的情况(默认情况下，有下面这个两个网段可供其使用)。
+<img src="/media/content/docker-troubleshooting/202212291405111.png" alt="">
+<strong>Docker默认使用网段</strong></p>
+</li>
+<li>
+<p><strong>[解决方法]</strong> 上述问题的处理方式，就是手动指定 Docker 服务的启动网段，二选一就可以了。</p>
+</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 查看docker容器配置</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> cat</span><span style="color:#9ECBFF"> /etc/docker/daemon.json</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#B392F0">    "registry-mirrors"</span><span style="color:#79B8FF">:</span><span style="color:#E1E4E8"> [</span><span style="color:#9ECBFF">"https://vec0xydj.mirror.aliyuncs.com"</span><span style="color:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#B392F0">    "default-address-pools"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF">[{</span><span style="color:#E1E4E8">"</span><span style="color:#B392F0">base</span><span style="color:#B392F0">":"</span><span style="color:#B392F0">172.17.0.0/12</span><span style="color:#B392F0">", "</span><span style="color:#B392F0">size</span><span style="color:#B392F0">":24}],</span></span>
+<span class="line"><span style="color:#B392F0">    "</span><span style="color:#B392F0">experimental</span><span style="color:#B392F0">": true,</span></span>
+<span class="line"><span style="color:#B392F0">    "</span><span style="color:#B392F0">default-runtime</span><span style="color:#B392F0">": "</span><span style="color:#B392F0">nvidia</span><span style="color:#B392F0">",</span></span>
+<span class="line"><span style="color:#B392F0">    "</span><span style="color:#B392F0">live-restore</span><span style="color:#B392F0">": true,</span></span>
+<span class="line"><span style="color:#B392F0">    "</span><span style="color:#B392F0">runtimes</span><span style="color:#B392F0">": {</span></span>
+<span class="line"><span style="color:#B392F0">        "</span><span style="color:#B392F0">nvidia</span><span style="color:#B392F0">": {</span></span>
+<span class="line"><span style="color:#B392F0">            "</span><span style="color:#B392F0">path</span><span style="color:#B392F0">": "</span><span style="color:#B392F0">/usr/bin/nvidia-container-runtime</span><span style="color:#B392F0">",</span></span>
+<span class="line"><span style="color:#B392F0">            "</span><span style="color:#B392F0">runtimeArgs</span><span style="color:#B392F0">": []</span></span>
+<span class="line"><span style="color:#B392F0">        }</span></span>
+<span class="line"><span style="color:#B392F0">    }</span></span>
+<span class="line"><span style="color:#B392F0">}</span></span></code></pre>
+<hr>
+<h2 id="12-docker-服务启动串台">12. Docker 服务启动串台</h2>
+<p><strong>使用 docker-compose 命令各自启动两组服务，发现服务会串台！</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 在两个不同名称的目录目录下面，使用 docker-compose 来启动服务，发现当 A 组服务启动完毕之后，再启动 B 组服务的时候，发现 A 组当中对应的一部分服务又重新启动了一次，这就非常奇怪了！因为这个问题的存在会导致，A 组服务和 B 组服务无法同时启动。之前还以为是工具的 Bug，后来请教了 <strong>“上峰”</strong>，才知道了原因，恍然大悟。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 服务目录结构如下所示</span></span>
+<span class="line"><span style="color:#B392F0">A:</span><span style="color:#9ECBFF"> /data1/app/docker-compose.yml</span></span>
+<span class="line"><span style="color:#B392F0">B:</span><span style="color:#9ECBFF"> /data2/app/docker-compose.yml</span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 发现 A 和 B 两组服务会串台的原因，原来是 docker-compose 会给启动的容器加 label 标签，然后根据这些 label 标签来识别和判断对应的容器服务是由谁启动的、谁来管理的，等等。而这里，我们需要关注的 label 变量是 com.docker.compose.project，其对应的值是使用启动配置文件的目录的最底层子目录名称，即上面的 app 就是对应的值。我们可以发现， A 和 B 两组服务对应的值都是 app，所以启动的时候被认为是同一个，这就出现了上述的问题。如果需要深入了解的话，可以去看对应源代码。
+<img src="/media/content/docker-troubleshooting/202212291406483.png" alt="">
+<strong>Docker服务启动串台</strong></li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 可以将目录结构调整为如下所示</span></span>
+<span class="line"><span style="color:#B392F0">A:</span><span style="color:#9ECBFF"> /data/app1/docker-compose.yml</span></span>
+<span class="line"><span style="color:#B392F0">B:</span><span style="color:#9ECBFF"> /data/app2/docker-compose.yml</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">A:</span><span style="color:#9ECBFF"> /data1/app-old/docker-compose.yml</span></span>
+<span class="line"><span style="color:#B392F0">B:</span><span style="color:#9ECBFF"> /data2/app-new/docker-compose.yml</span></span></code></pre>
+<ul>
+<li>或者使用 docker-compose 命令提供的参数 -p 手动指定标签，来规避该问题的发生。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 指定项目项目名称</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> docker-compose</span><span style="color:#79B8FF"> -f</span><span style="color:#9ECBFF"> ./docker-compose.yml</span><span style="color:#79B8FF"> -p</span><span style="color:#9ECBFF"> app1</span><span style="color:#9ECBFF"> up</span><span style="color:#79B8FF"> -d</span></span></code></pre>
+<hr>
+<h2 id="13-docker-命令调用报错">13. Docker 命令调用报错</h2>
+<p><strong>在编写脚本的时候常常会执行 docker 相关的命令，但是需要注意使用细节！</strong></p>
+<ul>
+<li>
+<p><strong>[问题起因]</strong> CI 更新环境执行了一个脚本，但是脚本执行过程中报错了，如下所示。通过对应的输出信息，可以看到提示说正在执行的设备不是一个 tty。
+<img src="/media/content/docker-troubleshooting/202212291406569.png" alt="">
+<strong>Docker命令调用报错</strong></p>
+</li>
+<li>
+<p>随即，查看了脚本发现报错地方是执行了一个 exec 的 docker 命令，大致如下所示。很奇怪的是，手动执行或直接调脚本的时候，怎么都是没有问题的，但是等到 CI 调用的时候怎么都是有问题。后来好好看下，下面这个命令，注意到 -it 这个参数了。</p>
+</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 脚本调用docker命令</span></span>
+<span class="line"><span style="color:#B392F0">docker</span><span style="color:#9ECBFF"> exec</span><span style="color:#79B8FF"> -it</span><span style="color:#F97583"> &#x3C;</span><span style="color:#9ECBFF">container_nam</span><span style="color:#E1E4E8">e</span><span style="color:#F97583">></span><span style="color:#9ECBFF"> psql</span><span style="color:#79B8FF"> -Upostgres</span><span style="color:#9ECBFF"> ......</span></span></code></pre>
+<ul>
+<li>
+<p>我们可以一起看下 exec 命令的这两个参数，自然就差不多理解了。
+| 编号 | 参数 | 解释说明 |
+| --- | --- | --- |
+| 1 | -i/-interactive | 即使没有附加也保持 STDIN 打开；如果你需要执行命令则需要开启这个选项 |
+| 2 | -t/–tty | 分配一个伪终端进行执行；一个连接用户的终端与容器 stdin 和 stdout 的桥梁 |</p>
+</li>
+<li>
+<p><strong>[解决方法]</strong> docker exec 的参数 -t 是指 Allocate a pseudo-TTY 的意思，而 CI 在执行 job 的时候并不是在 TTY 终端中执行，所以 -t 这个参数会报错。同时在 『<a href="https://stackoverflow.com/questions/43099116/error-the-input-device-is-not-a-tty">stackoverflow</a>』也有人给出原因，可以自行查看。
+<img src="/media/content/docker-troubleshooting/202212291407326.png" alt="">
+<strong>Docker命令调用报错</strong></p>
+</li>
+</ul>
+<hr>
+<h2 id="14-docker-定时任务异常">14. Docker 定时任务异常</h2>
+<p><strong>在 Crontab 定时任务中也存在 Docker 命令执行异常的情况！</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 今天发现了一个问题，就是在备份 Mysql 数据库的时候，使用 docker 容器进行备份，然后使用 Crontab 定时任务来触发备份。但是发现备份的 MySQL 数据库居然是空的，但是手动执行对应命令切是好的，很奇怪。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># Crontab定时任务</span></span>
+<span class="line"><span style="color:#B392F0">0</span><span style="color:#79B8FF"> *</span><span style="color:#9ECBFF">/6</span><span style="color:#79B8FF"> *</span><span style="color:#79B8FF"> *</span><span style="color:#79B8FF"> *</span><span style="color:#79B8FF"> \</span></span>
+<span class="line"><span style="color:#9ECBFF">    docker</span><span style="color:#9ECBFF"> exec</span><span style="color:#79B8FF"> -it</span><span style="color:#F97583"> &#x3C;</span><span style="color:#9ECBFF">container_nam</span><span style="color:#E1E4E8">e</span><span style="color:#F97583">></span><span style="color:#9ECBFF"> sh</span><span style="color:#79B8FF"> -c</span><span style="color:#79B8FF"> \</span></span>
+<span class="line"><span style="color:#9ECBFF">        'exec mysqldump --all-databases -uroot -ppassword ......'</span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 后来发现是因为执行的 docker 命令多个 -i 导致的。因为 Crontab 命令执行的时候，并不是交互式的，所以需要把这个去掉才可以。总结就是，如果你需要回显的话则需要 -t 选项，如果需要交互式会话则需要 -i 选项。
+| 编号 | 参数 | 解释说明 |
+| --- | --- | --- |
+| 1 | -i/-interactive | 即使没有附加也保持 STDIN 打开；如果你需要执行命令则需要开启这个选项 |
+| 2 | -t/–tty | 分配一个伪终端进行执行；一个连接用户的终端与容器 stdin 和 stdout 的桥梁 |</li>
+</ul>
+<hr>
+<h2 id="15-docker-变量使用引号">15. Docker 变量使用引号</h2>
+<p><strong>compose 里边环境变量带不带引号的问题！</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 使用过 compose 的朋友可能都遇到过，在编写启服务启动配置文件的时候，添加环境变量时到底是使用单引号、双引号还是不使用引号的问题？时间长了，我们可能会将三者混用，认为其效果是一样的。但是后来，发现的坑越来越多，才发现其越来越隐晦。</li>
+<li>反正我是遇到过很多问题，都是因为添加引号导致的服务启动异常的，后来得出的结论就是一律不使引号。裸奔，体验前所未有的爽快！直到现在看到了 Github 中对应的 <a href="https://github.com/docker/compose/issues/2854">issus</a> 之后，才终于破案了。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 在Compose中进行引用TEST_VAR变量，无法找到</span></span>
+<span class="line"><span style="color:#E1E4E8">TEST_VAR</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"test"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 在Compose中进行引用TEST_VAR变量，可以找到</span></span>
+<span class="line"><span style="color:#E1E4E8">TEST_VAR</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">test</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 后来发现docker本身其实已经正确地处理了引号的使用</span></span>
+<span class="line"><span style="color:#B392F0">docker</span><span style="color:#9ECBFF"> run</span><span style="color:#79B8FF"> -it</span><span style="color:#79B8FF"> --rm</span><span style="color:#79B8FF"> -e</span><span style="color:#9ECBFF"> TEST_VAR="test"</span><span style="color:#9ECBFF"> test:latest</span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 得到的结论就是，因为 Compose 解析 yaml 配置文件，发现引号也进行了解释包装。这就导致原本的 TEST_VAR="test" 被解析成了 'TEST_VAR="test"'，所以我们在引用的时候就无法获取到对应的值。现在解决方法就是，不管是我们直接在配置文件添加环境变量或者使用 env_file 配置文件，能不使用引号就不适用引号。</li>
+<li>需要注意的是环境变量配置的是日志格式的话(2022-01-01)，如果使用的是 Python 的 yaml.load 模块的话，会被当做是 date 类型的，这是如果希望保持原样信息的话，可以使用 '/" 引起来将其变成字符串格式的。</li>
+</ul>
+<hr>
+<h2 id="16-docker-删除镜像报错">16. Docker 删除镜像报错</h2>
+<p><strong>无法删除镜像，归根到底还是有地方用到了！</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 清理服器磁盘空间的时候，删除某个镜像的时候提示如下信息。提示需要强制删除，但是发现及时执行了强制删除依旧没有效果。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 删除镜像</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> docker</span><span style="color:#9ECBFF"> rmi</span><span style="color:#9ECBFF"> 3ccxxxx2e862</span></span>
+<span class="line"><span style="color:#B392F0">Error</span><span style="color:#9ECBFF"> response</span><span style="color:#9ECBFF"> from</span><span style="color:#9ECBFF"> daemon:</span><span style="color:#9ECBFF"> conflict:</span><span style="color:#9ECBFF"> unable</span><span style="color:#9ECBFF"> to</span><span style="color:#9ECBFF"> delete</span><span style="color:#9ECBFF"> 3ccxxxx2e862</span><span style="color:#E1E4E8"> (cannot </span><span style="color:#9ECBFF">be</span><span style="color:#9ECBFF"> forced</span><span style="color:#E1E4E8">) - image has dependent child images</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 强制删除</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> dcoker</span><span style="color:#9ECBFF"> rmi</span><span style="color:#79B8FF"> -f</span><span style="color:#9ECBFF"> 3ccxxxx2e862</span></span>
+<span class="line"><span style="color:#B392F0">Error</span><span style="color:#9ECBFF"> response</span><span style="color:#9ECBFF"> from</span><span style="color:#9ECBFF"> daemon:</span><span style="color:#9ECBFF"> conflict:</span><span style="color:#9ECBFF"> unable</span><span style="color:#9ECBFF"> to</span><span style="color:#9ECBFF"> delete</span><span style="color:#9ECBFF"> 3ccxxxx2e862</span><span style="color:#E1E4E8"> (cannot </span><span style="color:#9ECBFF">be</span><span style="color:#9ECBFF"> forced</span><span style="color:#E1E4E8">) - image has dependent child images</span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 后来才发现，出现这个原因主要是因为 TAG，即存在其他镜像引用了这个镜像。这里我们可以使用如下命令查看对应镜像文件的依赖关系，然后根据对应 TAG 来删除镜像。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 查询依赖 - image_id表示镜像名称</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> docker</span><span style="color:#9ECBFF"> image</span><span style="color:#9ECBFF"> inspect</span><span style="color:#79B8FF"> --format=</span><span style="color:#9ECBFF">'{{.RepoTags}} {{.Id}} {{.Parent}}'</span><span style="color:#E1E4E8"> $(</span><span style="color:#B392F0">docker</span><span style="color:#9ECBFF"> image</span><span style="color:#9ECBFF"> ls</span><span style="color:#79B8FF"> -q</span><span style="color:#79B8FF"> --filter</span><span style="color:#9ECBFF"> since=</span><span style="color:#F97583">&#x3C;</span><span style="color:#9ECBFF">image_i</span><span style="color:#E1E4E8">d</span><span style="color:#F97583">></span><span style="color:#E1E4E8">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 根据TAG删除镜像</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> docker</span><span style="color:#9ECBFF"> rmi</span><span style="color:#79B8FF"> -f</span><span style="color:#9ECBFF"> c565xxxxc87f</span></span></code></pre>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 删除悬空镜像</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> docker</span><span style="color:#9ECBFF"> rmi</span><span style="color:#E1E4E8"> $(</span><span style="color:#B392F0">docker</span><span style="color:#9ECBFF"> images</span><span style="color:#79B8FF"> --filter</span><span style="color:#9ECBFF"> "dangling=true"</span><span style="color:#79B8FF"> -q</span><span style="color:#79B8FF"> --no-trunc</span><span style="color:#E1E4E8">)</span></span></code></pre>
+<hr>
+<h2 id="17-docker-普通用户切换">17. Docker 普通用户切换</h2>
+<p><strong>切换 Docker 启动用户的话，还是需要注意下权限问题的！</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 我们知道在 Docker 容器里面使用 root 用户的话，是不安全的，很容易出现越权的安全问题，所以一般情况下，我们都会使用普通用户来代替 root 进行服务的启动和管理的。今天给一个服务切换用户的时候，发现 Nginx 服务一直无法启动，提示如下权限问题。因为对应的配置文件也没有配置 var 相关的目录，无奈 🤷‍♀ ！️</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># Nginx报错信息</span></span>
+<span class="line"><span style="color:#B392F0">nginx:</span><span style="color:#E1E4E8"> [alert] could not open error log file: </span><span style="color:#B392F0">open</span><span style="color:#E1E4E8">() </span><span style="color:#9ECBFF">"/var/log/nginx/error.log"</span><span style="color:#E1E4E8"> failed (</span><span style="color:#B392F0">13:</span><span style="color:#9ECBFF"> Permission</span><span style="color:#9ECBFF"> denied</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#B392F0">2020/11/12</span><span style="color:#9ECBFF"> 15:25:47</span><span style="color:#E1E4E8"> [emerg] 23#23: </span><span style="color:#B392F0">mkdir</span><span style="color:#E1E4E8">() </span><span style="color:#9ECBFF">"/var/cache/nginx/client_temp"</span><span style="color:#E1E4E8"> failed (</span><span style="color:#B392F0">13:</span><span style="color:#9ECBFF"> Permission</span><span style="color:#9ECBFF"> denied</span><span style="color:#E1E4E8">)</span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 后来发现还是 nginx.conf 配置文件，配置的有问题，需要将 Nginx 服务启动时候需要的文件都配置到一个无权限的目录，即可解决。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#B392F0">user</span><span style="color:#9ECBFF">  www-data</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">worker_processes</span><span style="color:#79B8FF">  1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">error_log</span><span style="color:#9ECBFF">  /data/logs/master_error.log</span><span style="color:#9ECBFF"> warn</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">pid</span><span style="color:#9ECBFF">        /dev/shm/nginx.pid</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">events</span><span style="color:#9ECBFF"> {</span></span>
+<span class="line"><span style="color:#B392F0">    worker_connections</span><span style="color:#79B8FF">  1024</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">http</span><span style="color:#9ECBFF"> {</span></span>
+<span class="line"><span style="color:#B392F0">    include</span><span style="color:#9ECBFF">       /etc/nginx/mime.types</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    default_type</span><span style="color:#9ECBFF">  application/octet-stream</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">    gzip</span><span style="color:#9ECBFF">               on</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    sendfile</span><span style="color:#9ECBFF">           on</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    tcp_nopush</span><span style="color:#9ECBFF">         on</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    keepalive_timeout</span><span style="color:#79B8FF">  65</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">    client_body_temp_path</span><span style="color:#9ECBFF">  /tmp/client_body</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    fastcgi_temp_path</span><span style="color:#9ECBFF">      /tmp/fastcgi_temp</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    proxy_temp_path</span><span style="color:#9ECBFF">        /tmp/proxy_temp</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    scgi_temp_path</span><span style="color:#9ECBFF">         /tmp/scgi_temp</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    uwsgi_temp_path</span><span style="color:#9ECBFF">        /tmp/uwsgi_temp</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">    include</span><span style="color:#9ECBFF"> /etc/nginx/conf.d/</span><span style="color:#79B8FF">*</span><span style="color:#9ECBFF">.conf</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<hr>
+<h2 id="18-docker-绑定到-ipv6-上">18. Docker 绑定到 IPv6 上</h2>
+<p><strong>Docker 服务在启动的时候，将地址绑定到 IPv6 地址上面了，提示报错信息！</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 物理机器更新了对应补丁之后，重启了服务，导致原本可以正常启动的 docker-compose 服务提示如下报错信息。不清楚是否修改了操作系统的相关配置，还是对应 docker 进行的其他方面的配置，比如修改 /etc/docker/daemon.json 或者 docker 的 service 启动文件。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># Docker的报错信息</span></span>
+<span class="line"><span style="color:#B392F0">docker</span><span style="color:#9ECBFF"> run</span><span style="color:#79B8FF"> -p</span><span style="color:#9ECBFF"> 80:80</span><span style="color:#9ECBFF"> nginx:alpine</span><span style="color:#9ECBFF"> succeeds.</span><span style="color:#9ECBFF"> Previously,</span><span style="color:#9ECBFF"> this</span><span style="color:#9ECBFF"> was</span><span style="color:#9ECBFF"> failing</span><span style="color:#9ECBFF"> with</span><span style="color:#9ECBFF"> Error</span><span style="color:#79B8FF"> \</span></span>
+<span class="line"><span style="color:#E1E4E8">starting </span><span style="color:#9ECBFF">userland</span><span style="color:#9ECBFF"> proxy:</span><span style="color:#9ECBFF"> listen</span><span style="color:#9ECBFF"> tcp6</span><span style="color:#E1E4E8"> [::]:80: socket: address family not supported by protocol.</span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 通过如上所示的报错信息，可以看到服务的启动端口绑定到了 tcp6 上面了，但是对应的 socket 发现系统本身并不支持。这时，我们一看下对应的操作系统 ipv6 的设置，发现系统禁用了，所有的 ipv6 地址。需要了解的朋友，可以参考 <a href="https://github.com/moby/moby/pull/42322">fix port forwarding with ipv6.disable=1</a> 和 <a href="https://github.com/moby/moby/issues/42288">cannot start if ipv6 is disabled on host</a> 这两个 issus 来获取更多信息。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-shell"><span class="line"><span style="color:#6A737D"># 操作系统配置</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> cat</span><span style="color:#9ECBFF"> /etc/sysctl.conf</span><span style="color:#F97583"> |</span><span style="color:#B392F0"> grep</span><span style="color:#9ECBFF"> ipv6</span></span>
+<span class="line"><span style="color:#B392F0">net.ipv6.conf.all.disable_ipv6</span><span style="color:#9ECBFF">=1</span></span></code></pre>
+<ul>
+<li><strong>[方法一]</strong> 最为简单的解决方法，就是在 docker-compose.yml 文件中，手动指定将对应服务的端口绑定到 ipv4 上面，如下所示。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-yaml"><span class="line"><span style="color:#85E89D">version</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"3"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#85E89D">services</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">  app</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">    restart</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">on-failure</span></span>
+<span class="line"><span style="color:#85E89D">    container_name</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">app_web</span></span>
+<span class="line"><span style="color:#85E89D">    image</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">app:latest</span></span>
+<span class="line"><span style="color:#85E89D">    ports</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">      - </span><span style="color:#9ECBFF">"0.0.0.0:80:80/tcp"</span></span>
+<span class="line"><span style="color:#85E89D">    volumes</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">      - </span><span style="color:#9ECBFF">"./app_web:/data"</span></span>
+<span class="line"><span style="color:#85E89D">    networks</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">      - </span><span style="color:#9ECBFF">app_network</span></span></code></pre>
+<ul>
+<li><strong>[方法二]</strong> 或者修改 /etc/docker/daemon.json 文件，在配置中，阻止 Docker 错误的将端口映射到 IPv6 上，即可达到同样的效果，且不用再次修改多个服务的启动配置文件了。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#6A737D"># 修改配置</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> vim</span><span style="color:#9ECBFF"> /etc/docker/daemon.json</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#B392F0">  "ipv6"</span><span style="color:#79B8FF">:</span><span style="color:#79B8FF"> false</span><span style="color:#9ECBFF">,</span></span>
+<span class="line"><span style="color:#B392F0">  "fixed-cidr-v6"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> "2001:db8:1::/64"</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 重启服务</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> systemctl</span><span style="color:#9ECBFF"> reload</span><span style="color:#9ECBFF"> docker</span></span></code></pre>
+<ul>
+<li><strong>[方法三]</strong> Docker 默认情况下会同时将端口映射于 IPv4 与 IPv6 两者上，而且有的时候会出现只绑定到了 IPv6，导致服务无法正常访问的情况。现在通用的始终还是 IPv4 地址，因此最简单的做法就是关闭 IPv6 地址。详细的配置，可以参考 <a href="https://github.com/moby/moby/issues/2174">Port redirecting binding to IPv6 but not IPv4 interfaces</a> 这个 issus 地址。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#6A737D"># 修改系统配置</span></span>
+<span class="line"><span style="color:#79B8FF">echo</span><span style="color:#9ECBFF"> '1'</span><span style="color:#F97583"> ></span><span style="color:#9ECBFF"> /proc/sys/net/ipv6/conf/lo/disable_ipv6</span></span>
+<span class="line"><span style="color:#79B8FF">echo</span><span style="color:#9ECBFF"> '1'</span><span style="color:#F97583"> ></span><span style="color:#9ECBFF"> /proc/sys/net/ipv6/conf/lo/disable_ipv6</span></span>
+<span class="line"><span style="color:#79B8FF">echo</span><span style="color:#9ECBFF"> '1'</span><span style="color:#F97583"> ></span><span style="color:#9ECBFF"> /proc/sys/net/ipv6/conf/all/disable_ipv6</span></span>
+<span class="line"><span style="color:#79B8FF">echo</span><span style="color:#9ECBFF"> '1'</span><span style="color:#F97583"> ></span><span style="color:#9ECBFF"> /proc/sys/net/ipv6/conf/default/disable_ipv6</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 重启网络</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> /etc/init.d/networking</span><span style="color:#9ECBFF"> restart</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 最后检测是否已关闭IPv6</span></span>
+<span class="line"><span style="color:#B392F0">ip</span><span style="color:#9ECBFF"> addr</span><span style="color:#9ECBFF"> show</span><span style="color:#F97583"> |</span><span style="color:#B392F0"> grep</span><span style="color:#9ECBFF"> net6</span></span></code></pre>
+<hr>
+<h2 id="19-docker-容器启动超时">19. Docker 容器启动超时</h2>
+<p><strong>Docker 服务在启动的时候，提示超时，被直接终止了！</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 使用 docker-compose 启动容器的时候，等待了很久的时候(大约 2-3 分钟左右)，之后提示如下信息。通过阅读信息内容，可以看到是因为超时导致的，提示可以通过设置环境变量，加大超时的时间。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> docker-compose</span><span style="color:#9ECBFF"> up</span><span style="color:#79B8FF"> -d</span></span>
+<span class="line"><span style="color:#B392F0">ERROR:</span><span style="color:#9ECBFF"> for</span><span style="color:#9ECBFF"> xxx</span><span style="color:#9ECBFF">  UnixHTTPConnectionPool</span><span style="color:#E1E4E8">(host</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">'localhost',</span><span style="color:#E1E4E8"> port</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">None</span><span style="color:#E1E4E8">)</span><span style="color:#9ECBFF">:</span><span style="color:#9ECBFF"> Read</span><span style="color:#9ECBFF"> timed</span><span style="color:#9ECBFF"> out.</span><span style="color:#E1E4E8"> (read </span><span style="color:#9ECBFF">timeout=</span><span style="color:#79B8FF">70</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#B392F0">ERROR:</span><span style="color:#9ECBFF"> An</span><span style="color:#9ECBFF"> HTTP</span><span style="color:#9ECBFF"> request</span><span style="color:#9ECBFF"> took</span><span style="color:#9ECBFF"> too</span><span style="color:#9ECBFF"> long</span><span style="color:#9ECBFF"> to</span><span style="color:#9ECBFF"> complete.</span><span style="color:#9ECBFF"> Retry</span><span style="color:#9ECBFF"> with</span><span style="color:#79B8FF"> --verbose</span><span style="color:#9ECBFF"> to</span><span style="color:#9ECBFF"> obtain</span><span style="color:#9ECBFF"> debug</span><span style="color:#9ECBFF"> information.</span></span>
+<span class="line"><span style="color:#B392F0">If</span><span style="color:#9ECBFF"> you</span><span style="color:#9ECBFF"> encounter</span><span style="color:#9ECBFF"> this</span><span style="color:#9ECBFF"> issue</span><span style="color:#9ECBFF"> regularly</span><span style="color:#9ECBFF"> because</span><span style="color:#9ECBFF"> of</span><span style="color:#9ECBFF"> slow</span><span style="color:#9ECBFF"> network</span><span style="color:#9ECBFF"> conditions,</span><span style="color:#9ECBFF"> consider</span><span style="color:#9ECBFF"> setting</span><span style="color:#9ECBFF"> COMPOSE_HTTP_TIMEOUT</span><span style="color:#9ECBFF"> to</span><span style="color:#9ECBFF"> a</span><span style="color:#9ECBFF"> higher</span><span style="color:#9ECBFF"> value</span><span style="color:#E1E4E8"> (current </span><span style="color:#9ECBFF">value:</span><span style="color:#79B8FF"> 60</span><span style="color:#E1E4E8">).</span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 按照提示设置的环境变量之后，再次启动发现确实可以正常启动了，但是还是能够感觉到有些慢。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> vim</span><span style="color:#9ECBFF"> /etc/profile</span></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#E1E4E8"> COMPOSE_HTTP_TIMEOUT</span><span style="color:#F97583">=</span><span style="color:#79B8FF">500</span></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#E1E4E8"> DOCKER_CLIENT_TIMEOUT</span><span style="color:#F97583">=</span><span style="color:#79B8FF">500</span></span></code></pre>
+<ul>
+<li>排除了下启动流程，因为容器启动有映射目录到容器里面且目录大小比较大，所以怀疑是因为 i/o 导致的。随即使用 iotop 命令查看服务器目前的 i/o 情况，发现存在很多个 rg 命令，且都处于 100% 左右。查了下，发现是 vscode 远程服务器启动的搜索目录结构的进程，西八，有些坑呀！</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> iotop</span></span>
+<span class="line"><span style="color:#B392F0"> 4269</span><span style="color:#9ECBFF"> be/4</span><span style="color:#9ECBFF"> escape</span><span style="color:#79B8FF">     15.64</span><span style="color:#9ECBFF"> K/s</span><span style="color:#79B8FF">    0.00</span><span style="color:#9ECBFF"> B/s</span><span style="color:#79B8FF">  0.00</span><span style="color:#9ECBFF"> %</span><span style="color:#79B8FF"> 98.36</span><span style="color:#9ECBFF"> %</span><span style="color:#9ECBFF"> rg</span><span style="color:#79B8FF"> --files</span><span style="color:#79B8FF"> --hidden</span></span>
+<span class="line"><span style="color:#B392F0"> 4270</span><span style="color:#9ECBFF"> be/4</span><span style="color:#9ECBFF"> escape</span><span style="color:#79B8FF">     28.15</span><span style="color:#9ECBFF"> K/s</span><span style="color:#79B8FF">    0.00</span><span style="color:#9ECBFF"> B/s</span><span style="color:#79B8FF">  0.00</span><span style="color:#9ECBFF"> %</span><span style="color:#79B8FF"> 97.46</span><span style="color:#9ECBFF"> %</span><span style="color:#9ECBFF"> rg</span><span style="color:#79B8FF"> --files</span><span style="color:#79B8FF"> --hidden</span></span>
+<span class="line"><span style="color:#B392F0"> 4272</span><span style="color:#9ECBFF"> be/4</span><span style="color:#9ECBFF"> escape</span><span style="color:#79B8FF">     31.27</span><span style="color:#9ECBFF"> K/s</span><span style="color:#79B8FF">    0.00</span><span style="color:#9ECBFF"> B/s</span><span style="color:#79B8FF">  0.00</span><span style="color:#9ECBFF"> %</span><span style="color:#79B8FF"> 97.39</span><span style="color:#9ECBFF"> %</span><span style="color:#9ECBFF"> rg</span><span style="color:#79B8FF"> --files</span><span style="color:#79B8FF"> --hidden</span></span>
+<span class="line"><span style="color:#B392F0"> 4276</span><span style="color:#9ECBFF"> be/4</span><span style="color:#9ECBFF"> escape</span><span style="color:#79B8FF">     34.40</span><span style="color:#9ECBFF"> K/s</span><span style="color:#79B8FF">    0.00</span><span style="color:#9ECBFF"> B/s</span><span style="color:#79B8FF">  0.00</span><span style="color:#9ECBFF"> %</span><span style="color:#79B8FF"> 96.98</span><span style="color:#9ECBFF"> %</span><span style="color:#9ECBFF"> rg</span><span style="color:#79B8FF"> --files</span><span style="color:#79B8FF"> --hidden</span></span></code></pre>
+<hr>
+<h2 id="20-docker-端口网络限制">20. Docker 端口网络限制</h2>
+<p><strong>如果发现服务都一切正常，但是无法无法访问的话，则多为网络问题！</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 启用服务之后，登录跳转发现直接 502 报错了。排除了配置等相关原因都没有任何问题(做过相关测试)，这就非常奇怪了！</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#6A737D"># 部署服务架构</span></span>
+<span class="line"><span style="color:#B392F0">nginx(80</span><span style="color:#E1E4E8">) -</span><span style="color:#F97583">></span><span style="color:#E1E4E8"> web1(</span><span style="color:#B392F0">8080</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#B392F0">          -</span><span style="color:#E1E4E8">> </span><span style="color:#9ECBFF">web2</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">8081</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 报错信息如下所示</span></span>
+<span class="line"><span style="color:#B392F0">nginx</span><span style="color:#9ECBFF"> connect</span><span style="color:#E1E4E8">() </span><span style="color:#9ECBFF">failed</span><span style="color:#E1E4E8"> (113: </span><span style="color:#9ECBFF">No</span><span style="color:#9ECBFF"> route</span><span style="color:#9ECBFF"> to</span><span style="color:#9ECBFF"> host</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">while</span><span style="color:#B392F0"> connecting</span><span style="color:#9ECBFF"> to</span><span style="color:#9ECBFF"> upstream</span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 根据错误信息可知，是因为没有路由到指定的 host 导致了，随即看了下防火墙是开着的，看了日志发现被过滤掉了，西八！问题找到了，现在需要做的就是，要么添加防火墙规则，要么关闭防火墙。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#6A737D"># 检查开放的端口</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> firewall-cmd</span><span style="color:#79B8FF"> --permanent</span><span style="color:#79B8FF"> --zone=public</span><span style="color:#79B8FF"> --list-ports</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 开启需要路由的端口</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> firewall-cmd</span><span style="color:#79B8FF"> --permanent</span><span style="color:#79B8FF"> --zone=public</span><span style="color:#79B8FF"> --add-port=8080/tcp</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> firewall-cmd</span><span style="color:#79B8FF"> --permanent</span><span style="color:#79B8FF"> --zone=public</span><span style="color:#79B8FF"> --add-port=8081/tcp</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 配置立即生效</span></span>
+<span class="line"><span style="color:#B392F0">firewall-cmd</span><span style="color:#79B8FF"> --reload</span></span></code></pre>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#6A737D"># 关闭防火墙</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> systemctl</span><span style="color:#9ECBFF"> stop</span><span style="color:#9ECBFF"> firewalld.service</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 禁用自启动</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> systemctl</span><span style="color:#9ECBFF"> disable</span><span style="color:#9ECBFF"> firewalld.service</span></span></code></pre>
+<hr>
+<h2 id="21-docker-无法获取镜像">21. Docker 无法获取镜像</h2>
+<p><strong>新初始化的机器，无法获取私有仓库的镜像文件！</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 机器初始化之后，使用如下命令登录私有 docker 仓库，发现提示无法获取对应镜像，但是在其他机器上面获取该镜像就可以执行成功，这就非常奇怪了！</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#6A737D"># 登录私有仓库</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> echo</span><span style="color:#9ECBFF"> '123456'</span><span style="color:#F97583"> |</span><span style="color:#B392F0"> docker</span><span style="color:#9ECBFF"> login</span><span style="color:#79B8FF"> -u</span><span style="color:#9ECBFF"> escape</span><span style="color:#79B8FF"> --password-stdin</span><span style="color:#9ECBFF"> docker.escapelife.site</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 异常信息提示</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> docker</span><span style="color:#9ECBFF"> pull</span><span style="color:#9ECBFF"> docker.escapelife.site/app:0.10</span></span>
+<span class="line"><span style="color:#B392F0">Error</span><span style="color:#9ECBFF"> response</span><span style="color:#9ECBFF"> from</span><span style="color:#9ECBFF"> daemon:</span><span style="color:#9ECBFF"> manifest</span><span style="color:#9ECBFF"> for</span><span style="color:#9ECBFF"> docker.escapelife.site/app:0.10</span><span style="color:#9ECBFF"> not</span><span style="color:#9ECBFF"> found:</span><span style="color:#9ECBFF"> manifest</span><span style="color:#9ECBFF"> unknown:</span><span style="color:#9ECBFF"> manifest</span><span style="color:#9ECBFF"> unknown</span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 太坑了，我还以为我发现某个隐藏的 bug 了，可劲的排查，最后发现，原来是自己镜像包名字写错了，应该写成 0.0.10 的，自己却写成了 0.10。这里，纪念一下，以后碰到上述报错，那肯定是镜像不存在的。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#6A737D"># 登录私有仓库之后会在用户家目录下生成一个docker配置</span></span>
+<span class="line"><span style="color:#6A737D"># 其用来记录docker私有仓库的登录认证信息(是加密过的信息但不安全) => base64</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> cat</span><span style="color:#9ECBFF"> .docker/config.json</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#B392F0">    "auths"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> {</span></span>
+<span class="line"><span style="color:#B392F0">        "docker.escapelife.site"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> {</span></span>
+<span class="line"><span style="color:#B392F0">            "auth"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> "d00u11Fu22B3355VG2xasE12w=="</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<hr>
+<h2 id="22-docker-使容器不退出">22. Docker 使容器不退出</h2>
+<p><strong>如何使使用 docker-compose 启动的容器服务 hang 住而不退出</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 有时候我们启动的服务，因为某些问题(bug)导致服务无法正常启动，就会出现容器无限重启(restart: on-failure)的情况，这时就很不利于排除问题。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#B392F0">➜</span><span style="color:#9ECBFF"> docker</span><span style="color:#9ECBFF"> ps</span><span style="color:#79B8FF"> -a</span></span>
+<span class="line"><span style="color:#B392F0">4e6xxx9a4</span><span style="color:#9ECBFF">   app:latest</span><span style="color:#9ECBFF">   "/xxx/…"</span><span style="color:#79B8FF">   26</span><span style="color:#9ECBFF"> seconds</span><span style="color:#9ECBFF"> ago</span><span style="color:#9ECBFF">   Restarting</span><span style="color:#E1E4E8"> (1) 2 seconds ago</span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 这时我们就需要根据，服务构建使用命令来决定是用什么命令来 hang 住服务。卡住的原理，就类似于使用 /bin/bash 进入容器是一样的，这里我就不过多解释了。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#6A737D"># 类似原理</span></span>
+<span class="line"><span style="color:#B392F0">docker</span><span style="color:#9ECBFF"> run</span><span style="color:#79B8FF"> -it</span><span style="color:#79B8FF"> --rm</span><span style="color:#79B8FF"> --entrypoint=/bin/bash</span><span style="color:#9ECBFF"> xxx/app:latest</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 使用Command命令</span></span>
+<span class="line"><span style="color:#B392F0">tty:</span><span style="color:#79B8FF"> true</span></span>
+<span class="line"><span style="color:#79B8FF">command</span><span style="color:#9ECBFF">:</span><span style="color:#9ECBFF"> tail</span><span style="color:#79B8FF"> -f</span><span style="color:#9ECBFF"> /dev/null</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 使用Entrypoint命令</span></span>
+<span class="line"><span style="color:#B392F0">tty:</span><span style="color:#79B8FF"> true</span></span>
+<span class="line"><span style="color:#B392F0">entrypoint:</span><span style="color:#9ECBFF"> tail</span><span style="color:#79B8FF"> -f</span><span style="color:#9ECBFF"> /dev/null</span></span></code></pre>
+<ul>
+<li>同理，我们在使用 docker-compose 或者 k8s 平台部署服务的时候，也有时会因为启动问题需要，使启动的服务不直接退出，来手动调试和排查问题原因。所以，我这里记录下其不同部署方式的，暂停方式。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-yaml"><span class="line"><span style="color:#6A737D"># Compose</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#85E89D">version</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"3"</span></span>
+<span class="line"><span style="color:#85E89D">services</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">  app</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">    image</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">ubuntu:latest</span></span>
+<span class="line"><span style="color:#85E89D">    tty</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">true</span></span>
+<span class="line"><span style="color:#85E89D">    entrypoint</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">/usr/bin/tail</span></span>
+<span class="line"><span style="color:#85E89D">    command</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"-f /dev/null"</span></span></code></pre>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-yaml"><span class="line"><span style="color:#6A737D"># K8S</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#85E89D">apiVersion</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">v1</span></span>
+<span class="line"><span style="color:#85E89D">kind</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">Pod</span></span>
+<span class="line"><span style="color:#85E89D">metadata</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">  name</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">ubuntu</span></span>
+<span class="line"><span style="color:#85E89D">spec</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">  containers</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">    - </span><span style="color:#85E89D">name</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">ubuntu</span></span>
+<span class="line"><span style="color:#85E89D">      image</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">ubuntu:latest</span></span>
+<span class="line"><span style="color:#85E89D">      command</span><span style="color:#E1E4E8">: [</span><span style="color:#9ECBFF">"/bin/bash"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"-c"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"--"</span><span style="color:#E1E4E8">]</span></span>
+<span class="line"><span style="color:#85E89D">      args</span><span style="color:#E1E4E8">: [</span><span style="color:#9ECBFF">"while true; do sleep 30; done;"</span><span style="color:#E1E4E8">]</span></span>
+<span class="line"><span style="color:#6A737D">      # command: ["sleep"]</span></span>
+<span class="line"><span style="color:#6A737D">      # args: ["infinity"]</span></span></code></pre>
+<hr>
+<h2 id="23-docker-不使用默认网段">23. Docker 不使用默认网段</h2>
+<p><strong>有些情况，内部规划的网段和可能和 Dockerd 默认的网段有冲突，导致异常出现！</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 今天在新机器上面，部署了一整套服务(多台机器)，服务部署完毕之后，通过前置 Nginx 服务发现并不能访问，后置机器开放的端口，发现发到对应端口的请求都没有转发出去。这就比较奇怪了，因为端口控制是已经开通了的，不应该出现不通的情况。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#B392F0">➜</span><span style="color:#9ECBFF"> nc</span><span style="color:#79B8FF"> -v</span><span style="color:#79B8FF"> 172.16.100.12</span><span style="color:#79B8FF"> 8000</span></span>
+<span class="line"><span style="color:#B392F0">nc:</span><span style="color:#9ECBFF"> connect</span><span style="color:#9ECBFF"> to</span><span style="color:#79B8FF"> 172.16.100.12</span><span style="color:#9ECBFF"> port</span><span style="color:#79B8FF"> 8000</span><span style="color:#E1E4E8"> (tcp) failed: Connection refused</span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 发现服务器端口不通，我这里怀疑可能是 dockerd 服务启动导致的，所以我先将服务都停掉，直接在机器上面启动了 Python 的服务端程序(Linux 机器自带 Python2.7.x 的版本)，然后在前置 Nginx 服务发现，端口确实是通的。后来，排除发现是内部服务默认网段和 dockerd 服务启动的默认网段是冲突的，导致重写了机器的防火墙规则，导致出现上述异常的。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> python</span><span style="color:#79B8FF"> -m</span><span style="color:#9ECBFF"> SimpleHTTPServer</span><span style="color:#79B8FF"> 8000</span></span>
+<span class="line"><span style="color:#B392F0">Serving</span><span style="color:#9ECBFF"> HTTP</span><span style="color:#9ECBFF"> on</span><span style="color:#79B8FF"> 0.0.0.0</span><span style="color:#9ECBFF"> port</span><span style="color:#79B8FF"> 8000</span><span style="color:#9ECBFF"> ...</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">➜</span><span style="color:#9ECBFF"> nc</span><span style="color:#79B8FF"> -v</span><span style="color:#79B8FF"> 172.16.100.12</span><span style="color:#79B8FF"> 8000</span></span>
+<span class="line"><span style="color:#B392F0">Connection</span><span style="color:#9ECBFF"> to</span><span style="color:#79B8FF"> 172.16.100.12</span><span style="color:#79B8FF"> 8000</span><span style="color:#9ECBFF"> port</span><span style="color:#E1E4E8"> [tcp/*] succeeded</span><span style="color:#F97583">!</span></span></code></pre>
+<ul>
+<li>既然问题已经知道了，现在需要做的就是非常简单了：不适用默认网段！通过 <a href="https://docs.mirantis.com/mke/3.4/install/plan-deployment/mcr-considerations/default-address-pools.html">『mirantis』</a> 里面，我们可以选择进行设置，然后重启服务 dockerd 服务，即可。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#6A737D"># 修改配置</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> cat</span><span style="color:#9ECBFF"> /etc/docker/daemon.json</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#B392F0">  "default-address-pools"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF">[{</span><span style="color:#E1E4E8">"</span><span style="color:#B392F0">base</span><span style="color:#B392F0">":"</span><span style="color:#B392F0">192.168.100.0/20</span><span style="color:#B392F0">","</span><span style="color:#B392F0">size</span><span style="color:#B392F0">":24}]</span></span>
+<span class="line"><span style="color:#B392F0">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0"># 重启服务</span></span>
+<span class="line"><span style="color:#B392F0">$ sudo systemctl restart docker</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0"># 启动服务验证是否生效</span></span>
+<span class="line"><span style="color:#B392F0">$ ip a</span></span>
+<span class="line"><span style="color:#B392F0">$ docker network inspect app | grep Subnet</span></span></code></pre>
+<p><img src="/media/content/docker-troubleshooting/202212291407482.png" alt="">
+<strong>Docker 不使用默认网段</strong></p>
+<ul>
+<li>这时，就到了考验我们网络的子网划分的能力了：如何在给定的网段下面合理且高效的进行划分呢？咳咳，确实难倒我了，这时我们可以再这个在线网站上面 <a href="https://www.sojson.com/convert/subnetmask.html">JSON 在线解析</a> 进行划分，然后选定合理的 base 和 size 就可以了。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#6A737D"># 报错信息</span></span>
+<span class="line"><span style="color:#B392F0">Error</span><span style="color:#9ECBFF"> response</span><span style="color:#9ECBFF"> from</span><span style="color:#9ECBFF"> daemon:</span><span style="color:#9ECBFF"> could</span><span style="color:#9ECBFF"> not</span><span style="color:#9ECBFF"> find</span><span style="color:#9ECBFF"> an</span><span style="color:#9ECBFF"> available,</span><span style="color:#9ECBFF"> non-overlapping</span><span style="color:#9ECBFF"> IPv4</span><span style="color:#9ECBFF"> address</span><span style="color:#9ECBFF"> pool</span><span style="color:#9ECBFF"> among</span><span style="color:#9ECBFF"> the</span><span style="color:#9ECBFF"> defaults</span><span style="color:#9ECBFF"> to</span><span style="color:#9ECBFF"> assign</span><span style="color:#9ECBFF"> to</span><span style="color:#9ECBFF"> the</span><span style="color:#9ECBFF"> network</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 按照下图我们可以对 pool 进行合理划分</span></span>
+<span class="line"><span style="color:#6A737D"># 给定 10.210.200.0 + 255.255.255.0 的网段来划分子网</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> cat</span><span style="color:#9ECBFF"> /etc/docker/daemon.json</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#B392F0">  "default-address-pools"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF">[{</span><span style="color:#E1E4E8">"</span><span style="color:#B392F0">base</span><span style="color:#B392F0">":"</span><span style="color:#B392F0">10.210.200.0/24</span><span style="color:#B392F0">","</span><span style="color:#B392F0">size</span><span style="color:#B392F0">":28}]</span></span>
+<span class="line"><span style="color:#B392F0">}</span></span></code></pre>
+<ul>
+<li>其中，base 告诉我们划分子网的网段是什么(从来开始)，是从前两位(/16)开始，还是第三位开始(/24)呢？而 size 则告诉我们划分的每个子网有多少 IP 地址可以使用呢？从 "10.210.200.0/24" 我们可以知道，该网络下面只有 254 个可用的 IP 地址(直接使用肯定不够)，然后我们需要给 docker 使用，划分每个子网可用 16 个 IP 地址，所以子网就应该写成 28 了。
+<img src="/media/content/docker-troubleshooting/202212291408753.png" alt="">
+<strong>Docker 不使用默认网段</strong></li>
+</ul>
+<hr>
+<h2 id="24-docker-添加私有仓库">24. Docker 添加私有仓库</h2>
+<p><strong>有些情况，我们服务器上面需要使用内部私有的容器镜像地址！</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 如果新机器上面需要使用私有仓库的话，但是又没有配置，再获取镜像的时候就会出现如下报错信息。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#6A737D"># 拉取/登陆私库时提示</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> docker</span><span style="color:#9ECBFF"> pull</span><span style="color:#9ECBFF"> 192.168.31.191:5000/nginx:latest</span></span>
+<span class="line"><span style="color:#B392F0">x509:</span><span style="color:#9ECBFF"> certificate</span><span style="color:#9ECBFF"> signed</span><span style="color:#9ECBFF"> by</span><span style="color:#9ECBFF"> unknown</span><span style="color:#9ECBFF"> authority</span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 该问题的处理方式很简单，如下所示，配置一下仓库地址，重启服务并登陆私有仓库就可以了。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#6A737D"># 添加配置</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> cat</span><span style="color:#9ECBFF"> /etc/docker/daemon.json</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#B392F0">    "insecure-registries"</span><span style="color:#79B8FF">:</span><span style="color:#E1E4E8"> [</span><span style="color:#9ECBFF">"192.168.31.191:5000"</span><span style="color:#E1E4E8">]</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 重启docker</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> systemctl</span><span style="color:#9ECBFF"> restart</span><span style="color:#9ECBFF"> docker</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 重新登录即可</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> docker</span><span style="color:#9ECBFF"> login</span><span style="color:#9ECBFF"> 私库地址</span><span style="color:#79B8FF"> -u</span><span style="color:#9ECBFF"> 用户名</span><span style="color:#79B8FF"> -p</span><span style="color:#9ECBFF"> 密码</span></span></code></pre>
+<hr>
+<h2 id="25-docker-解决时间同步">25. Docker 解决时间同步</h2>
+<p><strong>解决 Docker 容器时间时区和宿主机不同步的问题！</strong></p>
+<ul>
+<li><strong>[问题起因]</strong> 有时间我们会遇到新创建的容器，容器内部和外部时间不一致，这就导致服务的日志、定时任务等不能按照我们既定的时间触发，非常麻烦。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#6A737D"># 容器内部时间(CST - 东八区 - 北京时间)</span></span>
+<span class="line"><span style="color:#E1E4E8">[root@server </span><span style="color:#F97583">~</span><span style="color:#E1E4E8">]# date</span></span>
+<span class="line"><span style="color:#B392F0">Fri</span><span style="color:#9ECBFF"> Apr</span><span style="color:#79B8FF"> 27</span><span style="color:#9ECBFF"> 22:49:47</span><span style="color:#9ECBFF"> CST</span><span style="color:#79B8FF"> 2022</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 容器外部时间(UTC - 格林尼治 - 标准时间)</span></span>
+<span class="line"><span style="color:#E1E4E8">[root@server </span><span style="color:#F97583">~</span><span style="color:#E1E4E8">]# docker run --rm nginx date</span></span>
+<span class="line"><span style="color:#B392F0">Fri</span><span style="color:#9ECBFF"> Apr</span><span style="color:#79B8FF"> 27</span><span style="color:#9ECBFF"> 14:49:51</span><span style="color:#9ECBFF"> UTC</span><span style="color:#79B8FF"> 2022</span></span></code></pre>
+<ul>
+<li><strong>[解决方法]</strong> 宿主机设置了时区，而 Docker 容器并没有设置，导致两者相差 8 小时。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#6A737D"># 以 docker run 方式启动</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> docker</span><span style="color:#9ECBFF"> run</span><span style="color:#79B8FF"> -d</span><span style="color:#79B8FF"> --name</span><span style="color:#9ECBFF"> 'app'</span><span style="color:#79B8FF"> \</span></span>
+<span class="line"><span style="color:#79B8FF">    -v</span><span style="color:#9ECBFF"> /etc/localtime:/etc/localtime</span><span style="color:#79B8FF"> \</span></span>
+<span class="line"><span style="color:#9ECBFF">    escape/nginx:v1</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 以 Dockerfile 构建</span></span>
+<span class="line"><span style="color:#B392F0">ENV</span><span style="color:#9ECBFF"> TimeZone=Asia/Shanghai</span></span>
+<span class="line"><span style="color:#B392F0">RUN</span><span style="color:#9ECBFF"> ln</span><span style="color:#79B8FF"> -sf</span><span style="color:#9ECBFF"> /usr/share/zoneinfo/Asia/Shanghai</span><span style="color:#9ECBFF"> /etc/localtime</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 以 docker-compose 方式启动</span></span>
+<span class="line"><span style="color:#B392F0">environment:</span></span>
+<span class="line"><span style="color:#B392F0">  TZ:</span><span style="color:#9ECBFF"> Asia/Shanghai</span></span></code></pre>
+<hr>
+<h2 id="26-docker-容器磁盘不足">26. Docker 容器磁盘不足</h2>
+<p><strong>启动很多容器服务，导致存储和运行的容器目录(/var/lib/docker/)磁盘消耗很大！</strong></p>
+<ul>
+<li>
+<p><strong>[问题起因]</strong> 服务器使用久了，就会出现磁盘不足的问题，这时候就需要排除到底是什么服务或者数据导致的。但如果使用容器化部署服务的话(docker)，大多数都是因为启动的容器导致，即启动的服务占用了大量的磁盘空间。
+<img src="/media/content/docker-troubleshooting/202212291408180.png" alt="">
+<strong>Docker 容器导致磁盘不足</strong></p>
+</li>
+<li>
+<p><strong>[分析思路]</strong> 我们知道 /var/lib/docker/overlay2 目录下的文件夹名基本都是以 md5 编码命名的，而 overlay2 是 docker 使用的文件存储驱动，也就是说该目录里面存储的就是现在服务器运行的容器。同时，我们知道镜像是分层的结构，所以这容器每次层都在这里得到了体现。</p>
+</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#6A737D"># 查看容器的默认文件驱动</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> docker</span><span style="color:#9ECBFF"> info</span><span style="color:#F97583"> |</span><span style="color:#B392F0"> grep</span><span style="color:#9ECBFF"> "Storage Driver"</span></span>
+<span class="line"><span style="color:#B392F0">Storage</span><span style="color:#9ECBFF"> Driver:</span><span style="color:#9ECBFF"> overlay2</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 查看磁盘消耗大户</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> du</span><span style="color:#79B8FF"> -sh</span><span style="color:#9ECBFF"> /var/lib/docker/overlay2</span></span>
+<span class="line"><span style="color:#B392F0">900G</span><span style="color:#9ECBFF">    /var/lib/docker/overlay2</span></span></code></pre>
+<p><img src="/media/content/docker-troubleshooting/202212291408529.png" alt="">
+<strong>Docker 容器导致磁盘不足</strong></p>
+<ul>
+<li><strong>[分析思路]</strong> 如果我们临时启动了一个服务，当时只是打算只是临时使用，但是后续因为某些原因导致长期使用。同时因为运行中产生的数据或者文件并没有挂载映射到宿主机，导致写入容器内本地的文件最终到了一个很大的量级(比如容器产生的日志文件、数据文件)。这就导致我们看到，对应层下面 diff 和 merged 目录很大的原因。
+<ul>
+<li>diff -> 保存的就是差分信息 -> 容器的可读可写层且初始为空</li>
+<li>merged -> 容器运行时才会出现的存储情况集合 -> 容器的挂载点</li>
+<li>upperdir -> 容器层</li>
+<li>lowerdir -> 初始镜像层</li>
+</ul>
+</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#6A737D"># 里面到底存储的啥</span></span>
+<span class="line"><span style="color:#6A737D"># diff文件夹占用100G+，merged文件夹占用200+G</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> ls</span><span style="color:#79B8FF"> -lh</span><span style="color:#9ECBFF"> /var/lib/docker/overlay2/1e3137...9706bca6</span></span>
+<span class="line"><span style="color:#B392F0">drwxr-xr-x</span><span style="color:#79B8FF">  10</span><span style="color:#9ECBFF"> root</span><span style="color:#9ECBFF"> root</span><span style="color:#79B8FF">  4096</span><span style="color:#9ECBFF"> 8月</span><span style="color:#79B8FF">   5</span><span style="color:#79B8FF">  2021</span><span style="color:#9ECBFF"> diff/</span><span style="color:#6A737D">   # 大</span></span>
+<span class="line"><span style="color:#B392F0">-rw-r--r--</span><span style="color:#79B8FF">   1</span><span style="color:#9ECBFF"> root</span><span style="color:#9ECBFF"> root</span><span style="color:#79B8FF">    26</span><span style="color:#9ECBFF"> 8月</span><span style="color:#79B8FF">   5</span><span style="color:#79B8FF">  2021</span><span style="color:#9ECBFF"> link</span></span>
+<span class="line"><span style="color:#B392F0">-rw-r--r--</span><span style="color:#79B8FF">   1</span><span style="color:#9ECBFF"> root</span><span style="color:#9ECBFF"> root</span><span style="color:#79B8FF">   376</span><span style="color:#9ECBFF"> 8月</span><span style="color:#79B8FF">   5</span><span style="color:#79B8FF">  2021</span><span style="color:#9ECBFF"> lower</span></span>
+<span class="line"><span style="color:#B392F0">drwxr-xr-x</span><span style="color:#79B8FF">   1</span><span style="color:#9ECBFF"> root</span><span style="color:#9ECBFF"> root</span><span style="color:#79B8FF">  4096</span><span style="color:#9ECBFF"> 8月</span><span style="color:#79B8FF">   5</span><span style="color:#79B8FF">  2021</span><span style="color:#9ECBFF"> merged/</span><span style="color:#6A737D"> # 大</span></span>
+<span class="line"><span style="color:#B392F0">drwx------</span><span style="color:#79B8FF">   3</span><span style="color:#9ECBFF"> root</span><span style="color:#9ECBFF"> root</span><span style="color:#79B8FF">  4096</span><span style="color:#9ECBFF"> 4月</span><span style="color:#79B8FF">  24</span><span style="color:#9ECBFF"> 12:22</span><span style="color:#9ECBFF"> work/</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># link文件的内容对应了/var/lib/docker/overlay2/l的文件夹名称</span></span>
+<span class="line"><span style="color:#6A737D"># 保存了镜像层的短标识；用于解决mount参数中长字符超过页大小限制的问题</span></span></code></pre>
+<p><img src="/media/content/docker-troubleshooting/202212291409947.png" alt="">
+<strong>Docker 容器导致磁盘不足</strong></p>
+<ul>
+<li><strong>[解决方法]</strong> 宿主机设置了时区，而 Docker 容器并没有设置，导致两者相差 8 小时。</li>
+</ul>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#6A737D"># 查看那个容器层占用了大量磁盘空间</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> sudo</span><span style="color:#9ECBFF"> du</span><span style="color:#79B8FF"> -sh</span><span style="color:#9ECBFF"> /var/lib/docker/overlay2/</span><span style="color:#79B8FF">*</span><span style="color:#F97583"> |</span><span style="color:#B392F0"> grep</span><span style="color:#9ECBFF"> G</span><span style="color:#F97583"> |</span><span style="color:#B392F0"> sort</span><span style="color:#79B8FF"> -rn</span></span>
+<span class="line"><span style="color:#B392F0">121G</span><span style="color:#9ECBFF">    1e3137...9706bca6</span></span>
+<span class="line"><span style="color:#B392F0">33G</span><span style="color:#9ECBFF">     9d50b3...ef3ae1b0</span></span>
+<span class="line"><span style="color:#B392F0">12G</span><span style="color:#9ECBFF">     462157...03ce3935</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 查找对应层所属于那个容器镜像</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> docker</span><span style="color:#9ECBFF"> ps</span><span style="color:#79B8FF"> -q</span><span style="color:#F97583"> |</span><span style="color:#79B8FF"> \</span></span>
+<span class="line"><span style="color:#B392F0">    xargs</span><span style="color:#9ECBFF"> docker</span><span style="color:#9ECBFF"> inspect</span><span style="color:#79B8FF"> --format</span><span style="color:#9ECBFF"> '{{.State.Pid}}, {{.Id}}, {{.Name}}, {{.GraphDriver.Data.WorkDir}}'</span><span style="color:#F97583"> |</span><span style="color:#79B8FF"> \</span></span>
+<span class="line"><span style="color:#B392F0">    grep</span><span style="color:#9ECBFF"> xxx</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 可以根据容器id和名称查看他的层数信息(从低到高)</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> docker</span><span style="color:#9ECBFF"> inspect</span><span style="color:#9ECBFF"> xxx</span><span style="color:#F97583"> |</span><span style="color:#B392F0"> grep</span><span style="color:#79B8FF"> -E</span><span style="color:#9ECBFF"> "LowerDir|UpperDir|MergedDir|WorkDir"</span></span></code></pre>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-bash"><span class="line"><span style="color:#6A737D"># 在该目录下也存在一个同样名字容器的文件夹(xxx)</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> ls</span><span style="color:#79B8FF"> -lh</span><span style="color:#9ECBFF"> /var/lib/docker/image/overlay2/layerdb/mounts/</span></span>
+<span class="line"><span style="color:#B392F0">fff30d...bc6a0222</span></span>
+<span class="line"><span style="color:#B392F0">8078cf...73bda80b</span></span>
+<span class="line"><span style="color:#B392F0">b801ce...cc78e234</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># mount-id: 表示了我们刚才创建的容器的目录(/var/lib/docker/overlay2)</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> ls</span><span style="color:#79B8FF"> -lh</span><span style="color:#9ECBFF"> /var/lib/docker/image/overlay2/layerdb/mounts/ff30d...bc6a0222/</span></span>
+<span class="line"><span style="color:#B392F0">-rw-r--r--</span><span style="color:#79B8FF">  1</span><span style="color:#9ECBFF"> root</span><span style="color:#9ECBFF"> root</span><span style="color:#79B8FF">    69</span><span style="color:#9ECBFF"> 8月</span><span style="color:#79B8FF">   5</span><span style="color:#79B8FF">  2021</span><span style="color:#9ECBFF"> init-id</span></span>
+<span class="line"><span style="color:#B392F0">-rw-r--r--</span><span style="color:#79B8FF">  1</span><span style="color:#9ECBFF"> root</span><span style="color:#9ECBFF"> root</span><span style="color:#79B8FF">    64</span><span style="color:#9ECBFF"> 8月</span><span style="color:#79B8FF">   5</span><span style="color:#79B8FF">  2021</span><span style="color:#9ECBFF"> mount-id</span></span>
+<span class="line"><span style="color:#B392F0">-rw-r--r--</span><span style="color:#79B8FF">  1</span><span style="color:#9ECBFF"> root</span><span style="color:#9ECBFF"> root</span><span style="color:#79B8FF">    71</span><span style="color:#9ECBFF"> 8月</span><span style="color:#79B8FF">   5</span><span style="color:#79B8FF">  2021</span><span style="color:#9ECBFF"> parent</span></span></code></pre></article><nav class="toc glass" aria-label="目录"><h3>目录 <em>Contents</em></h3><ol><li style="padding-left:12px"><a href="#1-docker-迁移存储目录">1. Docker 迁移存储目录</a></li><li style="padding-left:12px"><a href="#2-docker-设备空间不足">2. Docker 设备空间不足</a></li><li style="padding-left:12px"><a href="#3-docker-缺共享链接库">3. Docker 缺共享链接库</a></li><li style="padding-left:12px"><a href="#4-docker-容器文件损坏">4. Docker 容器文件损坏</a></li><li style="padding-left:12px"><a href="#5-docker-容器优雅重启">5. Docker 容器优雅重启</a></li><li style="padding-left:12px"><a href="#6-docker-容器无法删除">6. Docker 容器无法删除</a></li><li style="padding-left:12px"><a href="#7-docker-容器中文异常">7. Docker 容器中文异常</a></li><li style="padding-left:12px"><a href="#8-docker-容器网络互通">8. Docker 容器网络互通</a></li><li style="padding-left:12px"><a href="#9-docker-容器总线错误">9. Docker 容器总线错误</a></li><li style="padding-left:12px"><a href="#10-docker-nfs-挂载报错">10. Docker NFS 挂载报错</a></li><li style="padding-left:12px"><a href="#11-docker-使用默认网段">11. Docker 使用默认网段</a></li><li style="padding-left:12px"><a href="#12-docker-服务启动串台">12. Docker 服务启动串台</a></li><li style="padding-left:12px"><a href="#13-docker-命令调用报错">13. Docker 命令调用报错</a></li><li style="padding-left:12px"><a href="#14-docker-定时任务异常">14. Docker 定时任务异常</a></li><li style="padding-left:12px"><a href="#15-docker-变量使用引号">15. Docker 变量使用引号</a></li><li style="padding-left:12px"><a href="#16-docker-删除镜像报错">16. Docker 删除镜像报错</a></li><li style="padding-left:12px"><a href="#17-docker-普通用户切换">17. Docker 普通用户切换</a></li><li style="padding-left:12px"><a href="#18-docker-绑定到-ipv6-上">18. Docker 绑定到 IPv6 上</a></li><li style="padding-left:12px"><a href="#19-docker-容器启动超时">19. Docker 容器启动超时</a></li><li style="padding-left:12px"><a href="#20-docker-端口网络限制">20. Docker 端口网络限制</a></li><li style="padding-left:12px"><a href="#21-docker-无法获取镜像">21. Docker 无法获取镜像</a></li><li style="padding-left:12px"><a href="#22-docker-使容器不退出">22. Docker 使容器不退出</a></li><li style="padding-left:12px"><a href="#23-docker-不使用默认网段">23. Docker 不使用默认网段</a></li><li style="padding-left:12px"><a href="#24-docker-添加私有仓库">24. Docker 添加私有仓库</a></li><li style="padding-left:12px"><a href="#25-docker-解决时间同步">25. Docker 解决时间同步</a></li><li style="padding-left:12px"><a href="#26-docker-容器磁盘不足">26. Docker 容器磁盘不足</a></li></ol></nav></div><footer class="article-footer"><section class="link-panel glass"><h3>标签与概念 <em>Tags &amp; concepts</em></h3><div class="chip-row"><a class="chip" href="/tags/docker/">#<!-- -->Docker</a></div></section><nav class="prev-next" aria-label="上下篇"><a class="pn-card glass" href="/posts/springmvc-session-sharing/"><small>上一篇 <em>Older</em></small><b>SpringMVC项目实现Session共享</b></a><a class="pn-card glass" href="/posts/activiti-quick-start/"><small>下一篇 <em>Newer</em></small><b>工作流引擎Activiti快速入门</b></a></nav></footer></div><footer class="site-foot public-footer"><p>本博客为个人非营利站点：记录赛博炼丹、生活补丁与古法编程档案；无广告、无推广、无统计追踪，不收集访客个人数据。<em>Non-commercial · no ads · no tracking.</em></p><p>每一篇笔记，都是网络里的一个节点。<em>Every note is a node in the network.</em></p></footer></div></div>
+  </body>
+</html>

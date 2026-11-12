@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>阿里孩舞·幂等了吗？</title>
+    <link>https://www.alihai5.com/</link>
+    <description>记录 AI 工具、自动化工作流、数字生活，以及 AI 普及之前的古法编程档案。</description>
+    <language>zh-CN</language>
+    <lastBuildDate>Thu, 12 Nov 2026 13:44:44 GMT</lastBuildDate>
+    <atom:link href="https://www.alihai5.com/feed.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>DDSU666型单相电子式电能表切换通讯协议</title>
+    <link>https://www.alihai5.com/posts/ddsu666-protocol-switch/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/ddsu666-protocol-switch/</guid>
+    <pubDate>Wed, 01 Feb 2023 07:22:12 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>IOT</category>
+    <category>ModBus</category>
+    <category>DLT645</category>
+    <category>IOT</category>
+    <category>DDSU666</category>
+    <description>记录正泰 DDSU666 单相电子式电能表从 DLT645 切换到 Modbus 协议的过程，包括协议识别、485 接线、串口参数、报文地址与校验位计算，以及发送后的结果验证。</description>
+  </item>
+  <item>
+    <title>浪浪山打工人旅游指南（一）Java 面试题【汇总篇】</title>
+    <link>https://www.alihai5.com/posts/java-interview-questions/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/java-interview-questions/</guid>
+    <pubDate>Mon, 16 Jan 2023 13:58:28 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>浪浪山打工人</category>
+    <category>JAVA</category>
+    <category>Java基础</category>
+    <category>Java面试题</category>
+    <category>2023汇总篇</category>
+    <description>一篇 Java 面试问答汇编，依次整理语言基础、虚拟机、多线程与并发、Spring 系列框架、持久层与数据库、缓存，以及微服务、反向代理、分布式协调和消息队列等主题。</description>
+  </item>
+  <item>
+    <title>浪浪山打工人旅游指南（零）系列的起源</title>
+    <link>https://www.alihai5.com/posts/langlangshan-origin/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/langlangshan-origin/</guid>
+    <pubDate>Mon, 16 Jan 2023 11:26:11 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>浪浪山打工人</category>
+    <category>JAVA</category>
+    <category>Java基础</category>
+    <category>Java面试题</category>
+    <description>借小猪妖“离开浪浪山”的情节，写下对职场处境、劳动价值与走出舒适圈的感想，并说明“浪浪山打工人旅游指南”系列的缘起，列出基础篇、进阶篇与专题篇规划。</description>
+  </item>
+  <item>
+    <title>SpringBoot集成TrueLicense实现授权管理</title>
+    <link>https://www.alihai5.com/posts/springboot-truelicense/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/springboot-truelicense/</guid>
+    <pubDate>Sat, 31 Dec 2022 06:03:15 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>JAVA</category>
+    <category>JAVA</category>
+    <category>TrueLicense</category>
+    <category>SpringBoot</category>
+    <category>License</category>
+    <description>记录 SpringBoot 集成 TrueLicense 的授权模块实现，涵盖密钥库与证书生成、License 创建和校验、服务器硬件信息绑定、拦截器及启动验证，并附配置与请求示例。</description>
+  </item>
+  <item>
+    <title>MySQL 数据库开发的三十六条军规</title>
+    <link>https://www.alihai5.com/posts/mysql-36-rules/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/mysql-36-rules/</guid>
+    <pubDate>Sat, 26 Feb 2022 03:37:18 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>MySQL</category>
+    <category>MySQL</category>
+    <description>汇总 MySQL 开发规范，涵盖数据量与表结构设计、字段类型、索引、SQL 编写、事务与批量操作，以及环境隔离、字符集和命名约定。</description>
+  </item>
+  <item>
+    <title>MySQL 常用函数&amp;数据类型</title>
+    <link>https://www.alihai5.com/posts/mysql-functions/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/mysql-functions/</guid>
+    <pubDate>Wed, 23 Feb 2022 05:32:16 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>MySQL</category>
+    <category>MySQL</category>
+    <description>以表格汇总 MySQL 字符串、数学、日期时间、流程及其他常用函数，并列出字符串、数值、日期时间和二进制数据类型的说明与取值范围。</description>
+  </item>
+  <item>
+    <title>MySQL 主键设计盘点</title>
+    <link>https://www.alihai5.com/posts/mysql-primary-key/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/mysql-primary-key/</guid>
+    <pubDate>Wed, 23 Feb 2022 05:32:16 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>MySQL</category>
+    <category>MySQL</category>
+    <description>说明 MySQL 主键的定义与设计原则，比较数据库自增 ID、UUID 的优缺点和适用场景，并介绍 Snowflake 的位结构、Java 实现及分布式发号特点。</description>
+  </item>
+  <item>
+    <title>MySQL 数据库设计规范</title>
+    <link>https://www.alihai5.com/posts/mysql-design-spec/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/mysql-design-spec/</guid>
+    <pubDate>Wed, 23 Feb 2022 03:37:18 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>MySQL</category>
+    <category>MySQL</category>
+    <description>按高危、强制、建议三级整理 MySQL 设计规范，涉及库表与字段命名、数据类型、索引、分库分表、字符集、DAO 设计，以及 DML、连接、事务和排序分组等 SQL 编写约束。</description>
+  </item>
+  <item>
+    <title>Java 技术栈（基础篇）</title>
+    <link>https://www.alihai5.com/posts/java-tech-stack-basics/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/java-tech-stack-basics/</guid>
+    <pubDate>Tue, 22 Feb 2022 05:32:16 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>JAVA</category>
+    <category>JAVA</category>
+    <category>Java基础</category>
+    <category>Spring</category>
+    <description>Java 基础知识整理，涵盖基本类型与包装缓存、字符串、参数传递、常用关键字、Object 通用方法、继承与接口、反射、异常、泛型、注解及版本特性。</description>
+  </item>
+  <item>
+    <title>工作流引擎Activiti快速入门</title>
+    <link>https://www.alihai5.com/posts/activiti-quick-start/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/activiti-quick-start/</guid>
+    <pubDate>Tue, 23 Jun 2020 05:32:16 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>JAVA</category>
+    <category>Activiti</category>
+    <description>介绍 Activiti 工作流引擎的适用场景、BPMN 2.0 基本概念与核心服务，并以请假流程示例演示流程部署、实例启动、待办查询和任务处理。</description>
+  </item>
+  <item>
+    <title>Docker 疑难杂症汇总</title>
+    <link>https://www.alihai5.com/posts/docker-troubleshooting/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/docker-troubleshooting/</guid>
+    <pubDate>Tue, 23 Jun 2020 05:32:16 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>Docker</category>
+    <category>Docker</category>
+    <description>汇总二十六项 Docker 与 Compose 使用问题的排查记录，涉及存储目录迁移、磁盘及 inode 不足、容器异常、网络与网段、字符集、私有仓库、时区和环境变量配置。</description>
+  </item>
+  <item>
+    <title>SpringMVC项目实现Session共享</title>
+    <link>https://www.alihai5.com/posts/springmvc-session-sharing/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/springmvc-session-sharing/</guid>
+    <pubDate>Wed, 11 Dec 2019 12:22:12 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>JAVA</category>
+    <category>Session</category>
+    <category>SpringMVC</category>
+    <description>记录老 SpringMVC 项目借助 Spring Session 与 Redis 实现集群 Session 共享的配置，包括 Jedis 依赖、web.xml 过滤器顺序、连接工厂和会话超时设置，供单节点应用 SAAS 化改造参考。</description>
+  </item>
+  <item>
+    <title>Kafka同组下多消费者仅一个消费者消费的情况处理</title>
+    <link>https://www.alihai5.com/posts/kafka-single-consumer/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/kafka-single-consumer/</guid>
+    <pubDate>Wed, 10 Apr 2019 12:42:52 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>JAVA</category>
+    <category>Kafka</category>
+    <description>记录同消费者组内多个服务节点仅一个节点消费 Kafka 消息的排查过程，将原因定位为分区数不足，给出增加分区的命令，并示例说明分区与消费者数量及多消费者组之间的分配关系。</description>
+  </item>
+  <item>
+    <title>Mybatis一级缓存导致的内存溢出</title>
+    <link>https://www.alihai5.com/posts/mybatis-l1-cache-oom/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/mybatis-l1-cache-oom/</guid>
+    <pubDate>Sat, 29 Sep 2018 12:06:29 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>JAVA</category>
+    <category>JVM</category>
+    <category>OOM</category>
+    <category>Mybatis</category>
+    <description>记录一次 MyBatis 一级缓存引发内存溢出的排查过程：从堆快照定位 PerpetualCache，结合数据下发业务与 JVisualVM 复现验证，最后将 localCacheScope 调整为 STATEMENT 并复测，补充一级缓存机制说明。</description>
+  </item>
+  <item>
+    <title>Druid监控导致的内存溢出问题定位处理</title>
+    <link>https://www.alihai5.com/posts/druid-memory-leak/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/druid-memory-leak/</guid>
+    <pubDate>Mon, 06 Aug 2018 06:03:15 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>JAVA</category>
+    <category>JVM</category>
+    <category>OOM</category>
+    <category>Druid</category>
+    <description>记录 Java 应用周期性 OOM 的定位过程，介绍堆、永久代与元空间溢出原理、Dump 获取及 VisualVM 使用，并通过构造示例和压测定位 Druid 监控因未参数化 SQL 无法合并而持续占用内存的问题。</description>
+  </item>
+  </channel>
+</rss>

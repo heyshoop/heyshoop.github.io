@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="icon" type="image/svg+xml" href="/avatar.svg"/>
+    <meta name="theme-color" content="#0d0e0e"/>
+    <title>Druid监控导致的内存溢出问题定位处理 · 阿里孩舞</title>
+    <script type="module" crossorigin src="/assets/index-B8E3Zrjo.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CsAgeU0E.css">
+  <meta name="description" content="记录 Java 应用周期性 OOM 的定位过程，介绍堆、永久代与元空间溢出原理、Dump 获取及 VisualVM 使用，并通过构造示例和压测定位 Druid 监控因未参数化 SQL 无法合并而持续占用内存的问题。"/>
+    <link rel="canonical" href="https://www.alihai5.com/posts/druid-memory-leak/"/>
+    <link rel="alternate" type="application/rss+xml" title="阿里孩舞·幂等了吗？" href="https://www.alihai5.com/feed.xml"/>
+    <meta property="og:site_name" content="阿里孩舞"/>
+    <meta property="og:locale" content="zh-CN"/>
+    <meta property="og:title" content="Druid监控导致的内存溢出问题定位处理 · 阿里孩舞"/>
+    <meta property="og:description" content="记录 Java 应用周期性 OOM 的定位过程，介绍堆、永久代与元空间溢出原理、Dump 获取及 VisualVM 使用，并通过构造示例和压测定位 Druid 监控因未参数化 SQL 无法合并而持续占用内存的问题。"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://www.alihai5.com/posts/druid-memory-leak/"/>
+    <meta property="og:image" content="https://www.alihai5.com/media/og-default.svg"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Druid监控导致的内存溢出问题定位处理 · 阿里孩舞"/>
+    <meta name="twitter:description" content="记录 Java 应用周期性 OOM 的定位过程，介绍堆、永久代与元空间溢出原理、Dump 获取及 VisualVM 使用，并通过构造示例和压测定位 Druid 监控因未参数化 SQL 无法合并而持续占用内存的问题。"/>
+    <meta name="twitter:image" content="https://www.alihai5.com/media/og-default.svg"/>
+    <meta property="article:published_time" content="2018-08-06T06:03:15.000Z"/>
+    <meta name="robots" content="index,follow"/>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Druid监控导致的内存溢出问题定位处理","description":"记录 Java 应用周期性 OOM 的定位过程，介绍堆、永久代与元空间溢出原理、Dump 获取及 VisualVM 使用，并通过构造示例和压测定位 Druid 监控因未参数化 SQL 无法合并而持续占用内存的问题。","inLanguage":"zh-CN","datePublished":"2018-08-06T06:03:15.000Z","dateModified":"2018-08-06T06:03:15.000Z","mainEntityOfPage":"https://www.alihai5.com/posts/druid-memory-leak/","author":{"@type":"Person","name":"heyshoop"},"publisher":{"@type":"Person","name":"heyshoop"},"keywords":"JVM, OOM, Druid","articleSection":"JAVA"}</script>
+  </head>
+  <body>
+    <div id="root"><link rel="preload" as="image" href="/avatar.svg"/><link rel="preload" as="image" href="/media/content/covers/jks.jpg"/><div class="neural page-post"><header class="topbar"><a class="brand" href="/" aria-label="阿里孩舞 首页"><span class="brand-mark" aria-hidden="true"><img src="/avatar.svg" alt=""/></span><span class="brand-text">阿里孩舞<!-- --> <b>/ <!-- -->个人博客</b><small>赛博炼丹与生活补丁<!-- --> · <!-- -->AI alchemy, life patches and legacy code</small></span></a><nav aria-label="主导航"><a class="" href="/">首页<em>Home</em></a><a class="" href="/ai/">赛博炼丹<em>AI Alchemy</em></a><a class="" href="/life/">生活补丁<em>Life Patches</em></a><a class="" href="/legacy/">古法编程<em>Legacy</em></a><a class="" href="/tags/">主题<em>Topics</em></a><a class="" href="/about/">关于<em>About</em></a></nav><div class="top-actions"><a class="pill ghost" href="/legacy/">古法编程 <em>Legacy</em></a></div></header><div class="page page-article"><header class="article-hero glass"><img class="article-cover" src="/media/content/covers/jks.jpg" alt="蓝绿色双马尾女性角色的半身插画"/><p class="eyebrow">古法编程<!-- --> <span>2018年8月6日<!-- --> · <!-- -->6<!-- --> 分钟 · <!-- -->JAVA</span></p><h1>Druid监控导致的内存溢出问题定位处理</h1><p class="article-description">记录 Java 应用周期性 OOM 的定位过程，介绍堆、永久代与元空间溢出原理、Dump 获取及 VisualVM 使用，并通过构造示例和压测定位 Druid 监控因未参数化 SQL 无法合并而持续占用内存的问题。</p></header><div class="article-layout"><article class="prose glass"><h1 id="0起因">0、起因</h1>
+<p>一台部署于商户私有云中的应用频繁宕机，经查为 OOM，周期大约一周一次，较规律，所谓千里之堤毁于蚁穴，初步怀疑是轻微的内存泄漏不断积累导致的内存溢出，所以再次宕机出现时果断 dump 内存镜像开始分析</p>
+<h1 id="1内存溢出原理">1、内存溢出原理</h1>
+<ul>
+<li>
+<p>常见内存溢出：</p>
+<p>相信通过写 java 程序讨生活的人对内存溢出并不陌生，先看三张图：</p>
+</li>
+</ul>
+<p><img src="/media/content/druid-memory-leak/202212290931807.png" alt=""></p>
+<p>Heap space（堆空间）</p>
+<p><img src="/media/content/druid-memory-leak/202212290931810.png" alt=""></p>
+<p>Permgen（永久代）</p>
+<p><img src="/media/content/druid-memory-leak/202212290931194.png" alt=""></p>
+<p>元空间（Metaspace）</p>
+<ul>
+<li>JVM 内存模型</li>
+</ul>
+<p><img src="/media/content/druid-memory-leak/202212290932304.png" alt=""></p>
+<p>Java 应用程序在启动时会指定所需要的内存大小，它被分割成两个不同的区域：<code>Heap space</code>（堆空间）和<code>Permgen</code>（永久代）。</p>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-java"><span class="line"><span style="color:#E1E4E8">java.lang.OutOfMemoryError</span></span></code></pre>
+<p>正如字面意思，当应用程序试图向这两个空间添加更多的数据，但却没有足够的空间来容纳这些数据时，将会触发<code>java.lang.OutOfMemoryError</code>。</p>
+<ul>
+<li>
+<p>内存溢出原因分析</p>
+<p>1、java.lang.OutOfMemoryError: PermGen space</p>
+<p><code>PermGen space</code>的全称是<code>Permanent Generation space</code>,是指内存的永久保存区域, 这块内存主要是被 JVM 存放 Class 和 Meta 信息的,Class 在被 Load 时就会被放到<code>PermGen space</code>中, 同时 GC(Garbage Collection)不会在主程序运行期对 <code>PermGen space</code>进行清理。</p>
+<p>所以如果你的应用中有很多 CLASS 的话,就很可能出现 PermGen space 错误。</p>
+<p>通过上面的描述就可以得出：如果要加载的 class 与 jar 文件大小超过-XX:MaxPermSize 就有可能会产生 java.lang.OutOfMemoryError: PermGen space 。</p>
+<p>换句话说-XX:MaxPermSize 的大小要超过 class 与 jar 的大小。</p>
+<p>2、java.lang.OutOfMemoryError: Java heap space</p>
+<p>虽然各种 java 虚拟机的实现机制不一,但是<code>heap space</code>内存溢出产生的原因相同：那就是堆内存不够虚拟机分配了。</p>
+<p>由于内存的分配机制与 GC 是有联系的，也就是说内存不够用时有部分内存 GC 肯定无法释放，而我们要找的就是为什么 GC 释放不了堆内存。</p>
+<p>所以当产生<code>heap space</code>内存溢出时，堆内存中对象数量过多的就可能是问题的根源了。例外的情况是，程序确实需要那么多内存，这时就要考虑增大堆内存。</p>
+</li>
+</ul>
+<h1 id="2内存溢出时应该做什么">2、内存溢出时应该做什么</h1>
+<ul>
+<li>
+<p>收集案发现场数据，尽快恢复系统</p>
+<p>获取内存快照，根据适用场景有以下三种方式：</p>
+<p>1、使用 jmap 命令在案发现场手动生成 dump 文件</p>
+<p><code>jmap -dump:format=b,file=heap.dump \`pid of java\`</code></p>
+<p>2、使用 JVM 参数自动在案发当场获取 dump 文件</p>
+<p><code>-XX:+HeapDumpOnOutOfMemoryError</code></p>
+<p>3、使用其它工具获取 dump 文件，主要针对本地开发环境：</p>
+<p>分析 <code>Heap Dump</code> 的工具都可以获取 <code>Heap Dump</code> 文件。
+比如：<code>jdk</code> 自带的工具 <code>jvisualvm</code>。
+其它工具：<code>Eclipse memory analyzer（jmat）</code>、<code>JProfiler</code> 等。</p>
+</li>
+<li>
+<p>本地复现之 jvisualvm 的使用</p>
+<p>无论是为了再现案发场景还是验证修复效果，都需要我们在本地环境中监控 JVM 的运行情况，SO 以我熟悉的<code>jvisualvm</code>为例，简单说下使用方法</p>
+<blockquote>
+<p>VisualVM 提供在 Java 虚拟机 (Java Virutal Machine, JVM) 上运行的 Java 应用程序的详细信息。在 VisualVM 的图形用户界面中，您可以方便、快捷地查看多个 Java 应用程序的相关信息。（摘自官方）
+简单说来，VisualVM 是一种集成了多个 JDK 命令行工具的可视化工具，它能为您提供强大的分析能力。所有这些都是免费的！它囊括的命令行工具包括 jstat, JConsole, jstack, jmap 和 jinfo，这些工具与 JDK 的标准版本是一致的。 可以使用 VisualVM 生成和分析海量数据、跟踪内存泄漏、监控垃圾回收器、执行内存和 CPU 分析。尽管 VisualVM 自身要在 JDK6 这个版本上运行，但是 JDK1.4 以上版本的程序它都能监控。
+VisualVM 的一个最大好处就是，它已经在你的 JDK bin 目录里了，只要你使用的是 JDK1.6 Update7 之后的版本。点击一下 jvisualvm.exe 图标它就可以运行了，也可以终端或者 CMD 中使用 jvisualvm 命令启动。</p>
+</blockquote>
+<p>Jvisualvm 本地联调的两种常用方法：</p>
+<p>1、<code>Jvisualvm</code>与<code>IDEA</code>集成，<code>Intelij Idea</code> -> <code>Preferences</code> -> <code>Plugins</code> ->
+<code>Browers Repositrories</code>，搜索<code>visualvm</code>，选择<code>install</code>：安装成功后会添加<code>visualvm</code>的启动选项，启动 Tomcat 的同时会打开一个<code>VisualVM</code>的窗口。</p>
+<p><img src="/media/content/druid-memory-leak/202212290933918.png" alt=""></p>
+<p>2、不通过插件直接启动，与本地 Tomcat 联调，需要配置一下 Tomcat，添加参数：</p>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-text"><span class="line"><span>-Dcom.sun.management.jmxremote.port=8999</span></span>
+<span class="line"><span>-Dcom.sun.management.jmxremote.ssl=false</span></span>
+<span class="line"><span>-Dcom.sun.management.jmxremote.authenticate=false</span></span></code></pre>
+</li>
+</ul>
+<h1 id="3自造案发现场">3、自造案发现场</h1>
+<blockquote>
+<p>为了快速验证我们的工具以及加深对 OOM 的理解，我们自造几种内存溢出场景，代码我已准备妥当，可以直接复制运行验证，开始前记得根据示例调整 JVM 参数~</p>
+</blockquote>
+<ul>
+<li>
+<p>PermGen OOM</p>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-java"><span class="line"><span style="color:#6A737D">/**</span></span>
+<span class="line"><span style="color:#6A737D"> * @program: jvisualvmDemo</span></span>
+<span class="line"><span style="color:#6A737D"> * @description: jdk1.7永久区内存溢出</span></span>
+<span class="line"><span style="color:#6A737D"> * -XX:MaxPermSize=5m</span></span>
+<span class="line"><span style="color:#6A737D"> * -XX:+HeapDumpOnOutOfMemoryError</span></span>
+<span class="line"><span style="color:#6A737D"> * -XX:HeapDumpPath=/Users/anchor/Downloads/dump/</span></span>
+<span class="line"><span style="color:#6A737D"> * </span><span style="color:#F97583">@author</span><span style="color:#6A737D">: Anchor</span></span>
+<span class="line"><span style="color:#6A737D"> * @create: 2018-07-31</span></span>
+<span class="line"><span style="color:#6A737D"> **/</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> PermGenOOM</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> static</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">[] </span><span style="color:#FFAB70">args</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">        while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">            Enhancer enhancer </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Enhancer</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">            enhancer.</span><span style="color:#B392F0">setSuperclass</span><span style="color:#E1E4E8">(MetaOOM.OOMObject.class);</span></span>
+<span class="line"><span style="color:#E1E4E8">            enhancer.</span><span style="color:#B392F0">setUseCache</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">false</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">            enhancer.</span><span style="color:#B392F0">setCallback</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> MethodInterceptor</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">                public</span><span style="color:#E1E4E8"> Object </span><span style="color:#B392F0">intercept</span><span style="color:#E1E4E8">(Object </span><span style="color:#FFAB70">obj</span><span style="color:#E1E4E8">, Method </span><span style="color:#FFAB70">method</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">Object</span><span style="color:#E1E4E8">[] </span><span style="color:#FFAB70">args</span><span style="color:#E1E4E8">, MethodProxy </span><span style="color:#FFAB70">proxy</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">throws</span><span style="color:#E1E4E8"> Throwable {</span></span>
+<span class="line"><span style="color:#F97583">                    return</span><span style="color:#E1E4E8"> proxy.</span><span style="color:#B392F0">invokeSuper</span><span style="color:#E1E4E8">(obj, args);</span></span>
+<span class="line"><span style="color:#E1E4E8">                }</span></span>
+<span class="line"><span style="color:#E1E4E8">            });</span></span>
+<span class="line"><span style="color:#6A737D">            //无限创建动态代理，生成Class对象</span></span>
+<span class="line"><span style="color:#E1E4E8">            enhancer.</span><span style="color:#B392F0">create</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    static</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> OOMObject</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span></code></pre>
+</li>
+<li>
+<p>MetaOOM</p>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-java"><span class="line"><span style="color:#6A737D">/**</span></span>
+<span class="line"><span style="color:#6A737D"> * @program: jvisualvmDemo</span></span>
+<span class="line"><span style="color:#6A737D"> * @description: 方法区内存异常</span></span>
+<span class="line"><span style="color:#6A737D"> * -XX:MetaspaceSize=8m</span></span>
+<span class="line"><span style="color:#6A737D"> * -XX:MaxMetaspaceSize=8m</span></span>
+<span class="line"><span style="color:#6A737D"> * -XX:+HeapDumpOnOutOfMemoryError</span></span>
+<span class="line"><span style="color:#6A737D"> * -XX:HeapDumpPath=/Users/anchor/Downloads/dump/</span></span>
+<span class="line"><span style="color:#6A737D"> * </span><span style="color:#F97583">@author</span><span style="color:#6A737D">: Anchor</span></span>
+<span class="line"><span style="color:#6A737D"> * @create: 2018-07-27</span></span>
+<span class="line"><span style="color:#6A737D"> **/</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> MetaOOM</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> static</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">[] </span><span style="color:#FFAB70">args</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">        while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">            Enhancer enhancer </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Enhancer</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">            enhancer.</span><span style="color:#B392F0">setSuperclass</span><span style="color:#E1E4E8">(OOMObject.class);</span></span>
+<span class="line"><span style="color:#E1E4E8">            enhancer.</span><span style="color:#B392F0">setUseCache</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">false</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">            enhancer.</span><span style="color:#B392F0">setCallback</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> MethodInterceptor</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">                public</span><span style="color:#E1E4E8"> Object </span><span style="color:#B392F0">intercept</span><span style="color:#E1E4E8">(Object </span><span style="color:#FFAB70">obj</span><span style="color:#E1E4E8">, Method </span><span style="color:#FFAB70">method</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">Object</span><span style="color:#E1E4E8">[] </span><span style="color:#FFAB70">args</span><span style="color:#E1E4E8">, MethodProxy </span><span style="color:#FFAB70">proxy</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">throws</span><span style="color:#E1E4E8"> Throwable {</span></span>
+<span class="line"><span style="color:#F97583">                    return</span><span style="color:#E1E4E8"> proxy.</span><span style="color:#B392F0">invokeSuper</span><span style="color:#E1E4E8">(obj, args);</span></span>
+<span class="line"><span style="color:#E1E4E8">                }</span></span>
+<span class="line"><span style="color:#E1E4E8">            });</span></span>
+<span class="line"><span style="color:#6A737D">            //无限创建动态代理，生成Class对象</span></span>
+<span class="line"><span style="color:#E1E4E8">            enhancer.</span><span style="color:#B392F0">create</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    static</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> OOMObject</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+</li>
+<li>
+<p>HeapOOM</p>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-java"><span class="line"><span style="color:#6A737D">/**</span></span>
+<span class="line"><span style="color:#6A737D"> * @program: jvisualvmDemo</span></span>
+<span class="line"><span style="color:#6A737D"> * @description: 堆内存异常</span></span>
+<span class="line"><span style="color:#6A737D"> * VM Args:</span></span>
+<span class="line"><span style="color:#6A737D"> *     //这两个参数保证了堆中的可分配内存固定为20M</span></span>
+<span class="line"><span style="color:#6A737D"> *     -Xms20m</span></span>
+<span class="line"><span style="color:#6A737D"> *     -Xmx20m</span></span>
+<span class="line"><span style="color:#6A737D"> *     -XX:+HeapDumpOnOutOfMemoryError</span></span>
+<span class="line"><span style="color:#6A737D"> *     -XX:HeapDumpPath=/Users/anchor/Downloads/dump/</span></span>
+<span class="line"><span style="color:#6A737D"> * </span><span style="color:#F97583">@author</span><span style="color:#6A737D">: Anchor</span></span>
+<span class="line"><span style="color:#6A737D"> * @create: 2018-07-27</span></span>
+<span class="line"><span style="color:#6A737D"> **/</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> HeapOOM</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">    //创建一个内部类用于创建对象使用</span></span>
+<span class="line"><span style="color:#F97583">    static</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> OOMObject</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> static</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">[] </span><span style="color:#FFAB70">args</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        List&#x3C;</span><span style="color:#F97583">OOMObject</span><span style="color:#E1E4E8">> list </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#E1E4E8"> ArrayList&#x3C;</span><span style="color:#F97583">OOMObject</span><span style="color:#E1E4E8">>();</span></span>
+<span class="line"><span style="color:#6A737D">        //无限创建对象，在堆中</span></span>
+<span class="line"><span style="color:#F97583">        while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">            list.</span><span style="color:#B392F0">add</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> OOMObject</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+</li>
+<li>
+<p>JavaVMStackSOF</p>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-java"><span class="line"><span style="color:#6A737D">/**</span></span>
+<span class="line"><span style="color:#6A737D"> * @program: jvisualvmDemo</span></span>
+<span class="line"><span style="color:#6A737D"> * @description: 栈内存异常</span></span>
+<span class="line"><span style="color:#6A737D"> * VM Args：</span></span>
+<span class="line"><span style="color:#6A737D"> *     //设置栈容量为160K，默认1M</span></span>
+<span class="line"><span style="color:#6A737D"> *    -Xss160k</span></span>
+<span class="line"><span style="color:#6A737D"> * </span><span style="color:#F97583">@author</span><span style="color:#6A737D">: Anchor</span></span>
+<span class="line"><span style="color:#6A737D"> * @create: 2018-07-27</span></span>
+<span class="line"><span style="color:#6A737D"> **/</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> JavaVMStackSOF</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> int</span><span style="color:#E1E4E8"> stackLength </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> stackLeak</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">        stackLength</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#6A737D">        //递归调用，触发异常</span></span>
+<span class="line"><span style="color:#B392F0">        stackLeak</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> static</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">[] </span><span style="color:#FFAB70">args</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">throws</span><span style="color:#E1E4E8"> Throwable {</span></span>
+<span class="line"><span style="color:#E1E4E8">        JavaVMStackSOF oom </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> JavaVMStackSOF</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">        try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">            oom.</span><span style="color:#B392F0">stackLeak</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        } </span><span style="color:#F97583">catch</span><span style="color:#E1E4E8"> (Throwable </span><span style="color:#FFAB70">e</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">            System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"stack length:"</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> oom.stackLength);</span></span>
+<span class="line"><span style="color:#F97583">            throw</span><span style="color:#E1E4E8"> e;</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+</li>
+</ul>
+<h1 id="4案例分析">4、案例分析</h1>
+<blockquote>
+<p>啰里啰嗦这么终于要进入正题了 😹</p>
+</blockquote>
+<p>准备环境，测试脚本</p>
+<p>根据本地机器性能配置 JVM 参数：</p>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-text"><span class="line"><span>-server -XX:PermSize=256M -XX:MaxPermSize=256m -Xms300M -Xmx300M</span></span>
+<span class="line"><span>-Dcom.sun.management.jmxremote.port=8999</span></span>
+<span class="line"><span>-Dcom.sun.management.jmxremote.ssl=false</span></span>
+<span class="line"><span>-Dcom.sun.management.jmxremote.authenticate=false</span></span></code></pre>
+<p>准备测试脚本：</p>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-python"><span class="line"><span style="color:#6A737D">#!/usr/bin/env python3</span></span>
+<span class="line"><span style="color:#6A737D"># -*- coding: utf-8 -*-</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">from</span><span style="color:#E1E4E8"> multiprocessing </span><span style="color:#F97583">import</span><span style="color:#E1E4E8"> Process,Pool</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> os,time</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> requests</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">def</span><span style="color:#B392F0"> run_proc</span><span style="color:#E1E4E8">(name):</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">in</span><span style="color:#79B8FF"> range</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">30000</span><span style="color:#E1E4E8">):</span></span>
+<span class="line"><span style="color:#E1E4E8">        postdata </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span><span style="color:#9ECBFF">'code'</span><span style="color:#E1E4E8">: i}</span></span>
+<span class="line"><span style="color:#E1E4E8">        r </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> requests.post(</span><span style="color:#9ECBFF">"http://localhost:8080/OOM.do"</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">data</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">postdata)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">if</span><span style="color:#79B8FF"> __name__</span><span style="color:#F97583"> ==</span><span style="color:#9ECBFF">'__main__'</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#79B8FF">    print</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Run the main process (</span><span style="color:#79B8FF">%s</span><span style="color:#9ECBFF">).'</span><span style="color:#F97583"> %</span><span style="color:#E1E4E8"> (os.getpid()))</span></span>
+<span class="line"><span style="color:#E1E4E8">    mainStart </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> time.time()</span></span>
+<span class="line"><span style="color:#E1E4E8">    p </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Pool(</span><span style="color:#79B8FF">8</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">in</span><span style="color:#79B8FF"> range</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">16</span><span style="color:#E1E4E8">):</span></span>
+<span class="line"><span style="color:#E1E4E8">        p.apply_async(run_proc,</span><span style="color:#FFAB70">args</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Process'</span><span style="color:#F97583">+</span><span style="color:#79B8FF">str</span><span style="color:#E1E4E8">(i),))</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">    print</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Waiting for all subprocesses done ...'</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    p.close()</span></span>
+<span class="line"><span style="color:#E1E4E8">    p.join()</span></span>
+<span class="line"><span style="color:#79B8FF">    print</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'All subprocesses done'</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    mainEnd </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> time.time()</span></span>
+<span class="line"><span style="color:#79B8FF">    print</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">'All process ran </span><span style="color:#79B8FF">%0.2f</span><span style="color:#9ECBFF"> seconds.'</span><span style="color:#F97583"> %</span><span style="color:#E1E4E8"> (mainEnd</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">mainStart))</span></span></code></pre>
+<p>内存快照分析</p>
+<p>快照导入 visualvm，简单翻了一下很快发现问题，内存中存在大量 SQL 片段未回收，如图：</p>
+<p><img src="/media/content/druid-memory-leak/202212290934440.png" alt=""></p>
+<p>为何内存会被大量 SQL 片段占领，莫非？？？果断开启断言（瞎猜）模式，我们要复现问题！</p>
+<blockquote>
+<p>假设 A：使用了静态变量定义 SQL 片段，导致资源未回收
+翻代码确认，发现 SQL 使用 String 对象拼接，非静态变量，但是该 SQL 进行了上百次的拼接必然造成资源浪费加重 GC 负担,有优化空间改 StringBuild，测试之。</p>
+</blockquote>
+<p>脚本跑起来~ Emm~ 貌似没啥效果</p>
+<blockquote>
+<p>假设 B：连接池不够用？</p>
+</blockquote>
+<p>翻代码确认，发现配置正常，改小连接池大小，测试之，无效。</p>
+<blockquote>
+<p>假设 C：数据库有死锁？</p>
+</blockquote>
+<p>但是与运维确认每次内存溢出只需重启应用即可恢复，数据库无需操作，PASS</p>
+<blockquote>
+<p>假设 D：。。。。。</p>
+</blockquote>
+<blockquote>
+<p>假设 X：难道 Druid 连接池会导致内存溢出？</p>
+</blockquote>
+<p>检查 Druid 配置，发现代码中除了使用了连接池还配置了 SQL 监控，URL 监控，那么监控数据存储在哪里了？难道默认是内存中？百度 Google 无果，直接动手压测，模拟 50W 请求，得到如下数据：成功的看到了内存溢出。</p>
+<p><img src="/media/content/druid-memory-leak/202212290935297.png" alt=""></p>
+<p>对比生产机内存快照，发现有戏！组成结果基本一致，可是没道理啊，难度 Druid 还有这种大坑？不行不敢确定，那么我们反向验证下，如果我关掉 Druid 的监控呢？说干就干，再跑 50W 请求：</p>
+<p><img src="/media/content/druid-memory-leak/202212290935142.png" alt=""></p>
+<p>欧克，果然有点意思，OOM 消失了(๑•̀ㅂ•́)و✧</p>
+<p>既然问题找到了，那么就要分析为啥会出现这种大坑，先从官网入手，翻下 Druid 的 lssues 发现竟然有前辈已经问过该类问题</p>
+<p><img src="/media/content/druid-memory-leak/202212290936633.png" alt=""></p>
+<p>but，官方并未回复，那么看起来这个问题太 low？</p>
+<p>Emm.... 那自己研究下好了</p>
+<p>进一步扩展</p>
+<p>翻阅官方文档， <a href="https://github.com/alibaba/druid/wiki/%E9%85%8D%E7%BD%AE_StatFilter">在 SQL 合并配置</a> ，发现如下内容：</p>
+<blockquote>
+<p>当你程序中存在没有参数化的 sql 执行时，sql 统计的效果会不好。比如：
+select _ from t where id = 1
+select _ from t where id = 2
+select _ from t where id = 3
+在统计中，显示为 3 条 sql，这不是我们希望要的效果。StatFilter 提供合并的功能，能够将这 3 个 SQL 合并为如下的 SQL
+select _ from t where id = ?</p>
+</blockquote>
+<p>问题到此已经基本明了，不规范的入参导致<code>StatFilter</code>未能成功合并 SQL，Druid 成功记录了所有的执行语句。。。。。。。</p>
+<p>大家可以自行体会下这两种写法的区别：</p>
+<p><img src="/media/content/druid-memory-leak/202212290936538.png" alt=""></p>
+<h1 id="5内存溢出排查总结">5、内存溢出排查总结</h1>
+<blockquote>
+<p>导致 OutOfMemoryError 异常的常见原因有以下几种：</p>
+<ul>
+<li>内存中加载的数据量过于庞大，如一次从数据库取出过多数据；</li>
+<li>集合类中有对对象的引用，使用完后未清空，使得JVM不能回收；</li>
+<li>代码中存在死循环或循环产生过多重复的对象实体；</li>
+<li>使用的第三方软件中的BUG；</li>
+<li>启动参数内存值设定的过小；</li>
+<li>编码不规范的隐患；</li>
+</ul>
+</blockquote></article><nav class="toc glass" aria-label="目录"><h3>目录 <em>Contents</em></h3><ol><li style="padding-left:0"><a href="#0起因">0、起因</a></li><li style="padding-left:0"><a href="#1内存溢出原理">1、内存溢出原理</a></li><li style="padding-left:0"><a href="#2内存溢出时应该做什么">2、内存溢出时应该做什么</a></li><li style="padding-left:0"><a href="#3自造案发现场">3、自造案发现场</a></li><li style="padding-left:0"><a href="#4案例分析">4、案例分析</a></li><li style="padding-left:0"><a href="#5内存溢出排查总结">5、内存溢出排查总结</a></li></ol></nav></div><footer class="article-footer"><section class="link-panel glass"><h3>标签与概念 <em>Tags &amp; concepts</em></h3><div class="chip-row"><a class="chip" href="/tags/jvm/">#<!-- -->JVM</a><a class="chip" href="/tags/oom/">#<!-- -->OOM</a><a class="chip" href="/tags/druid/">#<!-- -->Druid</a></div></section><section class="link-panel glass"><h3>反链 <em>Backlinks</em></h3><div class="chip-row"><a class="chip" href="/posts/mybatis-l1-cache-oom/">Mybatis一级缓存导致的内存溢出</a></div></section><nav class="prev-next" aria-label="上下篇"><span></span><a class="pn-card glass" href="/posts/mybatis-l1-cache-oom/"><small>下一篇 <em>Newer</em></small><b>Mybatis一级缓存导致的内存溢出</b></a></nav></footer></div><footer class="site-foot public-footer"><p>本博客为个人非营利站点：记录赛博炼丹、生活补丁与古法编程档案；无广告、无推广、无统计追踪，不收集访客个人数据。<em>Non-commercial · no ads · no tracking.</em></p><p>每一篇笔记，都是网络里的一个节点。<em>Every note is a node in the network.</em></p></footer></div></div>
+  </body>
+</html>

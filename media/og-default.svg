@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="阿里孩舞">
+  <defs>
+    <radialGradient id="orb" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#f4ead0"/>
+      <stop offset="45%" stop-color="#c9cac5"/>
+      <stop offset="100%" stop-color="#161717"/>
+    </radialGradient>
+    <linearGradient id="title" x1="0" x2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e6cf98"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#0d0e0e"/>
+  <circle cx="600" cy="260" r="132" fill="url(#orb)" opacity=".92"/>
+  <circle cx="600" cy="260" r="210" fill="none" stroke="#e6cf98" stroke-opacity=".18" stroke-width="2"/>
+  <circle cx="600" cy="260" r="270" fill="none" stroke="#ffffff" stroke-opacity=".08" stroke-width="1"/>
+  <text x="600" y="475" text-anchor="middle" font-family="'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="58" font-weight="700" fill="url(#title)" letter-spacing="4">阿里孩舞</text>
+  <text x="600" y="526" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#a5a6a1" letter-spacing="3">个人非营利技术博客</text>
+</svg>
