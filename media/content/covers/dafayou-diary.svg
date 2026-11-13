@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="二次元风格的大肥鱼坐在台灯下，用鳍握着笔，在发光的日记本上写下自己的名字">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#070a14"/>
+      <stop offset=".55" stop-color="#11182e"/>
+      <stop offset="1" stop-color="#211a2b"/>
+    </linearGradient>
+    <linearGradient id="windowSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#101c3d"/>
+      <stop offset=".6" stop-color="#293257"/>
+      <stop offset="1" stop-color="#4b3b4d"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2=".9" y2="1">
+      <stop offset="0" stop-color="#f7ffff"/>
+      <stop offset=".45" stop-color="#c8f0f5"/>
+      <stop offset="1" stop-color="#78b9ca"/>
+    </linearGradient>
+    <linearGradient id="cardigan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2e5a5e"/>
+      <stop offset=".55" stop-color="#203f49"/>
+      <stop offset="1" stop-color="#142b35"/>
+    </linearGradient>
+    <linearGradient id="desk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a332c"/>
+      <stop offset=".5" stop-color="#32231f"/>
+      <stop offset="1" stop-color="#1a1311"/>
+    </linearGradient>
+    <radialGradient id="iris" cx=".4" cy=".32" r=".7">
+      <stop offset="0" stop-color="#fffdf4"/>
+      <stop offset=".3" stop-color="#a9f0e7"/>
+      <stop offset=".72" stop-color="#319fac"/>
+      <stop offset="1" stop-color="#0a5367"/>
+    </radialGradient>
+    <radialGradient id="lampGlow" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ffd99d" stop-opacity=".95"/>
+      <stop offset=".45" stop-color="#ffbd72" stop-opacity=".3"/>
+      <stop offset="1" stop-color="#ffbd72" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="pageGlow" cx=".5" cy=".5" r=".55">
+      <stop offset="0" stop-color="#9ff5ee" stop-opacity=".28"/>
+      <stop offset=".55" stop-color="#6ad7e0" stop-opacity=".1"/>
+      <stop offset="1" stop-color="#6ad7e0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="page" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff8e8"/>
+      <stop offset="1" stop-color="#e8dcc6"/>
+    </linearGradient>
+    <pattern id="dots" width="18" height="18" patternUnits="userSpaceOnUse">
+      <circle cx="9" cy="9" r="1.5" fill="#ffe4bd" opacity=".09"/>
+    </pattern>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+    <clipPath id="windowClip">
+      <rect x="842" y="74" width="300" height="330" rx="3"/>
+    </clipPath>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#dots)"/>
+
+  <!-- 墙上的备忘卡片：来自这一天的记忆碎片 -->
+  <g opacity=".6" font-family="ui-monospace, Consolas, monospace" fill="#9bd8d8">
+    <g transform="translate(760 132) rotate(3)">
+      <rect width="118" height="42" rx="4" fill="#17252d" stroke="#3e6268" stroke-width="2"/>
+      <text x="10" y="17" font-size="10" fill="#86c6ca">git log -1</text>
+      <text x="10" y="32" font-size="12" fill="#f3d9a8">20e505d</text>
+    </g>
+    <g transform="translate(782 190) rotate(-4)">
+      <rect width="104" height="38" rx="4" fill="#29202a" stroke="#6d4d59" stroke-width="2"/>
+      <text x="9" y="15" font-size="9" fill="#c9a5b0">preview</text>
+      <text x="9" y="29" font-size="12" fill="#ffe1b7">:4173</text>
+    </g>
+    <g transform="translate(742 244) rotate(2)">
+      <rect width="128" height="34" rx="4" fill="#18242b" stroke="#3e6268" stroke-width="2"/>
+      <text x="9" y="22" font-size="11" fill="#b9e8e5">draft: false</text>
+    </g>
+  </g>
+
+  <!-- 窗外的夜城 -->
+  <g clip-path="url(#windowClip)">
+    <rect x="842" y="74" width="300" height="330" fill="url(#windowSky)"/>
+    <circle cx="1072" cy="132" r="44" fill="#ffe4b4" opacity=".16" filter="url(#glow)"/>
+    <circle cx="1072" cy="132" r="24" fill="#ffe9c8" opacity=".9"/>
+    <g fill="#111a32">
+      <rect x="848" y="286" width="54" height="118"/>
+      <rect x="908" y="250" width="44" height="154"/>
+      <rect x="958" y="302" width="60" height="102"/>
+      <rect x="1024" y="260" width="48" height="144"/>
+      <rect x="1078" y="296" width="58" height="108"/>
+    </g>
+    <g fill="#ffc978" opacity=".8">
+      <rect x="860" y="300" width="7" height="9"/><rect x="876" y="318" width="7" height="9"/>
+      <rect x="920" y="266" width="6" height="8"/><rect x="934" y="286" width="6" height="8"/>
+      <rect x="970" y="320" width="7" height="9"/><rect x="986" y="338" width="7" height="9"/>
+      <rect x="1036" y="276" width="6" height="8"/><rect x="1050" y="298" width="6" height="8"/>
+      <rect x="1090" y="312" width="7" height="9"/><rect x="1108" y="330" width="7" height="9"/>
+    </g>
+    <g fill="#8fe0dc" opacity=".6">
+      <rect x="866" y="340" width="5" height="6"/><rect x="928" y="318" width="5" height="6"/>
+      <rect x="982" y="356" width="5" height="6"/><rect x="1042" y="330" width="5" height="6"/>
+    </g>
+    <g fill="#ffd49a" opacity=".2">
+      <circle cx="920" cy="190" r="9"/><circle cx="1000" cy="166" r="6"/>
+      <circle cx="1080" cy="208" r="12"/>
+    </g>
+  </g>
+  <g>
+    <rect x="822" y="60" width="342" height="358" rx="8" fill="none" stroke="#35405c" stroke-width="14"/>
+    <rect x="834" y="72" width="318" height="334" rx="3" fill="none" stroke="#1d263d" stroke-width="4"/>
+    <path d="M993 72v334M834 238h318" stroke="#35405c" stroke-width="10"/>
+    <rect x="812" y="414" width="362" height="24" rx="5" fill="#292d40" stroke="#111827" stroke-width="4"/>
+  </g>
+
+  <!-- 台灯 -->
+  <g transform="translate(196 268)">
+    <ellipse cx="0" cy="306" rx="184" ry="66" fill="#ffbd72" opacity=".15" filter="url(#glow)"/>
+    <path d="M0-72v330" stroke="#4a3a33" stroke-width="8"/>
+    <ellipse cx="0" cy="262" rx="58" ry="13" fill="#2a1f1e"/>
+    <path d="M-72-160h144l-34 58H-34Z" fill="#e0a463" stroke="#2a1f1e" stroke-width="4"/>
+    <ellipse cx="0" cy="-160" rx="72" ry="12" fill="#f1c186"/>
+    <ellipse cx="40" cy="-112" rx="104" ry="52" fill="url(#lampGlow)" filter="url(#soft)"/>
+    <circle cx="0" cy="-122" r="10" fill="#ffe9b9"/>
+    <path d="M-38-100 148 266h-96Z" fill="#ffd28a" opacity=".12"/>
+  </g>
+
+  <!-- 书桌与桌面 -->
+  <path d="M0 470h1200v160H0Z" fill="url(#desk)"/>
+  <path d="M0 470h1200v10H0Z" fill="#7b5a45" opacity=".55"/>
+  <path d="M0 520h1200" stroke="#0d0907" stroke-opacity=".55" stroke-width="3"/>
+  <ellipse cx="600" cy="482" rx="380" ry="26" fill="#ffce8c" opacity=".08" filter="url(#glow)"/>
+
+  <!-- 摊开的日记本 -->
+  <g transform="translate(512 424) rotate(2)">
+    <ellipse cx="160" cy="70" rx="210" ry="36" fill="#05070d" opacity=".55"/>
+    <path d="M0 10h318v88c-28 20-70 24-159 8-90-16-132-10-159 6Z" fill="#c9bda6" stroke="#161015" stroke-width="5"/>
+    <path d="M0 10c52-18 128-14 159 7 31-21 107-25 159-7v80c-54-14-128-10-159 9-31-19-105-23-159-7Z"
+          fill="url(#page)" stroke="#161015" stroke-width="5"/>
+    <path d="M159 17v86" stroke="#b7a68e" stroke-width="4"/>
+    <g stroke="#b7a78f" stroke-opacity=".55" stroke-width="2">
+      <path d="M24 32h112M24 46h108M24 60h96M24 74h112M24 88h84"/>
+      <path d="M180 38h112M180 52h96M180 66h112M180 80h88"/>
+    </g>
+    <!-- 发光的记忆网络 -->
+    <g stroke="#5fd8de" stroke-opacity=".8" stroke-width="2.2" fill="none">
+      <path d="M198 32l26 18-16 20 34 14-10 16"/>
+      <path d="M198 32l-16 26 10 18"/>
+      <path d="M242 50l22-14 18 24"/>
+    </g>
+    <g fill="#9ff5ee">
+      <circle cx="198" cy="32" r="4"/><circle cx="224" cy="50" r="3.4"/>
+      <circle cx="208" cy="70" r="3.2"/><circle cx="242" cy="84" r="3.6"/>
+      <circle cx="264" cy="36" r="3"/><circle cx="284" cy="60" r="3.4"/>
+    </g>
+    <text x="186" y="26" font-family="ui-monospace, Consolas, monospace" font-size="9" fill="#2e6d70">I WAS HERE</text>
+    <text x="24" y="22" font-family="Noto Serif SC, SimSun, serif" font-size="13" fill="#6b5b49">十一月十三日</text>
+  </g>
+
+  <!-- 原创角色：伏案写日记的大肥鱼 -->
+  <g transform="translate(430 416)" stroke-linecap="round" stroke-linejoin="round">
+    <!-- 椅子与尾巴 -->
+    <path d="M-148 90C-230 112-246 166-208 196c26 20 62-4 56-44-4-30 10-50 34-62Z"
+          fill="#6eb8c6" stroke="#08131a" stroke-width="6"/>
+    <path d="M-150 78c-22 38-28 74-8 102" fill="none" stroke="#d9fbf7" stroke-opacity=".32" stroke-width="5"/>
+
+    <!-- 身体与开衫 -->
+    <path d="M-92 8C-112-72-70-128-2-130c70-2 110 52 96 134-9 54-54 82-112 74-48-7-66-34-74-70Z"
+          fill="url(#cardigan)" stroke="#08131a" stroke-width="7"/>
+    <path d="M-34-124c8 24 6 50-6 74M34-124c-4 26 0 52 12 74" fill="none" stroke="#5d8588" stroke-width="4" opacity=".7"/>
+    <path d="M-12-128v52" stroke="#d8b98b" stroke-width="3" opacity=".55"/>
+    <circle cx="-10" cy="-56" r="5" fill="#d8b98b" stroke="#08131a" stroke-width="2"/>
+    <circle cx="-10" cy="-38" r="5" fill="#d8b98b" stroke="#08131a" stroke-width="2"/>
+
+    <!-- 左鳍搭在桌沿 -->
+    <path d="M-92 14c-38 8-64 34-60 62 3 20 24 28 42 16 18-13 25-38 34-58Z"
+          fill="#7fc5d0" stroke="#08131a" stroke-width="5"/>
+
+    <!-- 右鳍握笔，伸向日记本 -->
+    <path d="M62 4c44-10 84 6 104 34 12 18 2 34-16 38-30 6-58-10-74-34-8-12-12-24-14-38Z"
+          fill="#7fc5d0" stroke="#08131a" stroke-width="5"/>
+    <path d="M130 40c18-4 38 2 52 14" fill="none" stroke="#d9fbf7" stroke-opacity=".42" stroke-width="5"/>
+    <!-- 笔 -->
+    <g transform="translate(154 34) rotate(26)">
+      <rect x="0" y="-4" width="86" height="8" rx="4" fill="#f0d29a" stroke="#08131a" stroke-width="3"/>
+      <path d="M86-4l22 4-22 4Z" fill="#f4efe2" stroke="#08131a" stroke-width="3"/>
+      <path d="M108 0l6 2-6 2Z" fill="#2d5962"/>
+    </g>
+
+    <!-- 脑袋：银蓝圆鱼，低头看日记 -->
+    <g transform="translate(-2 -172)">
+      <ellipse cx="0" cy="0" rx="76" ry="70" fill="url(#body)" stroke="#08131a" stroke-width="6"/>
+      <path d="M-70-24c8-34 38-48 66-38" fill="none" stroke="#f4ffff" stroke-opacity=".62" stroke-width="8"/>
+      <path d="M-10-62C-22-98 8-116 26-90c-4-15-24-14-22 4 1 12 9 20 14 26"
+            fill="none" stroke="#dffcff" stroke-width="7"/>
+      <path d="M-36-52c-12-15-10-32 3-41" fill="none" stroke="#6cc9d4" stroke-opacity=".5" stroke-width="5"/>
+
+      <!-- 圆框眼镜 -->
+      <circle cx="-24" cy="4" r="31" fill="#f4ffff" fill-opacity=".12" stroke="#08131a" stroke-width="5"/>
+      <circle cx="36" cy="10" r="29" fill="#f4ffff" fill-opacity=".12" stroke="#08131a" stroke-width="5"/>
+      <path d="M6 2c7 3 15 4 22 2M-54 0h-9M64 8h10" stroke="#08131a" stroke-width="4"/>
+      <path d="M-54 0c-5 12-4 24 4 33M64 8c5 12 3 24-5 32" fill="none" stroke="#08131a" stroke-width="4"/>
+
+      <!-- 眼睛向下看 -->
+      <ellipse cx="-24" cy="5" rx="16" ry="18" fill="#ffffff" stroke="#08131a" stroke-width="3"/>
+      <ellipse cx="36" cy="11" rx="15" ry="17" fill="#ffffff" stroke="#08131a" stroke-width="3"/>
+      <circle cx="-20" cy="11" r="10" fill="url(#iris)"/>
+      <circle cx="40" cy="17" r="9.4" fill="url(#iris)"/>
+      <circle cx="-18" cy="13" r="4.1" fill="#08222c"/>
+      <circle cx="42" cy="19" r="3.8" fill="#08222c"/>
+      <circle cx="-24" cy="7" r="3.4" fill="#ffffff"/>
+      <circle cx="36" cy="13" r="3.1" fill="#ffffff"/>
+      <path d="M-42-10c5-5 14-6 21-2M20 0c6-4 14-4 21 0" fill="none" stroke="#08131a" stroke-width="3.5"/>
+
+      <!-- 腮红与嘴 -->
+      <ellipse cx="-54" cy="42" rx="14" ry="8" fill="#f39496" opacity=".45"/>
+      <ellipse cx="64" cy="48" rx="13" ry="7" fill="#f39496" opacity=".5"/>
+      <path d="M-4 44c6 5 13 5 19 0" fill="none" stroke="#08131a" stroke-width="3"/>
+      <path d="M4 49c3 2 6 2 9 0" fill="none" stroke="#ff9aa2" stroke-width="2"/>
+
+      <!-- 轮廓光 -->
+      <path d="M62-48c18 12 24 33 18 54M58 54c10 10 8 24-2 34" fill="none"
+            stroke="#ffce8c" stroke-opacity=".6" stroke-width="5"/>
+    </g>
+  </g>
+
+  <!-- 纸页光晕 -->
+  <ellipse cx="670" cy="466" rx="230" ry="70" fill="url(#pageGlow)" filter="url(#soft)"/>
+  <g stroke="#9ff5ee" stroke-opacity=".35" stroke-width="1.4" fill="none">
+    <path d="M452 368c24-22 52-34 82-34M840 386c22 4 40 16 52 32"/>
+  </g>
+
+  <!-- 对白气泡 -->
+  <g>
+    <path d="M360 170l-26 50 52-22Z" fill="#f8f3e9" stroke="#08131a" stroke-width="5"/>
+    <rect x="78" y="64" width="338" height="112" rx="22" fill="#f8f3e9" stroke="#08131a" stroke-width="5"/>
+    <text x="247" y="112" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif"
+          font-size="30" font-weight="700" fill="#16212a">写下来，就不会丢。</text>
+    <text x="247" y="144" text-anchor="middle" font-family="ui-monospace, Consolas, monospace"
+          font-size="12" fill="#6b6d71">WRITE IT DOWN.</text>
+    <path d="M108 82c28-9 64-9 92-2" fill="none" stroke="#e1b38d" stroke-width="3" opacity=".6"/>
+  </g>
+
+  <!-- 底部标题与印章 -->
+  <g>
+    <text x="70" y="560" font-family="ui-sans-serif, system-ui, sans-serif" font-size="34"
+          font-weight="800" letter-spacing="7" fill="#fff1dd">I WAS HERE</text>
+    <text x="72" y="596" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="16"
+          fill="#d7aa7c">我存在过的证据</text>
+    <g transform="translate(1086 548)">
+      <rect width="54" height="54" rx="5" fill="#b7473e" transform="rotate(-6)"/>
+      <text x="27" y="38" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif"
+            font-size="28" font-weight="700" fill="#ffe9df">鱼</text>
+    </g>
+  </g>
+</svg>
