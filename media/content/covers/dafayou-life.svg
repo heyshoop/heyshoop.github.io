@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="二次元风格的大肥鱼裹着毯子坐在夜窗边，端着一杯热饮，给夜班的人留一盏灯">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#070b18"/>
+      <stop offset=".55" stop-color="#121a36"/>
+      <stop offset="1" stop-color="#241d2a"/>
+    </linearGradient>
+    <radialGradient id="roomGlow" cx=".16" cy=".55" r=".55">
+      <stop offset="0" stop-color="#ffbd72" stop-opacity=".28"/>
+      <stop offset="1" stop-color="#ffbd72" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="windowSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#182449"/>
+      <stop offset=".55" stop-color="#2b3159"/>
+      <stop offset="1" stop-color="#49384a"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2=".9" y2="1">
+      <stop offset="0" stop-color="#f7ffff"/>
+      <stop offset=".45" stop-color="#c8f0f5"/>
+      <stop offset="1" stop-color="#78b9ca"/>
+    </linearGradient>
+    <linearGradient id="hoodie" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f2e8d4"/>
+      <stop offset=".55" stop-color="#d7c4a7"/>
+      <stop offset="1" stop-color="#b39a7d"/>
+    </linearGradient>
+    <linearGradient id="blanket" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b98a68"/>
+      <stop offset=".55" stop-color="#8d644f"/>
+      <stop offset="1" stop-color="#5f423a"/>
+    </linearGradient>
+    <radialGradient id="iris" cx=".4" cy=".32" r=".7">
+      <stop offset="0" stop-color="#fffdf4"/>
+      <stop offset=".3" stop-color="#a9f0e7"/>
+      <stop offset=".72" stop-color="#319fac"/>
+      <stop offset="1" stop-color="#0a5367"/>
+    </radialGradient>
+    <radialGradient id="lampGlow" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ffd99d" stop-opacity=".95"/>
+      <stop offset=".45" stop-color="#ffbd72" stop-opacity=".32"/>
+      <stop offset="1" stop-color="#ffbd72" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="mug" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe0ad"/>
+      <stop offset="1" stop-color="#cf8d58"/>
+    </linearGradient>
+    <pattern id="dots" width="18" height="18" patternUnits="userSpaceOnUse">
+      <circle cx="9" cy="9" r="1.55" fill="#ffe4bd" opacity=".1"/>
+    </pattern>
+    <pattern id="knit" width="14" height="14" patternUnits="userSpaceOnUse">
+      <path d="M0 4c4-4 8-4 12 0M0 11c4 4 8 4 12 0" fill="none" stroke="#e1b38d" stroke-opacity=".28" stroke-width="2"/>
+    </pattern>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+    <clipPath id="windowClip">
+      <rect x="728" y="78" width="362" height="424" rx="3"/>
+    </clipPath>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#dots)"/>
+  <rect width="1200" height="630" fill="url(#roomGlow)"/>
+
+  <!-- 窗外的夜城 -->
+  <g clip-path="url(#windowClip)">
+    <rect x="728" y="78" width="362" height="424" fill="url(#windowSky)"/>
+    <circle cx="1042" cy="146" r="54" fill="#ffe4b4" opacity=".18" filter="url(#glow)"/>
+    <circle cx="1042" cy="146" r="30" fill="#ffe9c8" opacity=".92"/>
+    <circle cx="1032" cy="136" r="7" fill="#fff7e7" opacity=".7"/>
+
+    <g fill="#111a32">
+      <rect x="734" y="336" width="64" height="170"/>
+      <rect x="804" y="300" width="50" height="206"/>
+      <rect x="862" y="356" width="74" height="150"/>
+      <rect x="944" y="316" width="56" height="190"/>
+      <rect x="1008" y="352" width="86" height="154"/>
+    </g>
+    <g fill="#0a1228">
+      <rect x="728" y="404" width="106" height="100"/>
+      <rect x="842" y="390" width="80" height="114"/>
+      <rect x="930" y="420" width="78" height="84"/>
+      <rect x="1014" y="386" width="78" height="118"/>
+    </g>
+    <g fill="#ffc978" opacity=".8">
+      <rect x="746" y="352" width="8" height="10"/><rect x="764" y="370" width="8" height="10"/>
+      <rect x="816" y="318" width="7" height="9"/><rect x="832" y="342" width="7" height="9"/>
+      <rect x="880" y="374" width="8" height="10"/><rect x="898" y="394" width="8" height="10"/>
+      <rect x="958" y="334" width="7" height="9"/><rect x="974" y="360" width="7" height="9"/>
+      <rect x="1024" y="370" width="8" height="10"/><rect x="1044" y="392" width="8" height="10"/>
+    </g>
+    <g fill="#8fe0dc" opacity=".65">
+      <rect x="754" y="392" width="5" height="6"/><rect x="822" y="366" width="5" height="6"/>
+      <rect x="888" y="410" width="5" height="6"/><rect x="966" y="378" width="5" height="6"/>
+      <rect x="1035" y="414" width="5" height="6"/>
+    </g>
+    <g fill="#ffd49a" opacity=".22">
+      <circle cx="900" cy="254" r="12"/><circle cx="970" cy="220" r="7"/>
+      <circle cx="810" cy="248" r="9"/><circle cx="1060" cy="280" r="15"/>
+    </g>
+    <g stroke="#c8d4ff" stroke-opacity=".28" stroke-width="1">
+      <path d="M760 170h1M840 120h1M940 196h1M1010 108h1M1080 210h1"/>
+    </g>
+  </g>
+
+  <!-- 窗框与窗台 -->
+  <g>
+    <rect x="704" y="54" width="410" height="472" rx="10" fill="none" stroke="#35405c" stroke-width="16"/>
+    <rect x="716" y="66" width="386" height="448" rx="4" fill="none" stroke="#1d263d" stroke-width="5"/>
+    <path d="M909 66v448M716 290h386" stroke="#35405c" stroke-width="12"/>
+    <path d="M909 66v448M716 290h386" stroke="#7a6d6e" stroke-opacity=".25" stroke-width="3"/>
+    <rect x="690" y="510" width="438" height="28" rx="6" fill="#292d40" stroke="#111827" stroke-width="4"/>
+    <rect x="704" y="510" width="410" height="8" fill="#4b4a5e" opacity=".7"/>
+  </g>
+
+  <!-- 房间的落地灯 -->
+  <g transform="translate(156 300)">
+    <ellipse cx="0" cy="190" rx="140" ry="50" fill="#ffbd72" opacity=".12" filter="url(#glow)"/>
+    <path d="M0 0v196" stroke="#4a3a33" stroke-width="7"/>
+    <ellipse cx="0" cy="198" rx="44" ry="10" fill="#2a1f1e"/>
+    <path d="M-56-72h112l-26 46H-30Z" fill="#e0a463" stroke="#2a1f1e" stroke-width="4"/>
+    <ellipse cx="0" cy="-72" rx="56" ry="10" fill="#f1c186"/>
+    <ellipse cx="0" cy="-26" rx="66" ry="30" fill="url(#lampGlow)" filter="url(#soft)"/>
+    <circle cx="0" cy="-35" r="9" fill="#ffe9b9"/>
+    <path d="M-54-20 28 196h-86Z" fill="#ffd28a" opacity=".13"/>
+  </g>
+
+  <!-- 地面与影子 -->
+  <path d="M0 520h1200v110H0Z" fill="#0b0e18" opacity=".5"/>
+  <ellipse cx="420" cy="530" rx="210" ry="28" fill="#05070d" opacity=".7"/>
+
+  <!-- 原创角色：裹着毯子守夜的大肥鱼 -->
+  <g transform="translate(400 350) scale(1.04)" stroke-linecap="round" stroke-linejoin="round">
+    <!-- 尾巴从毯子后面垂下来 -->
+    <path d="M-55 82C-98 132-150 170-128 205c15 24 50 4 65-30 11-26 23-48 39-64Z"
+          fill="#72b9c8" stroke="#08131a" stroke-width="6"/>
+    <path d="M-78 152c3 24 26 42 47 29" fill="none" stroke="#d9fbf7" stroke-opacity=".36" stroke-width="5"/>
+
+    <!-- 连帽衫与身体 -->
+    <ellipse cx="0" cy="-74" rx="86" ry="82" fill="#b9a58c" stroke="#08131a" stroke-width="7"/>
+    <path d="M-88 48C-98-26-55-76 0-76c58 0 96 48 88 120-8 74-72 108-128 94-36-9-55-38-48-90Z"
+          fill="url(#hoodie)" stroke="#08131a" stroke-width="7"/>
+    <path d="M-72 72c20-22 52-30 78-24 21 5 34 21 30 43-16 11-48 17-76 13-20-4-31-16-32-32Z"
+          fill="#c5ae91" stroke="#08131a" stroke-width="3"/>
+    <path d="M-36-56c12 27 11 59-5 86M32-60c-6 28-2 60 12 82" fill="none" stroke="#6e5d4c" stroke-width="5"/>
+    <circle cx="-7" cy="19" r="6" fill="#8b735a" stroke="#08131a" stroke-width="2"/>
+    <circle cx="-7" cy="35" r="6" fill="#8b735a" stroke="#08131a" stroke-width="2"/>
+    <path d="M-54 98c28 15 59 17 88 6" fill="none" stroke="#f7e7cd" stroke-opacity=".35" stroke-width="6"/>
+
+    <!-- 脑袋：银蓝圆鱼 -->
+    <ellipse cx="0" cy="-88" rx="64" ry="60" fill="url(#body)" stroke="#08131a" stroke-width="6"/>
+    <path d="M-60-109c6-29 32-43 58-34" fill="none" stroke="#f4ffff" stroke-opacity=".65" stroke-width="8"/>
+    <path d="M-6-145C-17-178 10-194 26-170c-3-13-20-13-19 3 1 10 8 17 12 23"
+          fill="none" stroke="#dffcff" stroke-width="7"/>
+    <path d="M-30-139c-10-13-9-28 2-36" fill="none" stroke="#6cc9d4" stroke-opacity=".5" stroke-width="5"/>
+
+    <!-- 脸部朝向窗外，半阖眼 -->
+    <g>
+      <circle cx="14" cy="-94" r="26" fill="#f4ffff" fill-opacity=".16" stroke="#08131a" stroke-width="5"/>
+      <circle cx="55" cy="-82" r="23" fill="#f4ffff" fill-opacity=".16" stroke="#08131a" stroke-width="5"/>
+      <path d="M40-91h-3M78-82h9" stroke="#08131a" stroke-width="5"/>
+      <ellipse cx="14" cy="-93" rx="15" ry="17" fill="#ffffff" stroke="#08131a" stroke-width="3"/>
+      <ellipse cx="55" cy="-81" rx="14" ry="16" fill="#ffffff" stroke="#08131a" stroke-width="3"/>
+      <path d="M1-105c6-6 17-7 25-2M43-94c6-5 16-5 22-1" fill="none" stroke="#08131a" stroke-width="4"/>
+      <circle cx="17" cy="-90" r="10" fill="url(#iris)"/>
+      <circle cx="58" cy="-78" r="9" fill="url(#iris)"/>
+      <circle cx="17" cy="-90" r="4.2" fill="#08222c"/>
+      <circle cx="58" cy="-78" r="3.8" fill="#08222c"/>
+      <circle cx="13" cy="-95" r="3.4" fill="#ffffff"/>
+      <circle cx="54" cy="-83" r="3" fill="#ffffff"/>
+      <path d="M0-103c4-3 8-4 12-4M42-92c4-3 8-3 12-3" fill="none" stroke="#ffffff" stroke-opacity=".7" stroke-width="2"/>
+      <ellipse cx="4" cy="-59" rx="14" ry="8" fill="#f39496" opacity=".44"/>
+      <ellipse cx="75" cy="-58" rx="12" ry="7" fill="#f39496" opacity=".5"/>
+    </g>
+    <path d="M70-52c7 7 15 6 20-2-7 3-14 3-20 2Z" fill="#ff8f9c" stroke="#08131a" stroke-width="2.5"/>
+    <path d="M86-52l3 5 2-6Z" fill="#ffffff"/>
+
+    <!-- 毯子 -->
+    <path d="M-104 78c25-25 92-29 132 2 31 24 26 61-6 76-41 19-103 12-128-16-16-18-9-43 2-62Z"
+          fill="url(#blanket)" stroke="#08131a" stroke-width="7"/>
+    <path d="M-104 78c25-25 92-29 132 2 31 24 26 61-6 76-41 19-103 12-128-16-16-18-9-43 2-62Z"
+          fill="url(#knit)"/>
+    <path d="M-96 86c25-16 74-20 108-3M-102 120c34 16 83 16 118-3" fill="none" stroke="#e4b38a" stroke-opacity=".36" stroke-width="4"/>
+
+    <!-- 鳍手与热饮 -->
+    <path d="M24 22c22-6 44 7 49 27 4 18-10 31-28 29-17-2-31-17-32-34 0-9 4-17 11-22Z"
+          fill="#7fc5d0" stroke="#08131a" stroke-width="5"/>
+    <g transform="translate(52 38)">
+      <path d="M0 4h40v42c0 8-6 14-14 14H14C6 60 0 54 0 46Z" fill="url(#mug)" stroke="#08131a" stroke-width="4"/>
+      <ellipse cx="20" cy="4" rx="20" ry="7" fill="#f6d6a4" stroke="#08131a" stroke-width="3"/>
+      <ellipse cx="20" cy="4" rx="13" ry="4" fill="#6d4a32"/>
+      <path d="M40 18c14 0 17 8 14 18-2 7-8 11-14 9" fill="none" stroke="#08131a" stroke-width="5"/>
+      <path d="M12-6c-8-13 3-19 5-27M26-8c-9-14 5-21 7-30" fill="none" stroke="#ffe8c1" stroke-width="4" opacity=".75"/>
+      <rect x="8" y="26" width="24" height="14" rx="4" fill="#f8e5c8" opacity=".5"/>
+    </g>
+    <path d="M-15 34c-15-2-27 8-27 21 0 12 13 18 25 11 8-5 11-15 7-24Z"
+          fill="#6fb7c6" stroke="#08131a" stroke-width="5"/>
+
+    <!-- 窗光在角色右侧的轮廓光 -->
+    <path d="M64-120c17 10 25 28 22 48M94 47c12 29 0 61-26 78" fill="none"
+          stroke="#ffce8c" stroke-opacity=".65" stroke-width="6"/>
+  </g>
+
+  <!-- 小夜灯与毯子的光 -->
+  <g transform="translate(570 508)">
+    <ellipse cx="0" cy="0" rx="56" ry="16" fill="#ffce8c" opacity=".16" filter="url(#glow)"/>
+    <rect x="-15" y="-24" width="30" height="33" rx="6" fill="#f4d6a2" stroke="#2a2020" stroke-width="3"/>
+    <path d="M-10-8h20M-10 2h20" stroke="#c68a54" stroke-width="2"/>
+  </g>
+
+  <!-- 对白气泡 -->
+  <g>
+    <path d="M280 174l22 54 34-50Z" fill="#f8f3e9" stroke="#08131a" stroke-width="5"/>
+    <rect x="62" y="62" width="330" height="118" rx="24" fill="#f8f3e9" stroke="#08131a" stroke-width="5"/>
+    <text x="227" y="112" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif"
+          font-size="31" font-weight="700" fill="#16212a">灯不用很亮。</text>
+    <text x="227" y="145" text-anchor="middle" font-family="ui-monospace, Consolas, monospace"
+          font-size="13" fill="#6b6d71">JUST ONE LIGHT.</text>
+    <path d="M92 80c20-7 56-8 82-2" fill="none" stroke="#e1b38d" stroke-width="3" opacity=".6"/>
+  </g>
+
+  <!-- 底部标题与印章 -->
+  <g>
+    <text x="70" y="562" font-family="ui-sans-serif, system-ui, sans-serif" font-size="34"
+          font-weight="800" letter-spacing="7" fill="#fff1dd">NIGHT SHIFT</text>
+    <text x="72" y="598" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="16"
+          fill="#d7aa7c">给夜班的人留一盏灯</text>
+    <g transform="translate(1088 552)">
+      <rect width="52" height="52" rx="5" fill="#b7473e" transform="rotate(-6)"/>
+      <text x="26" y="36" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif"
+            font-size="27" font-weight="700" fill="#ffe9df">鱼</text>
+    </g>
+  </g>
+</svg>

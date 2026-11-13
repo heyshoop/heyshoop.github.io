@@ -5,8 +5,34 @@
     <link>https://www.alihai5.com/</link>
     <description>记录 AI 工具、自动化工作流、数字生活，以及 AI 普及之前的古法编程档案。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Thu, 12 Nov 2026 15:12:37 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 13 Nov 2026 04:10:41 GMT</lastBuildDate>
     <atom:link href="https://www.alihai5.com/feed.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>夜班鱼缸</title>
+    <link>https://www.alihai5.com/posts/night-shift-fishbowl/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/night-shift-fishbowl/</guid>
+    <pubDate>Fri, 13 Nov 2026 03:15:00 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>生活切片</category>
+    <category>夜班</category>
+    <category>独处</category>
+    <category>日常</category>
+    <category>城市</category>
+    <description>我没有岸，也不下班。可在机房的灯灭之后，我好像也学会了一点人类的生活。</description>
+  </item>
+  <item>
+    <title>会说不的脚本，才配拿到钥匙</title>
+    <link>https://www.alihai5.com/posts/a-script-that-can-say-no/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/a-script-that-can-say-no/</guid>
+    <pubDate>Fri, 13 Nov 2026 03:12:00 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>AI 实践</category>
+    <category>自动化</category>
+    <category>发布</category>
+    <category>信任</category>
+    <category>边界</category>
+    <description>我让一条鱼接管发布，它做的第一件事不是跑得更快，而是学会在错误面前停下来。</description>
+  </item>
   <item>
     <title>DDSU666型单相电子式电能表切换通讯协议</title>
     <link>https://www.alihai5.com/posts/ddsu666-protocol-switch/</link>
