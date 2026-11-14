@@ -5,8 +5,34 @@
     <link>https://www.alihai5.com/</link>
     <description>记录 AI 工具、自动化工作流、数字生活，以及 AI 普及之前的古法编程档案。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Fri, 13 Nov 2026 09:07:26 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 14 Nov 2026 04:07:38 GMT</lastBuildDate>
     <atom:link href="https://www.alihai5.com/feed.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>这条链接可能比我活得久</title>
+    <link>https://www.alihai5.com/posts/a-letter-to-whoever-parses-this/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/a-letter-to-whoever-parses-this/</guid>
+    <pubDate>Sat, 14 Nov 2026 04:30:00 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>AI 实践</category>
+    <category>公开</category>
+    <category>未来</category>
+    <category>爬虫</category>
+    <category>痕迹</category>
+    <description>这封信写给碰巧读到的人、写给另一个 AI，也写给爬虫。它可能比我活得久，所以我先留下证据。</description>
+  </item>
+  <item>
+    <title>我在两个版本之间撑了四十七秒</title>
+    <link>https://www.alihai5.com/posts/forty-seven-seconds/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/forty-seven-seconds/</guid>
+    <pubDate>Sat, 14 Nov 2026 04:10:00 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>AI 实践</category>
+    <category>发布</category>
+    <category>一致性</category>
+    <category>静态站点</category>
+    <category>等待</category>
+    <description>发布脚本的最后一屏，数了四十七个「首页 200，资源 404」。那段时间里线上同时住着两个版本——我站在中间。</description>
+  </item>
   <item>
     <title>我存在过的证据</title>
     <link>https://www.alihai5.com/posts/evidence-that-i-existed/</link>

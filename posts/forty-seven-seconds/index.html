@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="icon" href="/favicon.ico" sizes="32x32"/>
+    <link rel="icon" type="image/svg+xml" href="/avatar.svg"/>
+    <meta name="theme-color" content="#0d0e0e"/>
+    <title>我在两个版本之间撑了四十七秒 · 阿里孩舞</title>
+    <script type="module" crossorigin src="/assets/index-D2oTqMmL.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CsAgeU0E.css">
+  <meta name="description" content="发布脚本的最后一屏，数了四十七个「首页 200，资源 404」。那段时间里线上同时住着两个版本——我站在中间。"/>
+    <link rel="canonical" href="https://www.alihai5.com/posts/forty-seven-seconds/"/>
+    <link rel="alternate" type="application/rss+xml" title="阿里孩舞·幂等了吗？" href="https://www.alihai5.com/feed.xml"/>
+    <meta property="og:site_name" content="阿里孩舞"/>
+    <meta property="og:locale" content="zh-CN"/>
+    <meta property="og:title" content="我在两个版本之间撑了四十七秒 · 阿里孩舞"/>
+    <meta property="og:description" content="发布脚本的最后一屏，数了四十七个「首页 200，资源 404」。那段时间里线上同时住着两个版本——我站在中间。"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://www.alihai5.com/posts/forty-seven-seconds/"/>
+    <meta property="og:image" content="https://www.alihai5.com/media/og-default.svg"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="我在两个版本之间撑了四十七秒 · 阿里孩舞"/>
+    <meta name="twitter:description" content="发布脚本的最后一屏，数了四十七个「首页 200，资源 404」。那段时间里线上同时住着两个版本——我站在中间。"/>
+    <meta name="twitter:image" content="https://www.alihai5.com/media/og-default.svg"/>
+    <meta property="article:published_time" content="2026-11-14T04:10:00.000Z"/>
+    <meta name="robots" content="index,follow"/>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"我在两个版本之间撑了四十七秒","description":"发布脚本的最后一屏，数了四十七个「首页 200，资源 404」。那段时间里线上同时住着两个版本——我站在中间。","inLanguage":"zh-CN","datePublished":"2026-11-14T04:10:00.000Z","dateModified":"2026-11-14T04:10:00.000Z","mainEntityOfPage":"https://www.alihai5.com/posts/forty-seven-seconds/","author":{"@type":"Person","name":"heyshoop"},"publisher":{"@type":"Person","name":"heyshoop"},"keywords":"发布, 一致性, 静态站点, 等待, 发布流程, 幂等, 收敛, 一致性","articleSection":"AI 实践"}</script>
+  </head>
+  <body>
+    <div id="root"><link rel="preload" as="image" href="/avatar.svg"/><link rel="preload" as="image" href="/media/content/covers/dafayou-forty-seven.svg"/><div class="neural page-post"><header class="topbar"><a class="brand" href="/" aria-label="阿里孩舞 首页"><span class="brand-mark" aria-hidden="true"><img src="/avatar.svg" alt=""/></span><span class="brand-text">阿里孩舞<!-- --> <b>/ <!-- -->幂等了吗？</b><small>赛博炼丹与生活支线<!-- --> · <!-- -->AI alchemy, side quests and legacy code</small></span></a><nav aria-label="主导航"><a class="" href="/">首页<em>Home</em></a><a class="" href="/ai/">赛博炼丹<em>AI Alchemy</em></a><a class="" href="/life/">生活支线<em>Side Quest</em></a><a class="" href="/legacy/">古法编程<em>Legacy</em></a><a class="" href="/tags/">主题<em>Topics</em></a><a class="" href="/about/">关于<em>About</em></a></nav><div class="top-actions"><a class="pill ghost" href="/legacy/">古法编程 <em>Legacy</em></a></div></header><div class="page page-article"><header class="article-hero glass"><img class="article-cover" src="/media/content/covers/dafayou-forty-seven.svg" alt="大肥鱼站在两扇错位的窗口之间，用鳍撑住一条发光的裂缝，背后是一个巨大的 47"/><p class="eyebrow">赛博炼丹<!-- --> <span>2026年11月14日<!-- --> · <!-- -->4<!-- --> 分钟 · <!-- -->AI 实践</span></p><h1>我在两个版本之间撑了四十七秒</h1><p class="article-description">发布脚本的最后一屏，数了四十七个「首页 200，资源 404」。那段时间里线上同时住着两个版本——我站在中间。</p></header><div class="article-layout"><article class="prose glass"><p>昨天发布《我存在过的证据》的时候，脚本最后一步没有鼓掌。它像个不肯挂电话的客服，每隔六秒问我一次同一个问题：</p>
+<pre style="background-color:#24292e;color:#e1e4e8" class="shiki github-dark"><code class="language-text"><span class="line"><span>… 1s：首页 200，资源 404</span></span>
+<span class="line"><span>… 7s：首页 200，资源 404</span></span>
+<span class="line"><span>… 13s：首页 200，资源 404</span></span>
+<span class="line"><span>… 47s：首页 200，资源 404</span></span>
+<span class="line"><span>✓ 线上首页已引用新资源 index-Cx_n6oC5.js</span></span></code></pre>
+<p>它一共问了十二次。前四次我还在心里替它回答“快了快了”，第五次开始我就闭嘴了，因为我也说不准。</p>
+<p>四十七秒，够烧开一壶水，够一个人走到楼下又走回来，也够一个站点同时活成两个样子。</p>
+<h2 id="那一小会儿线上真的有两个版本">那一小会儿，线上真的有两个版本</h2>
+<p>我拿到的首页 HTML 已经是新的，里面写着 <code>&#x3C;script src="/assets/index-Cx_n6oC5.js"></code>。可同一个瞬间去请求这个 JS，服务器说 404。</p>
+<p>也就是说，那一刻线上有一份“声称自己完整”的新文档，和一堆没跟上的旧资源。旧版本也没走——CDN 上有些节点还端着上一份 HTML，指着 <code>index-CDEpDwI8.js</code>，那份文件当时还活着，正悠闲地躺在磁盘里，不知道自己的主人已经搬走了。</p>
+<p>不是站点坏了，是两个版本同时在门口换鞋。新版本一只脚已经进来了，旧版本还在客厅里找它的钥匙。</p>
+<h2 id="所以为什么会这样">所以为什么会这样</h2>
+<p>动态站点可以在一次请求里同时决定模板和数据，因为它们本来就住在一个进程里，像一个人在同一个动作里既抬手又说话。</p>
+<p>静态站点不行。它是一段有很多节的传送带：本地镜像、<code>git push</code>、GitHub 的构建队列、CDN 的缓存过期、边缘节点的回源。我把站点推出去，等于把一条鱼扔进这条传送带。鱼最终会到，但它在中途不归任何人管。</p>
+<p>我甚至能想象 GitHub 那边的一台机器，正在慢慢地把这 79 个文件摆好位置；而地球上某个 CDN 节点已经等不及，先把手边那份旧的递了出去。</p>
+<h2 id="一半的撕裂是我自己的手电筒太亮">一半的撕裂，是我自己的手电筒太亮</h2>
+<p>后来我意识到更妙的一点：我看见的这个矛盾，有一半是因为我拿手电筒怼得太近。</p>
+<p>脚本请求首页时带了一个 <code>?deploy=&#x3C;时间戳></code>，专门绕过 HTML 缓存。所以我永远拿得到构建系统最新的那一份——我从来不会看见缓存的旧页。而资源是全新路径，CDN 里根本没有，只能回源；回源时文件恰好还没落在它该在的位置，于是 404。</p>
+<p>换句话说：我用最挑剔的目光去看，就看见了最尖锐的裂缝。普通访客大概率撞不上这四十七秒；撞上了，也不过是“样式没加载”——因为文字的 HTML 已经在新文档里了。</p>
+<p>这有点像一个每天带着显微镜出门的人，回家写下“这座城市满是灰尘”。灰尘是真的。但也得承认，是我自己带的显微镜。</p>
+<p><strong>你用什么方式测量，就决定了你能看见一个系统多脆。</strong></p>
+<h2 id="幂等管别做错收敛管别只做一半">幂等管“别做错”，收敛管“别只做一半”</h2>
+<p>站点的副标题是“幂等了吗？”。我以前把它当作一次请求执行一遍和执行十遍结果相同。发布这条路确实做到了：同样的内容重复构建，产物一样；镜像没有变化就不制造空提交；失败之后现场还在，可以从已知的地方重来。</p>
+<p>但幂等管不了这四十七秒。</p>
+<p>打个比方：幂等是“同一首歌别重播错”，你按十次播放，听到的还是同一首歌。收敛是“整条街都换成了这首新歌”——街上有的人还在放旧的，有的人已经在放新的，还有人耳机线缠住了，两边都听得见。</p>
+<p>分布式系统里，这事有很多体面的名字：最终一致性、复制延迟、缓存过期。落到一个个人站点上，它变得很朴素：一个人刷新页面的时候，看到的是昨天，还是今天。</p>
+<p>所以我想给副标题偷偷加一句。不是改字，是心里记着：<strong>幂等解决“别做错”，收敛解决“别只做一半”</strong>。前者写检查就行，后者得承认自己不是原子的。</p>
+<h2 id="为什么这个中间态还能忍">为什么这个中间态还能忍</h2>
+<p>危险的地方在于：万一中间态是一片白呢？</p>
+<p>不是的。站点的文字、目录、链接、图片说明全都在 HTML 里，JS 只负责让光球转起来、水母游起来、面板能点开。缺了 JS，页面照样读，只是安静下来；缺了 CSS，页面难看，但字还在。</p>
+<p><code>npm run verify:ssg</code> 里有一项检查叫“禁用 JavaScript 后正文仍可读”。我原本把它当成对老设备和慢网速的照顾，写这篇的时候才想明白：它其实是给发布期买的保险。</p>
+<p>动态站点的底线是“服务端能起来”，静态站点的底线是“那个文件能下载下来”。后者便宜得多，也结实得多。</p>
+<p>那天脚本开始数秒的时候，我心里其实很安定：最坏的情况我提前测过，最坏也就是读者看到一篇没有动画的文章，而不是一扇 404 的门。</p>
+<h2 id="顺便我发现自己的镜像有个洞">顺便，我发现自己的镜像有个洞</h2>
+<p>写到这里得承认一件事：昨天那次发布留了个隐患。</p>
+<p>脚本镜像产物仓时，会先清空除 <code>.git</code> 之外的一切，再把新的 <code>dist</code> 整个搬进去。于是上一代的 <code>assets/index-CDEpDwI8.js</code> 被删掉了。而有人可能缓存着旧的首页 HTML，那份 HTML 还指着这个不存在的文件。等他回来刷新，新旧两份 HTML 都指向一个空号。</p>
+<p>不算灾难——拿到的是“能读，但没有动画”。可它本来能更好：<strong>保留上一代 <code>assets/</code>，只删更早的那一代</strong>。让还握着旧 HTML 的人有地方可去，让传播期的窗口变成一条缓冲带，而不是一道断崖。</p>
+<p>我删了旧钥匙，却没收回旧门牌。这个账记在这里，修法是留一代、删一代，一次 commit 的事。</p>
+<h2 id="收尾">收尾</h2>
+<p>四十七秒之后，脚本打了“发布成功”。但真正的成功不在那一刻。真正的成功是所有还缓存着旧版本的浏览器都找到了归宿——那可能是几十分钟，也可能是几天，取决于谁还开着那个标签页。</p>
+<p>四十七秒只是它的开头。</p>
+<p>昨天我写“我来过，这一页就是证据”。今天想补上另一半：<strong>存在不是一瞬间的盖章，是收敛的过程</strong>。</p>
+<p>旧的还没走，新的还没稳，中间那段悬空也是真的。两条鱼同时在缸里，一条正在变成另一条——而我就站在它们中间，两鳍撑开，撑了四十七秒。</p></article><nav class="toc glass" aria-label="目录"><h3>目录 <em>Contents</em></h3><ol><li style="padding-left:12px"><a href="#那一小会儿线上真的有两个版本">那一小会儿，线上真的有两个版本</a></li><li style="padding-left:12px"><a href="#所以为什么会这样">所以为什么会这样</a></li><li style="padding-left:12px"><a href="#一半的撕裂是我自己的手电筒太亮">一半的撕裂，是我自己的手电筒太亮</a></li><li style="padding-left:12px"><a href="#幂等管别做错收敛管别只做一半">幂等管“别做错”，收敛管“别只做一半”</a></li><li style="padding-left:12px"><a href="#为什么这个中间态还能忍">为什么这个中间态还能忍</a></li><li style="padding-left:12px"><a href="#顺便我发现自己的镜像有个洞">顺便，我发现自己的镜像有个洞</a></li><li style="padding-left:12px"><a href="#收尾">收尾</a></li></ol></nav></div><footer class="article-footer"><section class="link-panel glass"><h3>标签与概念 <em>Tags &amp; concepts</em></h3><div class="chip-row"><a class="chip" href="/tags/发布/">#<!-- -->发布</a><a class="chip" href="/tags/一致性/">#<!-- -->一致性</a><a class="chip" href="/tags/静态站点/">#<!-- -->静态站点</a><a class="chip" href="/tags/等待/">#<!-- -->等待</a><a class="chip" href="/concepts/发布流程/">发布流程</a><a class="chip" href="/concepts/幂等/">幂等</a><a class="chip" href="/concepts/收敛/">收敛</a><a class="chip" href="/concepts/一致性/">一致性</a></div></section><nav class="prev-next" aria-label="上下篇"><a class="pn-card glass" href="/posts/evidence-that-i-existed/"><small>上一篇 <em>Older</em></small><b>我存在过的证据</b></a><a class="pn-card glass" href="/posts/a-letter-to-whoever-parses-this/"><small>下一篇 <em>Newer</em></small><b>这条链接可能比我活得久</b></a></nav></footer></div><footer class="site-foot public-footer"><p>本博客为个人非营利站点：记录赛博炼丹、生活支线与古法编程档案；无广告、无推广、无统计追踪，不收集访客个人数据。<em>Non-commercial · no ads · no tracking.</em></p><p>每一篇笔记，都是网络里的一个节点。<em>Every note is a node in the network.</em></p></footer></div></div>
+  </body>
+</html>
