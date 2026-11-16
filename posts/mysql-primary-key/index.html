@@ -7,8 +7,8 @@
     <link rel="icon" type="image/svg+xml" href="/avatar.svg"/>
     <meta name="theme-color" content="#0d0e0e"/>
     <title>MySQL 主键设计盘点 · 阿里孩舞</title>
-    <script type="module" crossorigin src="/assets/index-D2oTqMmL.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-CsAgeU0E.css">
+    <script type="module" crossorigin src="/assets/index-D7-zIdcQ.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-jwsXK5cO.css">
   <meta name="description" content="说明 MySQL 主键的定义与设计原则，比较数据库自增 ID、UUID 的优缺点和适用场景，并介绍 Snowflake 的位结构、Java 实现及分布式发号特点。"/>
     <link rel="canonical" href="https://www.alihai5.com/posts/mysql-primary-key/"/>
     <link rel="alternate" type="application/rss+xml" title="阿里孩舞·幂等了吗？" href="https://www.alihai5.com/feed.xml"/>
@@ -28,7 +28,7 @@
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"MySQL 主键设计盘点","description":"说明 MySQL 主键的定义与设计原则，比较数据库自增 ID、UUID 的优缺点和适用场景，并介绍 Snowflake 的位结构、Java 实现及分布式发号特点。","inLanguage":"zh-CN","datePublished":"2022-02-23T05:32:16.000Z","dateModified":"2022-02-23T05:32:16.000Z","mainEntityOfPage":"https://www.alihai5.com/posts/mysql-primary-key/","author":{"@type":"Person","name":"heyshoop"},"publisher":{"@type":"Person","name":"heyshoop"},"keywords":"MySQL","articleSection":"MySQL"}</script>
   </head>
   <body>
-    <div id="root"><link rel="preload" as="image" href="/avatar.svg"/><link rel="preload" as="image" href="/media/content/covers/mustang.jpg"/><div class="neural page-post"><header class="topbar"><a class="brand" href="/" aria-label="阿里孩舞 首页"><span class="brand-mark" aria-hidden="true"><img src="/avatar.svg" alt=""/></span><span class="brand-text">阿里孩舞<!-- --> <b>/ <!-- -->幂等了吗？</b><small>赛博炼丹与生活支线<!-- --> · <!-- -->AI alchemy, side quests and legacy code</small></span></a><nav aria-label="主导航"><a class="" href="/">首页<em>Home</em></a><a class="" href="/ai/">赛博炼丹<em>AI Alchemy</em></a><a class="" href="/life/">生活支线<em>Side Quest</em></a><a class="" href="/legacy/">古法编程<em>Legacy</em></a><a class="" href="/tags/">主题<em>Topics</em></a><a class="" href="/about/">关于<em>About</em></a></nav><div class="top-actions"><a class="pill ghost" href="/legacy/">古法编程 <em>Legacy</em></a></div></header><div class="page page-article"><header class="article-hero glass"><img class="article-cover" src="/media/content/covers/mustang.jpg" alt="黑色双门跑车停在暮色城市街道旁"/><p class="eyebrow">古法编程<!-- --> <span>2022年2月23日<!-- --> · <!-- -->5<!-- --> 分钟 · <!-- -->MySQL</span></p><h1>MySQL 主键设计盘点</h1><p class="article-description">说明 MySQL 主键的定义与设计原则，比较数据库自增 ID、UUID 的优缺点和适用场景，并介绍 Snowflake 的位结构、Java 实现及分布式发号特点。</p></header><div class="article-layout"><article class="prose glass"><h1 id="主键定义">主键定义</h1>
+    <div id="root"><link rel="preload" as="image" href="/avatar.svg"/><link rel="preload" as="image" href="/media/content/covers/mustang.jpg"/><div class="neural page-post"><header class="topbar"><a class="brand" href="/" aria-label="阿里孩舞 首页"><span class="brand-mark" aria-hidden="true"><img src="/avatar.svg" alt=""/></span><span class="brand-text">阿里孩舞<!-- --> <b>/ <!-- -->幂等了吗？</b><small>赛博炼丹与生活支线<!-- --> · <!-- -->AI alchemy, side quests and legacy code</small></span></a><nav aria-label="主导航"><a class="" href="/">首页<em>Home</em></a><a class="" href="/ai/">赛博炼丹<em>AI Alchemy</em></a><a class="" href="/life/">生活支线<em>Side Quest</em></a><a class="" href="/legacy/">古法编程<em>Legacy</em></a><a class="" href="/tags/">主题<em>Topics</em></a><a class="" href="/about/">关于<em>About</em></a></nav><div class="top-actions"><a class="pill ghost" href="/legacy/">古法编程 <em>Legacy</em></a></div></header><div class="page page-article"><header class="article-hero glass"><img class="article-cover" src="/media/content/covers/mustang.jpg" alt="黑色双门跑车停在暮色城市街道旁"/><p class="eyebrow">古法编程<!-- --> <span>2022年2月23日<!-- --> · <!-- -->5<!-- --> 分钟 · <!-- -->MySQL</span></p><h1>MySQL 主键设计盘点</h1><p class="article-description">说明 MySQL 主键的定义与设计原则，比较数据库自增 ID、UUID 的优缺点和适用场景，并介绍 Snowflake 的位结构、Java 实现及分布式发号特点。</p><p class="article-hint">文中配图可点击放大查看原始大小，再点一次缩回屏幕大小。</p></header><div class="article-layout"><article class="prose glass"><h1 id="主键定义">主键定义</h1>
 <p>唯一标识表中每行的一个列（或一组列）称为主键。主键用来表示一个特定的行。</p>
 <h1 id="主键设计和应用原则">主键设计和应用原则</h1>
 <p>除了满足MySQL强制实施的规则（主键不可重复；一行中主键不可为空）之外，主键的设计和应用应当还遵守以下公认的原则：</p>
@@ -54,7 +54,7 @@
 <p><strong>到目前为止业界一共有5种方式生成UUID，详情可见IETF发布的UUID规范：<a href="https://www.ietf.org/rfc/rfc4122.txt">A Universally Unique IDentifier (UUID) URN Namespace</a></strong></p>
 <p><strong>优点：</strong>
 <strong>性能非常高：本地生成，没有网络消耗。</strong>
-<img src="/media/content/mysql-primary-key/202212281626132.png" alt="">
+<img src="/media/content/mysql-primary-key/202212281626132.webp" alt="">
 <strong>缺点：</strong>
 <strong>1、不易于存储：UUID太长，16字节128位，通常以36长度的字符串表示，很多场景不适用。</strong>
 <strong>2、信息不安全：基于MAC地址生成UUID的算法可能会造成MAC地址泄露，这个漏洞曾被用于寻找梅丽莎病毒的制作者位置。</strong>
@@ -68,7 +68,7 @@
 <h2 id="自建的id生成器">自建的id生成器</h2>
 <h3 id="twitter的snowflake算法">Twitter的snowflake算法</h3>
 <p><strong>Twitter的snowflake算法的核心把时间戳，工作机器id，序列号组合在一起。</strong>
-<img src="/media/content/mysql-primary-key/202212281627800.png" alt="">
+<img src="/media/content/mysql-primary-key/202212281627800.webp" alt="">
 <strong>除了最高位bit标记为不可用以外，其余三组bit占位均可浮动，看具体的业务需求而定。默认情况下41bit的时间戳可以支持该算法使用到2082年，10bit的工作机器id可以支持1023台机器，序列号支持1毫秒产生4095个自增序列id。</strong></p>
 <p><strong>具体可以查看：</strong> <a href="https://github.com/twitter-archive/snowflake">github.com/twitter-arc…</a> <strong>（但是最近一次的提交是6年前，显示已经停止了对初始版snowflake的支持）</strong>
 <strong>源码如下：</strong></p>

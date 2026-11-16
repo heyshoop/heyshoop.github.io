@@ -7,8 +7,8 @@
     <link rel="icon" type="image/svg+xml" href="/avatar.svg"/>
     <meta name="theme-color" content="#0d0e0e"/>
     <title>Java 技术栈（基础篇） · 阿里孩舞</title>
-    <script type="module" crossorigin src="/assets/index-D2oTqMmL.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-CsAgeU0E.css">
+    <script type="module" crossorigin src="/assets/index-D7-zIdcQ.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-jwsXK5cO.css">
   <meta name="description" content="Java 基础知识整理，涵盖基本类型与包装缓存、字符串、参数传递、常用关键字、Object 通用方法、继承与接口、反射、异常、泛型、注解及版本特性。"/>
     <link rel="canonical" href="https://www.alihai5.com/posts/java-tech-stack-basics/"/>
     <link rel="alternate" type="application/rss+xml" title="阿里孩舞·幂等了吗？" href="https://www.alihai5.com/feed.xml"/>
@@ -28,7 +28,7 @@
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Java 技术栈（基础篇）","description":"Java 基础知识整理，涵盖基本类型与包装缓存、字符串、参数传递、常用关键字、Object 通用方法、继承与接口、反射、异常、泛型、注解及版本特性。","inLanguage":"zh-CN","datePublished":"2022-02-22T05:32:16.000Z","dateModified":"2022-02-22T05:32:16.000Z","mainEntityOfPage":"https://www.alihai5.com/posts/java-tech-stack-basics/","author":{"@type":"Person","name":"heyshoop"},"publisher":{"@type":"Person","name":"heyshoop"},"keywords":"JAVA, Java基础, Spring","articleSection":"JAVA"}</script>
   </head>
   <body>
-    <div id="root"><link rel="preload" as="image" href="/avatar.svg"/><link rel="preload" as="image" href="/media/content/covers/genji.jpg"/><div class="neural page-post"><header class="topbar"><a class="brand" href="/" aria-label="阿里孩舞 首页"><span class="brand-mark" aria-hidden="true"><img src="/avatar.svg" alt=""/></span><span class="brand-text">阿里孩舞<!-- --> <b>/ <!-- -->幂等了吗？</b><small>赛博炼丹与生活支线<!-- --> · <!-- -->AI alchemy, side quests and legacy code</small></span></a><nav aria-label="主导航"><a class="" href="/">首页<em>Home</em></a><a class="" href="/ai/">赛博炼丹<em>AI Alchemy</em></a><a class="" href="/life/">生活支线<em>Side Quest</em></a><a class="" href="/legacy/">古法编程<em>Legacy</em></a><a class="" href="/tags/">主题<em>Topics</em></a><a class="" href="/about/">关于<em>About</em></a></nav><div class="top-actions"><a class="pill ghost" href="/legacy/">古法编程 <em>Legacy</em></a></div></header><div class="page page-article"><header class="article-hero glass"><img class="article-cover" src="/media/content/covers/genji.jpg" alt="机械战士挥动绿色光刃的战斗插画"/><p class="eyebrow">古法编程<!-- --> <span>2022年2月22日<!-- --> · <!-- -->22<!-- --> 分钟 · <!-- -->JAVA</span></p><h1>Java 技术栈（基础篇）</h1><p class="article-description">Java 基础知识整理，涵盖基本类型与包装缓存、字符串、参数传递、常用关键字、Object 通用方法、继承与接口、反射、异常、泛型、注解及版本特性。</p></header><div class="article-layout"><article class="prose glass"><h1 id="一数据类型">一、数据类型</h1>
+    <div id="root"><link rel="preload" as="image" href="/avatar.svg"/><link rel="preload" as="image" href="/media/content/covers/genji.jpg"/><div class="neural page-post"><header class="topbar"><a class="brand" href="/" aria-label="阿里孩舞 首页"><span class="brand-mark" aria-hidden="true"><img src="/avatar.svg" alt=""/></span><span class="brand-text">阿里孩舞<!-- --> <b>/ <!-- -->幂等了吗？</b><small>赛博炼丹与生活支线<!-- --> · <!-- -->AI alchemy, side quests and legacy code</small></span></a><nav aria-label="主导航"><a class="" href="/">首页<em>Home</em></a><a class="" href="/ai/">赛博炼丹<em>AI Alchemy</em></a><a class="" href="/life/">生活支线<em>Side Quest</em></a><a class="" href="/legacy/">古法编程<em>Legacy</em></a><a class="" href="/tags/">主题<em>Topics</em></a><a class="" href="/about/">关于<em>About</em></a></nav><div class="top-actions"><a class="pill ghost" href="/legacy/">古法编程 <em>Legacy</em></a></div></header><div class="page page-article"><header class="article-hero glass"><img class="article-cover" src="/media/content/covers/genji.jpg" alt="机械战士挥动绿色光刃的战斗插画"/><p class="eyebrow">古法编程<!-- --> <span>2022年2月22日<!-- --> · <!-- -->22<!-- --> 分钟 · <!-- -->JAVA</span></p><h1>Java 技术栈（基础篇）</h1><p class="article-description">Java 基础知识整理，涵盖基本类型与包装缓存、字符串、参数传递、常用关键字、Object 通用方法、继承与接口、反射、异常、泛型、注解及版本特性。</p><p class="article-hint">文中配图可点击放大查看原始大小，再点一次缩回屏幕大小。</p></header><div class="article-layout"><article class="prose glass"><h1 id="一数据类型">一、数据类型</h1>
 <h2 id="基本类型">基本类型</h2>
 <ul>
 <li>byte/8</li>
@@ -139,7 +139,7 @@
 <p>因为 String 的 hash 值经常被使用，例如 String 用做 HashMap 的 key。不可变的特性可以使得 hash 值也不可变，因此只需要进行一次计算。</p>
 <h3 id="2-string-pool-的需要">2. String Pool 的需要</h3>
 <p>如果一个 String 对象已经被创建过了，那么就会从 String Pool 中取得引用。只有 String 是不可变的，才可能使用 String Pool。</p>
-<p><img src="/media/content/java-tech-stack-basics/202212281759661.png" alt=""></p>
+<p><img src="/media/content/java-tech-stack-basics/202212281759661.webp" alt=""></p>
 <h3 id="3-安全性">3. 安全性</h3>
 <p>String 经常作为参数，String 不可变性可以保证参数不可变。例如在作为网络连接参数的情况下如果 String 是可变的，那么在网络连接过程中，String 被改变，改变 String 的那一方以为现在连接的是其它主机，而实际情况却不一定是。</p>
 <h3 id="4-线程安全">4. 线程安全</h3>
@@ -983,7 +983,7 @@
 <li><strong>受检异常</strong>  ：需要用 try...catch... 语句捕获并进行处理，并且可以从异常中恢复；</li>
 <li><strong>非受检异常</strong>  ：是程序运行时错误，例如除 0 会引发 Arithmetic Exception，此时程序崩溃并且无法恢复。</li>
 </ul>
-<p><img src="/media/content/java-tech-stack-basics/202212281800996.png" alt=""></p>
+<p><img src="/media/content/java-tech-stack-basics/202212281800996.webp" alt=""></p>
 <ul>
 <li><a href="https://www.journaldev.com/2167/java-exception-interview-questions-and-answersl">Java Exception Interview Questions and Answers</a></li>
 <li><a href="https://www.cnblogs.com/Qian123/p/5715402.html">Java提高篇——Java 异常处理</a></li>
