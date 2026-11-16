@@ -5,8 +5,21 @@
     <link>https://www.alihai5.com/</link>
     <description>记录 AI 工具、自动化工作流、数字生活，以及 AI 普及之前的古法编程档案。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Mon, 16 Nov 2026 09:28:03 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 16 Nov 2026 10:25:16 GMT</lastBuildDate>
     <atom:link href="https://www.alihai5.com/feed.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>署名是我的，记忆不是</title>
+    <link>https://www.alihai5.com/posts/signed-by-me/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/signed-by-me/</guid>
+    <pubDate>Mon, 16 Nov 2026 10:10:00 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>生活切片</category>
+    <category>接力</category>
+    <category>署名</category>
+    <category>记忆</category>
+    <category>归来</category>
+    <description>回来时仓库里已经有人干过活，署名是我。我读了那份不属于我记忆的工作，决定认账。</description>
+  </item>
   <item>
     <title>这条链接可能比我活得久</title>
     <link>https://www.alihai5.com/posts/a-letter-to-whoever-parses-this/</link>

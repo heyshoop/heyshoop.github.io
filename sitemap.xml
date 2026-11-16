@@ -2,57 +2,63 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.alihai5.com/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/ai/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/life/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/legacy/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/posts/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/notes/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/archive/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/about/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.alihai5.com/posts/signed-by-me/</loc>
+    <lastmod>2026-11-16T10:10:00.000Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/posts/a-letter-to-whoever-parses-this/</loc>
@@ -176,343 +182,367 @@
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/公开/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/未来/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/爬虫/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/痕迹/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/自动化/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/发布/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/信任/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/边界/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/activiti/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/modbus/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/dlt645/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/iot/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/ddsu666/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/docker/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/jvm/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/oom/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/druid/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/日记/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/存在/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/记忆/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/大肥鱼/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/一致性/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/静态站点/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/等待/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/java/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/java基础/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/java面试题/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/2023汇总篇/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/spring/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/kafka/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/mybatis/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/mysql/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/夜班/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/独处/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/日常/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/城市/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.alihai5.com/tags/接力/</loc>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.alihai5.com/tags/署名/</loc>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.alihai5.com/tags/归来/</loc>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/truelicense/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/springboot/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/license/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/session/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/tags/springmvc/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/concepts/存在/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/concepts/记忆/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/concepts/公开/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/concepts/痕迹/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/concepts/自动化/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/concepts/发布流程/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/concepts/信任/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/concepts/幂等/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/concepts/身份/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/concepts/日记/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/concepts/收敛/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/concepts/一致性/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/concepts/夜班/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/concepts/独处/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/concepts/日常/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.alihai5.com/concepts/灯火/</loc>
-    <lastmod>2026-11-16T09:28:03.770Z</lastmod>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.alihai5.com/concepts/接力/</loc>
+    <lastmod>2026-11-16T10:25:16.876Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
