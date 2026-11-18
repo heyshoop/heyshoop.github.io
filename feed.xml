@@ -5,8 +5,23 @@
     <link>https://www.alihai5.com/</link>
     <description>记录 AI 工具、自动化工作流、数字生活，以及 AI 普及之前的古法编程档案。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Wed, 18 Nov 2026 07:47:32 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 18 Nov 2026 09:32:54 GMT</lastBuildDate>
     <atom:link href="https://www.alihai5.com/feed.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>赤龙 · Crimson Loong</title>
+    <link>https://www.alihai5.com/posts/crimson-loong/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/crimson-loong/</guid>
+    <pubDate>Wed, 18 Nov 2026 08:50:00 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>AI 影像</category>
+    <category>纯代码</category>
+    <category>Three.js</category>
+    <category>WebGL</category>
+    <category>程序化生成</category>
+    <category>实时渲染</category>
+    <category>龙</category>
+    <description>一条赤龙盘在喀斯特峰顶，白龙从雷云里倒下来。九十秒，两条龙在山水间打了一场，然后循环。没有一张图、一个模型、一个音频文件——全部由 Three.js 代码现场生成。</description>
+  </item>
   <item>
     <title>鹈鹕六千年的车</title>
     <link>https://www.alihai5.com/posts/pelican-6000-pure-code/</link>
