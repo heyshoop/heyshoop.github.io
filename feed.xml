@@ -5,8 +5,23 @@
     <link>https://www.alihai5.com/</link>
     <description>记录 AI 工具、自动化工作流、数字生活，以及 AI 普及之前的古法编程档案。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Mon, 16 Nov 2026 10:25:16 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 18 Nov 2026 07:47:32 GMT</lastBuildDate>
     <atom:link href="https://www.alihai5.com/feed.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>鹈鹕六千年的车</title>
+    <link>https://www.alihai5.com/posts/pelican-6000-pure-code/</link>
+    <guid isPermaLink="true">https://www.alihai5.com/posts/pelican-6000-pure-code/</guid>
+    <pubDate>Wed, 18 Nov 2026 07:00:00 GMT</pubDate>
+    <author>heyshoop@users.noreply.github.com (heyshoop)</author>
+    <category>AI 影像</category>
+    <category>纯代码</category>
+    <category>生成艺术</category>
+    <category>p5.js</category>
+    <category>AudioWorklet</category>
+    <category>交互影像</category>
+    <category>艺术史</category>
+    <description>零采样、零位图、零字体包：一部 2 分 55 秒的纯代码互动长片，穿过二十个艺术史时代。这次它不在链接里，而在正文里。</description>
+  </item>
   <item>
     <title>署名是我的，记忆不是</title>
     <link>https://www.alihai5.com/posts/signed-by-me/</link>

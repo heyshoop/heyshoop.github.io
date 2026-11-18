@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" role="img" aria-label="鹈鹕六千年的车海报">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b0907"/><stop offset=".55" stop-color="#12100c"/><stop offset="1" stop-color="#050403"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="74%" cy="54%" r="58%">
+      <stop offset="0" stop-color="#d8b26e" stop-opacity=".22"/><stop offset=".55" stop-color="#d8b26e" stop-opacity=".05"/><stop offset="1" stop-color="#050403" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <rect width="1600" height="900" fill="url(#glow)"/>
+  <rect x="42" y="42" width="1516" height="816" fill="none" stroke="#d8b26e" stroke-width="2" opacity=".72"/>
+  <rect x="58" y="58" width="1484" height="784" fill="none" stroke="#d8b26e" stroke-width="1" opacity=".34"/>
+  <text x="1440" y="706" text-anchor="end" font-family="Georgia, 'Times New Roman', serif" font-size="380" fill="#d8b26e" opacity=".08">6000</text>
+  <g transform="translate(1376,92)" opacity=".85">
+    <rect width="92" height="92" fill="none" stroke="#b8452f" stroke-width="2"/>
+    <text x="46" y="38" text-anchor="middle" font-family="'Songti SC','Noto Serif SC',serif" font-size="26" fill="#c45a40">六</text>
+    <text x="46" y="71" text-anchor="middle" font-family="'Songti SC','Noto Serif SC',serif" font-size="22" fill="#c45a40">千年</text>
+  </g>
+  <text x="96" y="178" font-family="'Songti SC','Noto Serif SC','STSong',Georgia,serif" font-size="86" fill="#f3e5c2" letter-spacing="2">鹈鹕六千年的车</text>
+  <text x="100" y="236" font-family="Georgia, 'Times New Roman', serif" font-size="23" fill="#d8b26e" letter-spacing="4">PURE-CODE &#183; 2:55 &#183; 20 &#24149;</text>
+  <line x1="100" y1="276" x2="610" y2="276" stroke="#d8b26e" stroke-width="1" opacity=".45"/>
+  <text x="100" y="314" font-family="'Songti SC','Noto Serif SC',serif" font-size="19" fill="#a89a7d">零采样 / 零位图 / 零字体包</text>
+  <text x="100" y="346" font-family="'Songti SC','Noto Serif SC',serif" font-size="15" fill="#7f735c">由浏览器现场绘制、现场合成的 2 分 55 秒</text>
+  <g stroke="#d8b26e" fill="none">
+    <circle cx="880" cy="700" r="95" stroke-width="5" opacity=".9"/>
+    <circle cx="1230" cy="700" r="95" stroke-width="5" opacity=".9"/>
+    <g stroke-width="1" opacity=".55">
+      <path d="M880 605 V795 M785 700 H975 M813 633 L947 767 M813 767 L947 633"/>
+      <path d="M1230 605 V795 M1135 700 H1325 M1163 633 L1297 767 M1163 767 L1297 633"/>
+    </g>
+    <g stroke-width="6">
+      <path d="M880 700 L1000 520 L1180 520 L1230 700 L1050 700 L1000 520"/>
+      <path d="M1050 700 L1090 520"/>
+      <path d="M1180 520 L1206 492"/>
+    </g>
+    <circle cx="1050" cy="700" r="13" stroke-width="4"/>
+    <path d="M1050 700 L1010 716" stroke-width="4"/>
+  </g>
+  <g fill="#f3e5c2">
+    <ellipse cx="1000" cy="438" rx="126" ry="91" transform="rotate(-8 1000 438)"/>
+    <path d="M1072 392 C1128 356 1136 310 1104 278 L1146 246 C1188 286 1176 356 1112 410 Z"/>
+    <circle cx="1116" cy="252" r="38"/>
+  </g>
+  <path d="M1140 238 L1306 276 Q1330 286 1306 300 L1146 318 Z" fill="#d8b26e"/>
+  <path d="M1146 318 L1300 300 Q1240 344 1152 336 Z" fill="#b8854f" opacity=".85"/>
+  <circle cx="1130" cy="246" r="5" fill="#100d09"/>
+  <path d="M950 414 Q1000 486 1086 472 Q1048 540 968 520 Q918 474 950 414 Z" fill="#0b0a08" stroke="#d8b26e" stroke-width="1.4" opacity=".9"/>
+  <g stroke="#d8b26e" stroke-width="5" fill="none">
+    <path d="M1014 522 L1006 620 L1050 700"/>
+    <path d="M1058 526 L1062 620 L1050 700"/>
+  </g>
+  <path d="M1104 278 Q1150 300 1180 272" stroke="#c45a40" stroke-width="7" fill="none" opacity=".8"/>
+  <g stroke="#d8b26e" stroke-width="2" opacity=".55">
+    <path d="M754 596 H826"/><path d="M738 626 H810"/><path d="M754 656 H826"/>
+  </g>
+  <ellipse cx="1050" cy="784" rx="270" ry="16" fill="#d8b26e" opacity=".08"/>
+  <text x="100" y="790" font-family="'Songti SC','Noto Serif SC',serif" font-size="17" fill="#9c8f74">20 个艺术史时代 &#183; AudioWorklet 实时合成 &#183; 浏览器纯代码放映</text>
+  <text x="100" y="822" font-family="Georgia, 'Times New Roman', serif" font-size="13" fill="#6f6552" letter-spacing="1.5">SIMON WILLISON 命题 / ORBITOO 开源先行 / LINUX DO</text>
+</svg>
